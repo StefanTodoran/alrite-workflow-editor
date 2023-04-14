@@ -1,0 +1,67 @@
+body {
+  font-family: 'Poppins', sans-serif;
+  --alrite-green: #6FC387;
+  --light-green: #ECF4EE;
+  --light-border: #E2E2E2;
+  --light-background: #FBFBFB;
+  --near-black: #262626;
+  
+  margin: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  overflow-y: scroll;
+}
+
+.page-card {
+  background-color: var(--light-background);
+  border: 3px solid var(--light-border);
+  border-radius: 5px;
+  padding: 10px 10px;
+  color: var(--near-black);
+
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+
+  flex-basis: 300px;
+  flex-grow: 0;
+  flex-shrink: 0;
+  margin: 10px 10px;
+}
+
+.page-card.selected {
+  background-color: var(--light-green);
+  border: 3px solid var(--alrite-green);
+  flex-basis: 450px;
+}
+
+.page-card > h1 {
+  font-weight: 400;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.card-buttons-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-button {
+  width: 30px;
+  height: 30px;
+  margin-left: 5px;
+  transition: opacity 0.5s ease;
+}
+
+.page-card.selected .card-button > circle {
+  fill: var(--near-black)
+}
+
+.card-button:hover {
+  cursor: pointer;
+  opacity: 0.5;
+}
