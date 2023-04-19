@@ -7,7 +7,9 @@
    * Initialization function that should handle anything that needs to occur on page load.
    */
   function init() {
-    console.log("test");
+    const dummyData = [
+      {}
+    ];
   }
   
 })();
