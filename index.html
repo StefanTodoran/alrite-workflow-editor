@@ -13,159 +13,12 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500&display=swap" rel="stylesheet">
 
-  <script src="src/index.js" type="text/javascript"></script>
+  <script src="lib/index.js" type="text/javascript"></script>
 </head>
 
 <body>
-  <!-- <div class="page-card">
+  <div class="page-card hidden" id="template-card">
     <h1></h1>
-    <div class="card-buttons-container">
-      <svg class="card-button" viewBox="0 0 25 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="12.5" cy="13" r="12.5" fill="#E2E2E2" />
-        <path d="M21 13.5L8 12.5L11 9.5L4 13.5L11 17.5L8 14.5L21 13.5Z" fill="white" stroke="white" stroke-width="2"
-          stroke-linejoin="round" />
-      </svg>
-      <svg class="card-button" viewBox="0 0 25 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="12.5" cy="13" r="12.5" fill="#E2E2E2" />
-        <path d="M4 13.5L17 12.5L14 9.5L21 13.5L14 17.5L17 14.5L4 13.5Z" fill="white" stroke="white" stroke-width="2"
-          stroke-linejoin="round" />
-      </svg>
-      <svg class="card-button" viewBox="0 0 25 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="12.5" cy="13" r="12.5" fill="#E2E2E2" />
-        <path d="M6 6.5L12.5 11.5L19 6.5L14 13L19 19.5L12.5 14.5L6 19.5L11 13L6 6.5Z" fill="white" stroke="white"
-          stroke-width="2" stroke-linejoin="round" />
-      </svg>
-    </div>
-  </div> -->
-
-  <div class="page-card">
-    <h1>Page 1</h1>
-    <div class="card-buttons-container">
-      <svg class="card-button" viewBox="0 0 25 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="12.5" cy="13" r="12.5" fill="#E2E2E2" />
-        <path d="M21 13.5L8 12.5L11 9.5L4 13.5L11 17.5L8 14.5L21 13.5Z" fill="white" stroke="white" stroke-width="2"
-          stroke-linejoin="round" />
-      </svg>
-      <svg class="card-button" viewBox="0 0 25 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="12.5" cy="13" r="12.5" fill="#E2E2E2" />
-        <path d="M4 13.5L17 12.5L14 9.5L21 13.5L14 17.5L17 14.5L4 13.5Z" fill="white" stroke="white" stroke-width="2"
-          stroke-linejoin="round" />
-      </svg>
-      <svg class="card-button" viewBox="0 0 25 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="12.5" cy="13" r="12.5" fill="#E2E2E2" />
-        <path d="M6 6.5L12.5 11.5L19 6.5L14 13L19 19.5L12.5 14.5L6 19.5L11 13L6 6.5Z" fill="white" stroke="white"
-          stroke-width="2" stroke-linejoin="round" />
-      </svg>
-    </div>
-  </div>
-
-  <div class="page-card">
-    <h1>Page 2</h1>
-    <div class="card-buttons-container">
-      <svg class="card-button" viewBox="0 0 25 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="12.5" cy="13" r="12.5" fill="#E2E2E2" />
-        <path d="M21 13.5L8 12.5L11 9.5L4 13.5L11 17.5L8 14.5L21 13.5Z" fill="white" stroke="white" stroke-width="2"
-          stroke-linejoin="round" />
-      </svg>
-      <svg class="card-button" viewBox="0 0 25 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="12.5" cy="13" r="12.5" fill="#E2E2E2" />
-        <path d="M4 13.5L17 12.5L14 9.5L21 13.5L14 17.5L17 14.5L4 13.5Z" fill="white" stroke="white" stroke-width="2"
-          stroke-linejoin="round" />
-      </svg>
-      <svg class="card-button" viewBox="0 0 25 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="12.5" cy="13" r="12.5" fill="#E2E2E2" />
-        <path d="M6 6.5L12.5 11.5L19 6.5L14 13L19 19.5L12.5 14.5L6 19.5L11 13L6 6.5Z" fill="white" stroke="white"
-          stroke-width="2" stroke-linejoin="round" />
-      </svg>
-    </div>
-  </div>
-
-  <div class="page-card selected">
-    <h1>Page 3</h1>
-    <div class="card-buttons-container">
-      <svg class="card-button" viewBox="0 0 25 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="12.5" cy="13" r="12.5" fill="#E2E2E2" />
-        <path d="M21 13.5L8 12.5L11 9.5L4 13.5L11 17.5L8 14.5L21 13.5Z" fill="white" stroke="white" stroke-width="2"
-          stroke-linejoin="round" />
-      </svg>
-      <svg class="card-button" viewBox="0 0 25 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="12.5" cy="13" r="12.5" fill="#E2E2E2" />
-        <path d="M4 13.5L17 12.5L14 9.5L21 13.5L14 17.5L17 14.5L4 13.5Z" fill="white" stroke="white" stroke-width="2"
-          stroke-linejoin="round" />
-      </svg>
-      <svg class="card-button" viewBox="0 0 25 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="12.5" cy="13" r="12.5" fill="#E2E2E2" />
-        <path d="M6 6.5L12.5 11.5L19 6.5L14 13L19 19.5L12.5 14.5L6 19.5L11 13L6 6.5Z" fill="white" stroke="white"
-          stroke-width="2" stroke-linejoin="round" />
-      </svg>
-    </div>
-  </div>
-
-  <div class="page-card">
-    <h1>Page 4</h1>
-    <div class="card-buttons-container">
-      <svg class="card-button" viewBox="0 0 25 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="12.5" cy="13" r="12.5" fill="#E2E2E2" />
-        <path d="M21 13.5L8 12.5L11 9.5L4 13.5L11 17.5L8 14.5L21 13.5Z" fill="white" stroke="white" stroke-width="2"
-          stroke-linejoin="round" />
-      </svg>
-      <svg class="card-button" viewBox="0 0 25 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="12.5" cy="13" r="12.5" fill="#E2E2E2" />
-        <path d="M4 13.5L17 12.5L14 9.5L21 13.5L14 17.5L17 14.5L4 13.5Z" fill="white" stroke="white" stroke-width="2"
-          stroke-linejoin="round" />
-      </svg>
-      <svg class="card-button" viewBox="0 0 25 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="12.5" cy="13" r="12.5" fill="#E2E2E2" />
-        <path d="M6 6.5L12.5 11.5L19 6.5L14 13L19 19.5L12.5 14.5L6 19.5L11 13L6 6.5Z" fill="white" stroke="white"
-          stroke-width="2" stroke-linejoin="round" />
-      </svg>
-    </div>
-  </div>
-
-  <div class="page-card">
-    <h1>Page 5</h1>
-    <div class="card-buttons-container">
-      <svg class="card-button" viewBox="0 0 25 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="12.5" cy="13" r="12.5" fill="#E2E2E2" />
-        <path d="M21 13.5L8 12.5L11 9.5L4 13.5L11 17.5L8 14.5L21 13.5Z" fill="white" stroke="white" stroke-width="2"
-          stroke-linejoin="round" />
-      </svg>
-      <svg class="card-button" viewBox="0 0 25 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="12.5" cy="13" r="12.5" fill="#E2E2E2" />
-        <path d="M4 13.5L17 12.5L14 9.5L21 13.5L14 17.5L17 14.5L4 13.5Z" fill="white" stroke="white" stroke-width="2"
-          stroke-linejoin="round" />
-      </svg>
-      <svg class="card-button" viewBox="0 0 25 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="12.5" cy="13" r="12.5" fill="#E2E2E2" />
-        <path d="M6 6.5L12.5 11.5L19 6.5L14 13L19 19.5L12.5 14.5L6 19.5L11 13L6 6.5Z" fill="white" stroke="white"
-          stroke-width="2" stroke-linejoin="round" />
-      </svg>
-    </div>
-  </div>
-
-  <div class="page-card">
-    <h1>Page 6</h1>
-    <div class="card-buttons-container">
-      <svg class="card-button" viewBox="0 0 25 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="12.5" cy="13" r="12.5" fill="#E2E2E2" />
-        <path d="M21 13.5L8 12.5L11 9.5L4 13.5L11 17.5L8 14.5L21 13.5Z" fill="white" stroke="white" stroke-width="2"
-          stroke-linejoin="round" />
-      </svg>
-      <svg class="card-button" viewBox="0 0 25 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="12.5" cy="13" r="12.5" fill="#E2E2E2" />
-        <path d="M4 13.5L17 12.5L14 9.5L21 13.5L14 17.5L17 14.5L4 13.5Z" fill="white" stroke="white" stroke-width="2"
-          stroke-linejoin="round" />
-      </svg>
-      <svg class="card-button" viewBox="0 0 25 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="12.5" cy="13" r="12.5" fill="#E2E2E2" />
-        <path d="M6 6.5L12.5 11.5L19 6.5L14 13L19 19.5L12.5 14.5L6 19.5L11 13L6 6.5Z" fill="white" stroke="white"
-          stroke-width="2" stroke-linejoin="round" />
-      </svg>
-    </div>
-  </div>
-
-  <div class="page-card">
-    <h1>Page 7</h1>
     <div class="card-buttons-container">
       <svg class="card-button" viewBox="0 0 25 26" fill="none" xmlns="http://www.w3.org/2000/svg">
         <circle cx="12.5" cy="13" r="12.5" fill="#E2E2E2" />
@@ -187,7 +40,7 @@
 
   <!-- I don't understand why but for some reason stupid flexbox
   ignores the last card's padding if we don't add this dummy element... -->
-  <div style="opacity: 0;">.</div>
+  <div style="opacity: 0;" id="last-position">.</div>
 </body>
 
 </html>

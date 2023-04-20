@@ -65,3 +65,7 @@ body {
   cursor: pointer;
   opacity: 0.5;
 }
+
+.hidden {
+  display: none;
+}
