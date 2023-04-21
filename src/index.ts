@@ -7,8 +7,6 @@ var selectedPage = null;
  * Initialization function that should handle anything that needs to occur on page load.
  */
 function init() {
-  console.log("INIT");
-
   const dummyData = [
     <Components.Page>{
       pageID: "page_1",
@@ -62,6 +60,7 @@ function addPageCard(id: string, title: string) {
   // Only this new card and the template will be hidden.
   const card: Element = document.querySelectorAll(".page-card.hidden")[1];
   card.querySelector("h1").textContent = title;
+  card.querySelector("h2").textContent = id;
   card.classList.remove("hidden");
   card.id = id;
 }
