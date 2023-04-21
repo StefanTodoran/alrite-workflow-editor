@@ -9,22 +9,24 @@ export module Components {
   }
   
   export interface MultipleChoice extends PageComponent {
+    valueID: string, //Unique id for the value of this page component
     text: string,
     choices: Choice[],
     multiselect: boolean,
   }
   
   export interface Choice {
+    valueID: string, //Unique id for the value of this page component
     text: string,
-    link: string, // The pageID this option links to if selected (not valid if parent has multiselect enabled)
-    valueID: string, // Unique identifier e.g. "option_A", will store boolean representing if selected
+    value: any,
+    //link: string, // The pageID this option links to if selected (not valid if parent has multiselect enabled)
   }
   
   export interface TextInput extends PageComponent {
+    valueID: string, //Unique id for the value of this page component
     text: string,
     type: string, // Type of input to accept, e.g. "numeric", "default"
     units?: string, // If provided, displayed next to the TextInput, e.g. "cm"
-    valueID: string, // Must be unique, used for identifying the value inputted
     defaultValue?: any, // Type depends on type property
   }
   
@@ -35,6 +37,7 @@ export module Components {
   }
   
   export interface Counter extends PageComponent {
+    valueID: string, //Unique id for the value of this page component
     title: string,
     hint?: string,
     timeLimit: number, // Given in seconds
@@ -54,6 +57,8 @@ export module Components {
     pageID: string, // Must be unique
     title: string,
     content: PageComponent[],
+    conditionalLinks: LogicComponent[],
+    defaultLink: string,
   }
   
   // ============== \\
@@ -61,22 +66,20 @@ export module Components {
   // ============== \\
   
   export interface LogicComponent {
-    // Only one of these should exist per page, used to do conditional
+    // Used to do conditional
     // logic based on some value input on the page.
   }
   
   export interface ComparisonLogic extends LogicComponent {
     type: string, // Valid types include ">", "<", ">=", "<=", "="
     valueID: string,
-    threshold: number,
-    satisfiedLink: string, // The pageIDs to link to given whether value satisfies the threshold given the comparison type
-    notSatisfiedLink: string,
+    threshold: any,
+    satisfiedLink: string, // The pageID to link to given whether value satisfies the threshold given the comparison type
   }
   
   export interface SelectionLogic extends LogicComponent {
     type: string, // Valid types include "all_selected", "at_least_one", "exactly_one", "none_selected"
     valueIDs: string[],
-    satisfiedLink: string, // The pageIDs to link to given whether value satisfies the boolean condition
-    notSatisfiedLink: string,
+    satisfiedLink: string, // The pageID to link to given whether value satisfies the threshold given the comparison type
   }
 }
