@@ -16,6 +16,9 @@ body {
 h1 {
   margin-top: 1vmin;
   margin-bottom: 0;
+  font-weight: 400;
+  margin: 0;
+  white-space: nowrap;
 }
 
 h2 {
@@ -38,21 +41,25 @@ h2 {
   align-items: center;
 
   flex-basis: 300px;
-  flex-grow: 0;
   flex-shrink: 0;
   margin: 10px 10px;
+  transition: flex-basis 0.5s ease, border 0.5s ease, background-color 0.5s ease;
+  animation: fade-in forwards 1s ease;
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 .page-card.selected {
   background-color: var(--light-green);
   border: 3px solid var(--alrite-green);
   flex-basis: 450px;
-}
-
-.page-card > h1 {
-  font-weight: 400;
-  margin: 0;
-  white-space: nowrap;
 }
 
 .card-buttons-container {
@@ -69,13 +76,36 @@ h2 {
   transition: opacity 0.5s ease;
 }
 
+.page-card .card-button > circle {
+  transition: fill 0.5s ease;
+}
 .page-card.selected .card-button > circle {
   fill: var(--near-black)
 }
 
-.card-button:hover {
+.card-button:hover:not(.disabled) {
   cursor: pointer;
   opacity: 0.5;
+}
+
+.page-card-label {
+  margin-right: 25px;
+  transition: margin 0.5s ease;
+}
+
+.selected > .page-card-label {
+  margin-right: 50px;
+}
+
+.disabled {
+  pointer-events: none;
+  opacity: 0.25;
+}
+
+#add-page-button {
+  padding-right: 10px;
+  cursor: pointer;
+  animation: fade-in forwards 0.5s ease;
 }
 
 .hidden {

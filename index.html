@@ -26,17 +26,23 @@
       <h2></h2>
     </div>
     <div class="card-buttons-container">
-      <svg class="card-button" viewBox="0 0 25 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg class="card-button move-left-button" viewBox="0 0 25 26" fill="none" xmlns="http://www.w3.org/2000/svg">
         <circle cx="12.5" cy="13" r="12.5" fill="#E2E2E2" />
         <path d="M21 13.5L8 12.5L11 9.5L4 13.5L11 17.5L8 14.5L21 13.5Z" fill="white" stroke="white" stroke-width="2"
           stroke-linejoin="round" />
       </svg>
-      <svg class="card-button" viewBox="0 0 25 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg class="card-button move-right-button" viewBox="0 0 25 26" fill="none" xmlns="http://www.w3.org/2000/svg">
         <circle cx="12.5" cy="13" r="12.5" fill="#E2E2E2" />
         <path d="M4 13.5L17 12.5L14 9.5L21 13.5L14 17.5L17 14.5L4 13.5Z" fill="white" stroke="white" stroke-width="2"
           stroke-linejoin="round" />
       </svg>
-      <svg class="card-button" viewBox="0 0 25 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg class="card-button edit-button" viewBox="0 0 25 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="12.5" cy="13" r="12.5" fill="#E2E2E2" />
+        <path fill-rule="evenodd" clip-rule="evenodd"
+          d="M19.4176 20.4167C21.597 18.235 19.2814 15.2352 17.1021 15.7806C16.6662 15.8897 16.5572 15.7806 16.2848 15.5079L10.4539 9.39719C10.1814 9.12448 10.1285 9.07145 10.1814 8.85177C10.6171 7.04507 9.40353 5.06759 6.85263 5.00014C6.53762 4.99181 6.39669 5.35924 6.61753 5.58427C7.68447 6.67142 8.3377 7.15223 7.86587 7.62457L6.63998 8.85177C6.16431 9.32795 5.75395 8.89048 4.60335 7.66388L4.59744 7.65759C4.37715 7.42275 3.9951 7.55021 4.00005 7.87232C4.03678 10.2615 5.89566 11.6629 7.86587 11.1698C8.08381 11.1153 8.13829 11.1698 8.41071 11.4425L14.5141 17.2805C14.7865 17.5532 14.8955 17.6623 14.7865 18.0986C14.2417 20.2803 17.2383 22.5984 19.4176 20.4167ZM16.6253 19.5304L16.2848 18.235L17.2383 17.2805L18.5323 17.6214L18.8728 18.9168L17.9193 19.8713L16.6253 19.5304Z"
+          fill="white" />
+      </svg>
+      <svg class="card-button delete-button" viewBox="0 0 25 26" fill="none" xmlns="http://www.w3.org/2000/svg">
         <circle cx="12.5" cy="13" r="12.5" fill="#E2E2E2" />
         <path d="M6 6.5L12.5 11.5L19 6.5L14 13L19 19.5L12.5 14.5L6 19.5L11 13L6 6.5Z" fill="white" stroke="white"
           stroke-width="2" stroke-linejoin="round" />
@@ -46,11 +52,12 @@
 
   <!-- I don't understand why but for some reason stupid flexbox
   ignores the last card's padding if we don't add this dummy element... -->
-  <div id="last-position">
-    <svg class="card-button" viewBox="0 0 25 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="12.5" cy="13" r="12.5" fill="#E2E2E2" />
-      <path d="M6 6.5L12.5 11.5L19 6.5L14 13L19 19.5L12.5 14.5L6 19.5L11 13L6 6.5Z" fill="white" stroke="white"
-        stroke-width="2" stroke-linejoin="round" />
+  <div id="add-page-button">
+    <svg width="50" height="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="25" cy="25" r="17.5" fill="#E2E2E2" />
+      <path
+        d="M24.5056 14.8081H26.1218L26.1218 24.5056H35.8193L35.8193 26.1218L26.1218 26.1218V35.8193H24.5056V26.1218L14.8081 26.1218L14.8081 24.5056L24.5056 24.5056L24.5056 14.8081Z"
+        fill="white" stroke="white" stroke-width="2" stroke-linejoin="round" />
     </svg>
   </div>
 </body>
