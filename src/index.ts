@@ -13,37 +13,17 @@ function init() {
   const dummyData = [
     <Components.Page>{
       pageID: "page_1",
-      title: "abc",
+      title: "First Page",
       content: [],
     },
     <Components.Page>{
       pageID: "page_2",
-      title: "long long name",
+      title: "Second Page",
       content: [],
     },
     <Components.Page>{
       pageID: "page_3",
-      title: "Page 3",
-      content: [],
-    },
-    <Components.Page>{
-      pageID: "page_4",
-      title: "Page 4",
-      content: [],
-    },
-    <Components.Page>{
-      pageID: "page_5",
-      title: "Page 5",
-      content: [],
-    },
-    <Components.Page>{
-      pageID: "page_6",
-      title: "Page 6",
-      content: [],
-    },
-    <Components.Page>{
-      pageID: "page_7",
-      title: "Page 7",
+      title: "Final Page",
       content: [],
     },
   ];
@@ -52,8 +32,8 @@ function init() {
     const page: Components.Page = dummyData[i];
     addPageCard(page.pageID, page.title);
   }
-  updatePageCardMoveButtons();
 
+  updatePageCardMoveButtons();
   document.getElementById("add-page-button").addEventListener("click", addNewPage);
 }
 
@@ -67,6 +47,9 @@ function addNewPage() {
   addPageCard(page.pageID, page.title);
   updatePageCardMoveButtons();
 
+  // selectedCard = null;
+  // updateSelectedCard();
+
   newPageIndex++;
   window.scrollTo({
     left: body.scrollWidth,
@@ -79,11 +62,8 @@ function addNewPage() {
 function addPageCard(id: string, title: string) {
   const addButton = document.getElementById("add-page-button");
   const template = document.getElementById("template-card");
-  const copy = template.cloneNode(true);
-  body.insertBefore(copy, addButton);
+  const card = template.cloneNode(true) as HTMLElement;
 
-  // Only this new card and the template will be hidden.
-  const card: Element = document.querySelectorAll(".page-card.hidden")[1];
   card.querySelector("h1").textContent = title;
   card.querySelector("h2").textContent = id;
   card.classList.remove("hidden");
@@ -106,6 +86,48 @@ function addPageCard(id: string, title: string) {
     body.insertBefore(card, card.nextSibling.nextSibling);
     updatePageCardMoveButtons();
   });
+
+  const deleteCard = card.querySelector(".delete-button");
+  deleteCard.addEventListener("click", () => {
+    if (window.confirm(`Are you sure you want to delete "${card.id}"?`)) {
+      body.removeChild(card);
+    }
+  });
+
+  const addComponent = card.querySelector(".add-component-button");
+  addComponent.addEventListener("click", () => {
+    const newComponent = document.getElementById("template-new-component").cloneNode(true) as HTMLElement;
+    newComponent.removeAttribute('id');
+    newComponent.classList.remove("hidden");
+
+    newComponent.querySelector(".create-component").addEventListener("click", () => {
+      const typeInput = <HTMLInputElement>newComponent.querySelector(".component-type")
+      addComponentToCard(typeInput.value, card, newComponent);
+    });
+
+    card.insertBefore(newComponent, addComponent);
+  });
+
+  body.insertBefore(card, addButton);
+}
+
+function addComponentToCard(type: string, card: HTMLElement, creator: HTMLElement) {
+  let template;
+  switch (type) {
+    case "TextInput":
+      template = document.getElementById("template-text-input-component");
+      break;
+      case "Button":
+      template = document.getElementById("template-button-component");
+      break;
+    default:
+      return;
+  }
+
+  const component = template.cloneNode(true) as HTMLElement;
+  component.classList.remove("hidden");
+  card.insertBefore(component, creator);
+  card.removeChild(creator)
 }
 
 // Updates the event listeners for ever page card, ensure the first page card 
@@ -131,16 +153,6 @@ function updatePageCardMoveButtons() {
   });
 }
 
-// Give a reference to a DOM element (specifically a page card),
-// creates a Page component for exporting purposes.
-function extractPageCard(card: HTMLElement) {
-  return <Components.Page>{
-    pageID: card.id,
-    title: card.querySelector("h1").textContent,
-    content: [] // TODO
-  };
-}
-
 // When a card is selected to edit, run this function
 // to update the css styles accordingly.
 function updateSelectedCard() {
@@ -149,4 +161,18 @@ function updateSelectedCard() {
 
   allCards.forEach(card => card.classList.remove("selected"));
   if (newSelected) newSelected.classList.add("selected");
+}
+
+// ==================== \\
+// EXTRACTION FUNCTIONS \\
+// ==================== \\
+
+// Give a reference to a DOM element (specifically a page card),
+// creates a Page component for exporting purposes.
+function extractPageCard(card: HTMLElement) {
+  return <Components.Page>{
+    pageID: card.id,
+    title: card.querySelector("h1").textContent,
+    content: [] // TODO
+  };
 }

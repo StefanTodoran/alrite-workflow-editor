@@ -9,22 +9,21 @@ export module Components {
   }
   
   export interface MultipleChoice extends PageComponent {
-    valueID: string, //Unique id for the value of this page component
+    valueID: string, // Unique id for the input value for this page component
     text: string,
     choices: Choice[],
     multiselect: boolean,
   }
   
   export interface Choice {
-    valueID: string, //Unique id for the value of this page component
+    valueID: string, // Unique id for the input value for this page component
     text: string,
     value: any,
-    //link: string, // The pageID this option links to if selected (not valid if parent has multiselect enabled)
   }
   
   export interface TextInput extends PageComponent {
-    valueID: string, //Unique id for the value of this page component
-    text: string,
+    valueID: string, // Unique id for the input value for this page component
+    label: string,
     type: string, // Type of input to accept, e.g. "numeric", "default"
     units?: string, // If provided, displayed next to the TextInput, e.g. "cm"
     defaultValue?: any, // Type depends on type property
@@ -37,7 +36,7 @@ export module Components {
   }
   
   export interface Counter extends PageComponent {
-    valueID: string, //Unique id for the value of this page component
+    valueID: string, // Unique id for the input value for this page component
     title: string,
     hint?: string,
     timeLimit: number, // Given in seconds
@@ -66,8 +65,8 @@ export module Components {
   // ============== \\
   
   export interface LogicComponent {
-    // Used to do conditional
-    // logic based on some value input on the page.
+    // Used to do conditional logic based 
+    // on some value input on the page.
   }
   
   export interface ComparisonLogic extends LogicComponent {
@@ -80,6 +79,6 @@ export module Components {
   export interface SelectionLogic extends LogicComponent {
     type: string, // Valid types include "all_selected", "at_least_one", "exactly_one", "none_selected"
     valueIDs: string[],
-    satisfiedLink: string, // The pageID to link to given whether value satisfies the threshold given the comparison type
+    satisfiedLink: string, // The pageID to link to given whether value satisfies the selection type
   }
 }
