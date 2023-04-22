@@ -116,6 +116,13 @@ function addPageCard(id: string, title: string) {
     card.insertBefore(newComponent, addComponent);
   });
 
+  card.querySelector("h1").addEventListener("keydown", (evt) => {
+    if (evt.key === "Enter") {
+      (document.activeElement as HTMLElement).blur();
+      evt.preventDefault();
+    }
+  });
+
   body.insertBefore(card, addButton);
 }
 

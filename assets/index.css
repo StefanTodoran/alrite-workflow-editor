@@ -12,7 +12,11 @@ body {
   overflow-y: scroll;
 }
 
-body, button, input, option, select {
+body,
+button,
+input,
+option,
+select {
   font-family: 'Poppins', sans-serif;
 }
 
@@ -20,9 +24,11 @@ h1,
 h2 {
   white-space: nowrap;
   margin: 0;
+  color: var(--near-black)
 }
 
 h1 {
+  font-size: 24px;
   font-weight: 400;
 }
 
@@ -30,7 +36,10 @@ h2 {
   font-weight: 300;
 }
 
-button, input, option, select {
+button,
+input,
+option,
+select {
   font-weight: 200;
 }
 
@@ -179,12 +188,19 @@ button, input, option, select {
   background-color: var(--alrite-green);
 }
 
-.add-component-button, .component-type {
+.add-component-button,
+.component-type {
   transition: opacity 0.5s ease;
 }
 
 .add-component-button {
   cursor: pointer;
+}
+
+.card-button>circle,
+.add-component-button circle,
+#add-page-button circle {
+  fill: var(--light-border);
 }
 
 #add-page-button {
@@ -206,6 +222,23 @@ button, input, option, select {
   fill: var(--alrite-green)
 }
 
+#dark-mode-button,
+#light-mode-button {
+  position: fixed;
+  bottom: 10px;
+  left: 10px;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  transition: transform 0.5s ease, opacity 0.5s ease;
+}
+
+#dark-mode-button:hover,
+#light-mode-button:hover {
+  transform: scale(0.95);
+  opacity: 0.75;
+}
+
 @keyframes fade-in {
   0% {
     opacity: 0;
@@ -218,4 +251,21 @@ button, input, option, select {
 
 .hidden {
   display: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: var(--near-black);
+
+    --light-green: #27442F;
+    --light-border: #545454;
+    --light-background: #7E7E7E;
+    --near-black: #262626;
+  }
+
+  h1,
+  h2,
+  .prop-input:before {
+    color: white
+  }
 }
