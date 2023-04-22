@@ -9,34 +9,58 @@ export module Components {
   }
   
   export interface MultipleChoice extends PageComponent {
-    valueID: string, // Unique id for the input value for this page component
-    text: string,
+    // Unique id for the input value for this page component
+    valueID: string, 
+
+    // A text label, generally a question prompt
+    label: string,
+
+    // A set of choices or answers for the question
     choices: Choice[],
+
+    // Whether the user can select multiple options
     multiselect: boolean,
   }
   
   export interface Choice {
-    valueID: string, // Unique id for the input value for this page component
+    // Unique id for the input value for this page component
+    valueID: string, 
+    
+    // The text this choice displays, e.g. "Option A"
     text: string,
+
+    // The value associated with selecting this choice (can be same or different to text)
+    // You might want this to be different if some logic is done based on this choice
     value: any,
   }
   
   export interface TextInput extends PageComponent {
-    valueID: string, // Unique id for the input value for this page component
+    // Unique id for the input value for this page component
+    valueID: string, 
+
+    // Text indicating what should be input
     label: string,
-    type: string, // Type of input to accept, e.g. "numeric", "default"
-    units?: string, // If provided, displayed next to the TextInput, e.g. "cm"
-    defaultValue?: any, // Type depends on type property
+
+    // Type of input to accept, e.g. "numeric", "alphanumeric", "default", "any"
+    // Default means alphabetical character input only, no numbers.
+    type: string, 
+    
+    units?: string, // If provided, displayed next to the TextInput, e.g. "cm" (optional)
+    defaultValue?: any, // The type of this depends on type property (optional)
   }
   
   export interface Button extends PageComponent {
-    text?: string, // Defaults to "skip"
-    hint?: string, // Displayed above button detailing when/why to skip
+    // The button's display text, defaults to "Next"
+    text?: string,
+
+    hint?: string, // Displayed above button detailing, when/why to skip (optional)
     link: string, // The pageID this button skips to if pressed
   }
   
   export interface Counter extends PageComponent {
-    valueID: string, // Unique id for the input value for this page component
+    // Unique id for the input value for this page component
+    valueID: string, 
+
     title: string,
     hint?: string,
     timeLimit: number, // Given in seconds
@@ -71,7 +95,7 @@ export module Components {
   
   export interface ComparisonLogic extends LogicComponent {
     type: string, // Valid types include ">", "<", ">=", "<=", "="
-    valueID: string,
+    valueID: string, // Value which is compared to the threshold
     threshold: any,
     satisfiedLink: string, // The pageID to link to given whether value satisfies the threshold given the comparison type
   }

@@ -63,9 +63,13 @@
 
   <!-- NEW PAGE COMPONENT -->
   <div class="card component-card hidden" id="template-new-component">
-    <input type="text" class="component-type">
+    <select class="component-type">
+      <option value="TextInput">Text Input</option>
+      <option value="Button">Button</option>
+      <option value="Comparison">Comparison Logic</option>
+    </select>
     <button class="create-component">Create</button>
-    <h2>Page Component</h2>
+    <h2>New Component</h2>
   </div>
 
   <!-- TEXT INPUT PAGE COMPONENT -->
@@ -75,13 +79,13 @@
 
     <div class="component-card-fields">
       <span class="prop-input" style="--label: 'label'">
-        <input type="text" class="prop-label" placeholder="Enter text">
+        <input type="text" class="prop-label" placeholder="Text input prompt">
       </span>
       <span class="prop-input" style="--label: 'type'">
-        <input type="text" class="prop-type" placeholder="Alphanumeric">
+        <input type="text" class="prop-type" placeholder="e.g. alphanumeric, numeric, default">
       </span>
       <span class="prop-input" style="--label: 'valueID'">
-        <input type="text" class="prop-valueID" placeholder="input_01">
+        <input type="text" class="prop-valueID" placeholder="Unique identifier, e.g. input_01">
       </span>
       <span class="prop-input optional" style="--label: 'units'">
         <input type="text" class="prop-units">
@@ -99,13 +103,34 @@
 
     <div class="component-card-fields">
       <span class="prop-input" style="--label: 'text'">
-        <input type="text" class="prop-text" placeholder="Skip">
+        <input type="text" class="prop-text" placeholder="Button text to display">
       </span>
       <span class="prop-input" style="--label: 'link'">
-        <input type="text" class="prop-link" placeholder="page_1">
+        <input type="text" class="prop-link" placeholder="Page ID to link to">
       </span>
       <span class="prop-input optional" style="--label: 'hint'">
         <input type="text" class="prop-hint">
+      </span>
+    </div>
+  </div>
+
+  <!-- COMPARISON LOGIC COMPONENT -->
+  <div class="card component-card hidden" id="template-comparison-component">
+    <h1>Comparison</h1>
+    <h2>Logic Component</h2>
+
+    <div class="component-card-fields">
+      <span class="prop-input" style="--label: 'type'">
+        <input type="text" class="prop-text" placeholder=">, <, >=, <=, or =">
+      </span>
+      <span class="prop-input" style="--label: 'threshold'">
+        <input type="text" class="prop-hint" placeholder="e.g. 1000">
+      </span>
+      <span class="prop-input" style="--label: 'valueID'">
+        <input type="text" class="prop-link" placeholder="Value ID to compare">
+      </span>
+      <span class="prop-input" style="--label: 'satisfiedLink'">
+        <input type="text" class="prop-link" placeholder="Page ID to link to">
       </span>
     </div>
   </div>

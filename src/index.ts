@@ -69,24 +69,29 @@ function addPageCard(id: string, title: string) {
   card.classList.remove("hidden");
   card.id = id;
 
+  // Edit card toggles where this card is selected.
+  // Only selected cards can have their components edited.
   const editCard = card.querySelector(".edit-button");
   editCard.addEventListener("click", () => {
     selectedCard = selectedCard === card.id ? null : card.id;
     updateSelectedCard();
   });
 
+  // These buttons are used to rearrange page cards, the order has no 
+  // semantic meaning since intra-page navigation is done via links,
+  // but this is useful for convenience of editing.
   const moveLeft = card.querySelector(".move-left-button");
+  const moveRight = card.querySelector(".move-right-button");
   moveLeft.addEventListener("click", () => {
     body.insertBefore(card, card.previousSibling);
     updatePageCardMoveButtons();
   });
-
-  const moveRight = card.querySelector(".move-right-button");
   moveRight.addEventListener("click", () => {
     body.insertBefore(card, card.nextSibling.nextSibling);
     updatePageCardMoveButtons();
   });
 
+  // Prompts the user to double check they want to delete, then deletes.
   const deleteCard = card.querySelector(".delete-button");
   deleteCard.addEventListener("click", () => {
     if (window.confirm(`Are you sure you want to delete "${card.id}"?`)) {
@@ -94,6 +99,9 @@ function addPageCard(id: string, title: string) {
     }
   });
 
+  // This button creates a new component card. When the user selects
+  // what type of component they want, that card is replaced by an empty
+  // card for that specific component type.
   const addComponent = card.querySelector(".add-component-button");
   addComponent.addEventListener("click", () => {
     const newComponent = document.getElementById("template-new-component").cloneNode(true) as HTMLElement;
@@ -111,14 +119,20 @@ function addPageCard(id: string, title: string) {
   body.insertBefore(card, addButton);
 }
 
+// Given a card, a component type, and the reference to the "new component" card
+// which triggered this function call, creates a new empty component card of the
+// specified type, then replaces the "new component" card with the empty component card.
 function addComponentToCard(type: string, card: HTMLElement, creator: HTMLElement) {
   let template;
   switch (type) {
     case "TextInput":
       template = document.getElementById("template-text-input-component");
       break;
-      case "Button":
+    case "Button":
       template = document.getElementById("template-button-component");
+      break;
+    case "Comparison":
+      template = document.getElementById("template-comparison-component");
       break;
     default:
       return;
