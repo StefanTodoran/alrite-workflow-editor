@@ -3,12 +3,13 @@ import { Components } from "./components";
 window.addEventListener("load", init);
 var body: HTMLElement = null;
 var selectedCard: string = null;
+var darkMode: boolean = false;
 
 /**
  * Initialization function that should handle anything that needs to occur on page load.
  */
 function init() {
-  body = document.querySelector("body");
+  body = document.querySelector("body"); // Just a nice shorthand to have
 
   const dummyData = [
     <Components.Page>{
@@ -35,6 +36,12 @@ function init() {
 
   updatePageCardMoveButtons();
   document.getElementById("add-page-button").addEventListener("click", addNewPage);
+
+  // Handling dark mode
+  darkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  document.getElementById("light-mode-button").addEventListener("click", toggleDarkMode);
+  document.getElementById("dark-mode-button").addEventListener("click", toggleDarkMode);
+  updateDarkMode();
 }
 
 let newPageIndex = 0;
@@ -178,6 +185,23 @@ function updateSelectedCard() {
 
   allCards.forEach(card => card.classList.remove("selected"));
   if (newSelected) newSelected.classList.add("selected");
+}
+
+function toggleDarkMode() {
+  darkMode = !darkMode;
+  updateDarkMode();
+}
+
+function updateDarkMode() {
+  if (darkMode) {
+    body.classList.add("darkMode");
+    document.getElementById("light-mode-button").classList.add("hidden");
+    document.getElementById("dark-mode-button").classList.remove("hidden");
+  } else {
+    body.classList.remove("darkMode");
+    document.getElementById("dark-mode-button").classList.add("hidden");
+    document.getElementById("light-mode-button").classList.remove("hidden");
+  }
 }
 
 // ==================== \\

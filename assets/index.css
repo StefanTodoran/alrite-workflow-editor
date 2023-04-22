@@ -10,6 +10,7 @@ body {
   flex-direction: row;
   align-items: center;
   overflow-y: scroll;
+  transition: background-color 0.5s ease;
 }
 
 body,
@@ -24,7 +25,8 @@ h1,
 h2 {
   white-space: nowrap;
   margin: 0;
-  color: var(--near-black)
+  color: var(--near-black);
+  transition: color 0.5s ease;
 }
 
 h1 {
@@ -164,6 +166,7 @@ select {
 .prop-input:before {
   content: var(--label) "*: ";
   opacity: 0.85;
+  transition: color 0.5s ease;
 }
 
 .prop-input.optional:before {
@@ -253,19 +256,17 @@ select {
   display: none;
 }
 
-@media (prefers-color-scheme: dark) {
-  body {
-    background-color: var(--near-black);
+body.darkMode {
+  background-color: var(--near-black);
 
-    --light-green: #27442F;
-    --light-border: #545454;
-    --light-background: #7E7E7E;
-    --near-black: #262626;
-  }
+  --light-green: #27442F;
+  --light-border: #545454;
+  --light-background: #7E7E7E;
+  --near-black: #262626;
+}
 
-  h1,
-  h2,
-  .prop-input:before {
-    color: white
-  }
+.darkMode h1,
+.darkMode h2,
+.darkMode .prop-input:before {
+  color: white
 }
