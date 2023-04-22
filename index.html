@@ -66,6 +66,7 @@
     <select class="component-type">
       <option value="TextInput">Text Input</option>
       <option value="Button">Button</option>
+      <option value="MediaItem">Media Item</option>
       <option value="Comparison">Comparison Logic</option>
     </select>
     <button class="create-component">Create</button>
@@ -110,6 +111,21 @@
       </span>
       <span class="prop-input optional" style="--label: 'hint'">
         <input type="text" class="prop-hint">
+      </span>
+    </div>
+  </div>
+
+  <!-- MEDIA ITEM PAGE COMPONENT -->
+  <div class="card component-card hidden" id="template-media-item-component">
+    <h1>Media Item</h1>
+    <h2>Page Component</h2>
+
+    <div class="component-card-fields">
+      <span class="prop-input" style="--label: 'fileName'">
+        <input type="text" class="prop-label" placeholder="e.g. chest_indrawing.mp4">
+      </span>
+      <span class="prop-input optional" style="--label: 'label'">
+        <input type="text" class="prop-units" placeholder="e.g. 'Example of chest indrawing.'">
       </span>
     </div>
   </div>

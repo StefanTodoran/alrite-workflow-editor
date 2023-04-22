@@ -123,21 +123,17 @@ function addPageCard(id: string, title: string) {
 // which triggered this function call, creates a new empty component card of the
 // specified type, then replaces the "new component" card with the empty component card.
 function addComponentToCard(type: string, card: HTMLElement, creator: HTMLElement) {
-  let template;
-  switch (type) {
-    case "TextInput":
-      template = document.getElementById("template-text-input-component");
-      break;
-    case "Button":
-      template = document.getElementById("template-button-component");
-      break;
-    case "Comparison":
-      template = document.getElementById("template-comparison-component");
-      break;
-    default:
-      return;
+  const templates: { [key: string]: string } = {
+    // Page Components
+    "TextInput": "template-text-input-component",
+    "Button": "template-button-component",
+    "MediaItem": "template-media-item-component",
+
+    // Logic Components
+    "Comparison": "template-comparison-component",
   }
 
+  const template = document.getElementById(templates[type]);
   const component = template.cloneNode(true) as HTMLElement;
   component.classList.remove("hidden");
   card.insertBefore(component, creator);

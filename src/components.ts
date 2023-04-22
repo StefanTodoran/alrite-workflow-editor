@@ -7,6 +7,11 @@ export module Components {
     // Represents any page component that has a 
     // visual element to display on the page.
   }
+
+  export interface MediaItem extends PageComponent {
+    fileName: string, // The file name of the image or video to display
+    label?: string, // Optional text to display underneatht the image or video
+  }
   
   export interface MultipleChoice extends PageComponent {
     // Unique id for the input value for this page component

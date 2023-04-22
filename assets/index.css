@@ -1,0 +1,221 @@
+body {
+  --alrite-green: #6FC387;
+  --light-green: #ECF4EE;
+  --light-border: #E2E2E2;
+  --light-background: #FBFBFB;
+  --near-black: #262626;
+
+  margin: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  overflow-y: scroll;
+}
+
+body, button, input, option, select {
+  font-family: 'Poppins', sans-serif;
+}
+
+h1,
+h2 {
+  white-space: nowrap;
+  margin: 0;
+}
+
+h1 {
+  font-weight: 400;
+}
+
+h2 {
+  font-weight: 300;
+}
+
+button, input, option, select {
+  font-weight: 200;
+}
+
+.page-card-label h2 {
+  font-size: 16px;
+  opacity: 0.5;
+}
+
+.component-card h1 {
+  font-size: 20px;
+  opacity: 0.85;
+}
+
+.component-card h2 {
+  font-size: 12px;
+  opacity: 0.35;
+}
+
+.component-card {
+  white-space: nowrap;
+  animation: fade-in forwards 1s ease;
+}
+
+.component-card-fields {
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  margin-top: 0;
+  transition: opacity 0.5s ease, max-height 0.5s ease, margin-top 0.5s ease;
+}
+
+.selected .component-card-fields {
+  opacity: 1;
+  max-height: 100vh;
+  margin-top: 10px;
+}
+
+.page-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+
+  padding: 10px 20px;
+  flex-basis: 300px;
+  flex-shrink: 0;
+  height: calc(100vh - 20px);
+  transition: flex-basis 0.5s ease;
+  animation: fade-in forwards 1s ease;
+}
+
+.page-card.selected {
+  flex-basis: 450px;
+}
+
+.card {
+  background-color: var(--light-background);
+  border: 3px solid var(--light-border);
+  border-radius: 10px;
+  padding: 15px 10px;
+  margin-bottom: 10px;
+  width: 100%;
+
+  color: var(--near-black);
+  transition: border 0.5s ease, background-color 0.5s ease;
+}
+
+.selected .card {
+  background-color: var(--light-green);
+  border: 3px solid var(--alrite-green);
+}
+
+.page-card-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-buttons-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-button {
+  width: 30px;
+  height: 30px;
+  margin-left: 5px;
+  cursor: pointer;
+  transition: opacity 0.5s ease;
+}
+
+.page-card.selected .card-button>circle {
+  fill: var(--near-black)
+}
+
+.page-card-label {
+  margin-right: 25px;
+  transition: margin 0.5s ease;
+}
+
+.selected>.page-card-label {
+  margin-right: 50px;
+}
+
+.disabled,
+.page-card:not(.selected) .add-component-button,
+.page-card:not(.selected) .component-type {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.prop-input {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin: 5px 5px;
+}
+
+.prop-input:before {
+  content: var(--label) "*: ";
+  opacity: 0.85;
+}
+
+.prop-input.optional:before {
+  content: var(--label) ": ";
+  opacity: 0.55;
+}
+
+.create-component {
+  border: none;
+  border-radius: 3px;
+  color: white;
+  transition: background-color 0.5s ease;
+  background-color: var(--light-border);
+}
+
+.selected .create-component {
+  background-color: var(--near-black);
+}
+
+.selected .create-component:hover {
+  cursor: pointer;
+  background-color: var(--alrite-green);
+}
+
+.add-component-button, .component-type {
+  transition: opacity 0.5s ease;
+}
+
+.add-component-button {
+  cursor: pointer;
+}
+
+#add-page-button {
+  cursor: pointer;
+  padding-left: 5vw;
+  padding-right: calc(5vw + 10px);
+  animation: fade-in forwards 0.5s ease;
+}
+
+#add-page-button circle,
+.page-card .card-button>circle,
+.add-component-button circle {
+  transition: fill 0.5s ease
+}
+
+#add-page-button:hover circle,
+.page-card .card-button:hover>circle,
+.add-component-button:hover circle {
+  fill: var(--alrite-green)
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+.hidden {
+  display: none;
+}
