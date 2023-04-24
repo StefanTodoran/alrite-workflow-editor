@@ -348,22 +348,41 @@ function drop(evt: any) {
 // ==================== \\
 
 function exportWorkflow() {
-  const cards = document.querySelectorAll(".page-card");
+  const cards = document.querySelectorAll(".page-card:not(.hidden)") as NodeListOf<HTMLElement>;
+  console.log("Starting workflow export...");
 
   for (let i = 0; i < cards.length; i++) {
     const card = cards[i];
-    const components = card.querySelectorAll(".component-card");
-
-
+    extractPageCard(card);
   }
 }
 
 // Give a reference to a DOM element (specifically a page card),
 // creates a Page component for exporting purposes.
-function extractPageCard(card: HTMLElement) {
-  return <Components.Page>{
+function extractPageCard(card: HTMLElement) : Components.Page {
+  const page = <Components.Page>{
     pageID: card.id,
     title: card.querySelector("h1").textContent,
-    content: [] // TODO
+    content: [],
   };
+
+  // All page and logic components have card and component-card
+  // class, subcomponents have sub-card and component-card class.
+  const components = card.querySelectorAll(".card.component-card");
+
+  components.forEach(component => {
+    // console.log(component.classList)
+
+    const container = component.querySelector(".component-card-fields");
+    const props = container.querySelectorAll(".prop-input");
+
+    props.forEach(prop => {
+      const input = prop.querySelector("input") || prop.querySelector("select");
+
+      console.log("\n\n", input.classList[0].slice(5));
+      console.log(input);
+    });
+  });
+
+  return page;
 }
