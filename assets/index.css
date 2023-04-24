@@ -119,6 +119,7 @@ select {
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+  cursor: pointer;
 }
 
 .card-buttons-container {
@@ -200,6 +201,15 @@ select {
   cursor: pointer;
 }
 
+/* .dragdrop {
+  background-color: var(--alrite-green);
+  opacity: 0.2;
+
+  width: 100%;
+  height: 15px;
+  flex-shrink: 0;
+} */
+
 .card-button>circle,
 .add-component-button circle,
 #add-page-button circle {
@@ -260,8 +270,8 @@ body.darkMode {
   background-color: var(--near-black);
 
   --light-green: #27442F;
-  --light-border: #545454;
-  --light-background: #7E7E7E;
+  --light-border: #7E7E7E;
+  --light-background: #545454;
   --near-black: #262626;
 }
 

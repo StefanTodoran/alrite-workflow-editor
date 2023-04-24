@@ -86,7 +86,6 @@ export module Components {
     title: string,
     content: PageComponent[],
     conditionalLinks: LogicComponent[],
-    defaultLink: string,
   }
   
   // ============== \\
@@ -103,6 +102,7 @@ export module Components {
     valueID: string, // Value which is compared to the threshold
     threshold: any,
     satisfiedLink: string, // The pageID to link to given whether value satisfies the threshold given the comparison type
+    notSatisfiedLink: string, // The pageID to link to given whether value satisfies the threshold given the comparison type
   }
   
   export interface SelectionLogic extends LogicComponent {

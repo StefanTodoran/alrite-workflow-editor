@@ -1,15 +1,16 @@
 import { Components } from "./components";
 
 window.addEventListener("load", init);
-var body: HTMLElement = null;
-var selectedCard: string = null;
+var body: HTMLElement = null; // Just a nice shorthand to have
+var selectedCard: string = null; // The currently selected page card
 var darkMode: boolean = false;
+var componentID = 0; // Used to ensure unique component ids in the HTML
 
 /**
  * Initialization function that should handle anything that needs to occur on page load.
  */
 function init() {
-  body = document.querySelector("body"); // Just a nice shorthand to have
+  body = document.querySelector("body");
 
   const dummyData = [
     <Components.Page>{
@@ -38,7 +39,7 @@ function init() {
   document.getElementById("add-page-button").addEventListener("click", addNewPage);
 
   // Handling dark mode
-  darkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  // darkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
   document.getElementById("light-mode-button").addEventListener("click", toggleDarkMode);
   document.getElementById("dark-mode-button").addEventListener("click", toggleDarkMode);
   updateDarkMode();
@@ -76,10 +77,8 @@ function addPageCard(id: string, title: string) {
   card.classList.remove("hidden");
   card.id = id;
 
-  // Edit card toggles where this card is selected.
   // Only selected cards can have their components edited.
-  const editCard = card.querySelector(".edit-button");
-  editCard.addEventListener("click", () => {
+  card.querySelector(".page-card-header").addEventListener("click", function () {
     selectedCard = selectedCard === card.id ? null : card.id;
     updateSelectedCard();
   });
@@ -89,26 +88,29 @@ function addPageCard(id: string, title: string) {
   // but this is useful for convenience of editing.
   const moveLeft = card.querySelector(".move-left-button");
   const moveRight = card.querySelector(".move-right-button");
-  moveLeft.addEventListener("click", () => {
+  moveLeft.addEventListener("click", function (evt) {
     body.insertBefore(card, card.previousSibling);
     updatePageCardMoveButtons();
+    evt.stopPropagation(); // Otherwise, click goes through to parent (the card header)
   });
-  moveRight.addEventListener("click", () => {
+  moveRight.addEventListener("click", function (evt) {
     body.insertBefore(card, card.nextSibling.nextSibling);
     updatePageCardMoveButtons();
+    evt.stopPropagation();
   });
 
   // Prompts the user to double check they want to delete, then deletes.
   const deleteCard = card.querySelector(".delete-button");
-  deleteCard.addEventListener("click", () => {
+  deleteCard.addEventListener("click", function (evt) {
     if (window.confirm(`Are you sure you want to delete "${card.id}"?`)) {
       body.removeChild(card);
     }
+    evt.stopPropagation();
   });
 
-  // This button creates a new component card. When the user selects
-  // what type of component they want, that card is replaced by an empty
-  // card for that specific component type.
+  // This button creates a new component card. When the user selects what type of
+  // component they want, that card is replaced by an empty card for that specific
+  // component type. We also increment the ID to ensure unique HTML IDs for each component.
   const addComponent = card.querySelector(".add-component-button");
   addComponent.addEventListener("click", () => {
     const newComponent = document.getElementById("template-new-component").cloneNode(true) as HTMLElement;
@@ -116,10 +118,14 @@ function addPageCard(id: string, title: string) {
     newComponent.classList.remove("hidden");
 
     newComponent.querySelector(".create-component").addEventListener("click", () => {
-      const typeInput = <HTMLInputElement>newComponent.querySelector(".component-type")
-      addComponentToCard(typeInput.value, card, newComponent);
+      const typeInput = <HTMLInputElement>newComponent.querySelector(".component-type");
+      addComponentToCard(typeInput.value, card, newComponent, componentID);
+
+      addComponent.classList.remove("disabled");
+      componentID++;
     });
 
+    addComponent.classList.add("disabled");
     card.insertBefore(newComponent, addComponent);
   });
 
@@ -136,7 +142,7 @@ function addPageCard(id: string, title: string) {
 // Given a card, a component type, and the reference to the "new component" card
 // which triggered this function call, creates a new empty component card of the
 // specified type, then replaces the "new component" card with the empty component card.
-function addComponentToCard(type: string, card: HTMLElement, creator: HTMLElement) {
+function addComponentToCard(type: string, card: HTMLElement, creator: HTMLElement, id: number) {
   const templates: { [key: string]: string } = {
     // Page Components
     "TextInput": "template-text-input-component",
@@ -150,6 +156,8 @@ function addComponentToCard(type: string, card: HTMLElement, creator: HTMLElemen
   const template = document.getElementById(templates[type]);
   const component = template.cloneNode(true) as HTMLElement;
   component.classList.remove("hidden");
+  component.id = `${card.id}.${type}.${id}`;
+
   card.insertBefore(component, creator);
   card.removeChild(creator)
 }
@@ -192,6 +200,9 @@ function toggleDarkMode() {
   updateDarkMode();
 }
 
+// This function updates the body's class. This affects page background, and since 
+// the body class also sets css variables contianing colors which all other components
+// use, it updates the entire page's styles. This function also swaps the buttons.
 function updateDarkMode() {
   if (darkMode) {
     body.classList.add("darkMode");
@@ -202,6 +213,35 @@ function updateDarkMode() {
     document.getElementById("dark-mode-button").classList.add("hidden");
     document.getElementById("light-mode-button").classList.remove("hidden");
   }
+}
+
+// ======================= \\
+// DRAG AND DROP FUNCTIONS \\
+// ======================= \\
+
+function allowDrop(evt: any) {
+  evt.preventDefault();
+}
+
+function drag(evt: any) { // Called on drag start
+  evt.dataTransfer.setData("component", evt.target.id);
+}
+
+function drop(evt: any) {
+  evt.preventDefault();
+  const id = evt.dataTransfer.getData("component");
+  const component = document.getElementById(id);
+
+  // The component we want to move the dragged component above
+  const targetComponent = evt.target.closest(".card.component-card");
+  const pageCard = targetComponent.parentNode;
+
+  // Update the id (in case we were dragged to a new page)
+  // We increment the global componentID to be certain we don't have duplicate ids
+  const parts = component.id.split(".");
+  component.id = `${pageCard.id}.${parts[1]}.${componentID++}`;
+
+  pageCard.insertBefore(component, targetComponent);
 }
 
 // ==================== \\
