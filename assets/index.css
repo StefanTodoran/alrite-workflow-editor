@@ -45,6 +45,23 @@ select {
   font-weight: 200;
 }
 
+button {
+  border: none;
+  border-radius: 3px;
+  color: white;
+  transition: background-color 0.5s ease;
+  background-color: var(--light-border);
+}
+
+.selected button {
+  background-color: var(--near-black);
+}
+
+.selected button:hover {
+  cursor: pointer;
+  background-color: var(--alrite-green);
+}
+
 .page-card-label h2 {
   font-size: 16px;
   opacity: 0.5;
@@ -144,8 +161,16 @@ select {
   transition: opacity 0.5s ease;
 }
 
-.page-card.selected .card-button>circle {
-  fill: var(--near-black)
+.add-subcomponent-button {
+  width: 35px;
+  height: 35px;
+  margin: 10px 0 10px 50%;
+  transform: translateX(-50%);
+  transition: opacity 0.5s ease, margin 0.5s ease;
+}
+
+.page-card:not(.selected) .add-subcomponent-button {
+  margin: 5px 0 5px 50%;
 }
 
 .page-card-label {
@@ -158,12 +183,14 @@ select {
 }
 
 .disabled,
-.page-card:not(.selected) .component-type {
+.page-card:not(.selected) .drop-down,
+.page-card:not(.selected) .drop-down {
   pointer-events: none;
   opacity: 0.5;
 }
 
 .page-card:not(.selected) .add-component-button,
+.page-card:not(.selected) .add-subcomponent-button,
 .page-card:not(.selected) .delete-component-button {
   pointer-events: none;
   opacity: 0.2;
@@ -187,45 +214,28 @@ select {
   opacity: 0.55;
 }
 
-.create-component {
-  border: none;
-  border-radius: 3px;
-  color: white;
-  transition: background-color 0.5s ease;
-  background-color: var(--light-border);
-}
-
-.selected .create-component {
-  background-color: var(--near-black);
-}
-
-.selected .create-component:hover {
-  cursor: pointer;
-  background-color: var(--alrite-green);
-}
-
 .add-component-button,
-.component-type {
+.drop-down {
   transition: opacity 0.5s ease;
 }
 
-.add-component-button {
+.add-component-button,
+.add-button {
   cursor: pointer;
 }
 
-/* .dragdrop {
-  background-color: var(--alrite-green);
-  opacity: 0.2;
+.card-subcomponents {
+  width: unset;
+  margin-top: 10px;
+  margin-bottom: 0;
+  padding: 0 10px;
+  display: flex;
+  flex-direction: column;
+}
 
-  width: 100%;
-  height: 15px;
-  flex-shrink: 0;
-} */
-
-.card-button>circle,
-.add-component-button circle,
-#add-page-button circle {
-  fill: var(--light-border);
+.sub-card {
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 #add-page-button {
@@ -235,15 +245,22 @@ select {
   animation: fade-in forwards 0.5s ease;
 }
 
-#add-page-button circle,
+.page-card.selected .card-button>circle {
+  fill: var(--near-black)
+}
+
+.card-button>circle,
+.add-button circle {
+  fill: var(--light-border);
+}
+
 .page-card .card-button>circle,
-.add-component-button circle {
+.add-button circle {
   transition: fill 0.5s ease
 }
 
-#add-page-button:hover circle,
 .page-card .card-button:hover>circle,
-.add-component-button:hover circle {
+.add-button:hover circle {
   fill: var(--alrite-green)
 }
 
@@ -260,8 +277,10 @@ select {
 }
 
 #export-button {
-  right: 60px; /* distance from edge to dark/light mode button + button size + margin */
+  right: 60px;
+  /* distance from edge to dark/light mode button + button size + margin */
 }
+
 .darkMode #export-button rect {
   fill: var(--light-background)
 }

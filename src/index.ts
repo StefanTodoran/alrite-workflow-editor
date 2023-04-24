@@ -6,6 +6,17 @@ var selectedCard: string = null; // The currently selected page card
 var darkMode: boolean = false;
 var componentID = 0; // Used to ensure unique component ids in the HTML
 
+var templates: { [key: string]: string } = {
+  // Page Components
+  "TextInput": "template-text-input-component",
+  "Button": "template-button-component",
+  "MediaItem": "template-media-item-component",
+  "MultipleChoice": "template-multiple-choice-component",
+
+  // Logic Components
+  "Comparison": "template-comparison-component",
+}
+
 /**
  * Initialization function that should handle anything that needs to occur on page load.
  */
@@ -55,9 +66,7 @@ function addNewPage() {
   };
   addPageCard(page.pageID, page.title);
   updatePageCardMoveButtons();
-
-  // selectedCard = null;
-  // updateSelectedCard();
+  updateAllDropDowns();
 
   newPageIndex++;
   window.scrollTo({
@@ -69,42 +78,49 @@ function addNewPage() {
 // Creates and adds a page card to the DOM, before the add button.
 // Populates it with the id and title and adds event listeners.
 function addPageCard(id: string, title: string) {
-  const addButton = document.getElementById("add-page-button");
-  const template = document.getElementById("template-card");
-  const card = template.cloneNode(true) as HTMLElement;
+  const card = getTemplateCopy("template-page-card");
+  card.id = id;
 
   card.querySelector("h1").textContent = title;
   card.querySelector("h2").textContent = id;
-  card.classList.remove("hidden");
-  card.id = id;
 
   // Only selected cards can have their components edited.
-  card.querySelector(".page-card-header").addEventListener("click", function () {
+  createButtonClickEvent(card, ".page-card-header", function () {
     selectedCard = selectedCard === card.id ? null : card.id;
     updateSelectedCard();
+  });
+
+  // We wish to avoid newlines in page titles, and we also
+  // select the card for convenience. Also we don't want click through.
+  card.querySelector("h1").addEventListener("keydown", (evt) => {
+    if (evt.key === "Enter") {
+      (document.activeElement as HTMLElement).blur();
+      selectedCard = card.id;
+      updateSelectedCard();
+      evt.preventDefault();
+    }
   });
 
   // These buttons are used to rearrange page cards, the order has no 
   // semantic meaning since intra-page navigation is done via links,
   // but this is useful for convenience of editing.
-  const moveLeft = card.querySelector(".move-left-button");
-  const moveRight = card.querySelector(".move-right-button");
-  moveLeft.addEventListener("click", function (evt) {
+  createButtonClickEvent(card, ".move-left-button", function (evt) {
     body.insertBefore(card, card.previousSibling);
     updatePageCardMoveButtons();
     evt.stopPropagation(); // Otherwise, click goes through to parent (the card header)
   });
-  moveRight.addEventListener("click", function (evt) {
+  createButtonClickEvent(card, ".move-right-button", function (evt) {
     body.insertBefore(card, card.nextSibling.nextSibling);
     updatePageCardMoveButtons();
     evt.stopPropagation();
   });
 
   // Prompts the user to double check they want to delete, then deletes.
-  const deleteCard = card.querySelector(".delete-button");
-  deleteCard.addEventListener("click", function (evt) {
+  createButtonClickEvent(card, ".delete-button", function (evt) {
     if (window.confirm(`Are you sure you want to delete "${card.id}"?`)) {
       body.removeChild(card);
+      updateAllDropDowns();
+      updatePageCardMoveButtons();
     }
     evt.stopPropagation();
   });
@@ -113,12 +129,10 @@ function addPageCard(id: string, title: string) {
   // component they want, that card is replaced by an empty card for that specific
   // component type. We also increment the ID to ensure unique HTML IDs for each component.
   const addComponent = card.querySelector(".add-component-button");
-  addComponent.addEventListener("click", () => {
-    const newComponent = document.getElementById("template-new-component").cloneNode(true) as HTMLElement;
-    newComponent.removeAttribute('id');
-    newComponent.classList.remove("hidden");
+  addComponent.addEventListener("click", function () {
+    const newComponent = getTemplateCopy("template-new-component");
 
-    newComponent.querySelector(".create-component").addEventListener("click", () => {
+    createButtonClickEvent(newComponent, ".create-component", function () {
       const typeInput = <HTMLInputElement>newComponent.querySelector(".component-type");
       addComponentToCard(typeInput.value, card, newComponent, componentID);
 
@@ -126,17 +140,11 @@ function addPageCard(id: string, title: string) {
       componentID++;
     });
 
-    addComponent.classList.add("disabled");
+    addComponent.classList.add("disabled"); // No new components until the current one is created.
     card.insertBefore(newComponent, addComponent);
   });
 
-  card.querySelector("h1").addEventListener("keydown", (evt) => {
-    if (evt.key === "Enter") {
-      (document.activeElement as HTMLElement).blur();
-      evt.preventDefault();
-    }
-  });
-
+  const addButton = document.getElementById("add-page-button");
   body.insertBefore(card, addButton);
 }
 
@@ -144,29 +152,50 @@ function addPageCard(id: string, title: string) {
 // which triggered this function call, creates a new empty component card of the
 // specified type, then replaces the "new component" card with the empty component card.
 function addComponentToCard(type: string, card: HTMLElement, creator: HTMLElement, id: number) {
-  const templates: { [key: string]: string } = {
-    // Page Components
-    "TextInput": "template-text-input-component",
-    "Button": "template-button-component",
-    "MediaItem": "template-media-item-component",
-
-    // Logic Components
-    "Comparison": "template-comparison-component",
-  }
-
-  const template = document.getElementById(templates[type]);
-  const component = template.cloneNode(true) as HTMLElement;
-  component.classList.remove("hidden");
+  const component = getTemplateCopy(templates[type]);
   component.id = `${card.id}.${type}.${id}`;
 
-  component.querySelector(".delete-component-button").addEventListener("click", () => {
+  createButtonClickEvent(component, ".delete-component-button", function () {
     if (window.confirm(`Are you sure you want to delete this "${type}" component?`)) {
       component.remove(); // We don't use card.removeChild() because the card parent can change!
     }
   });
 
+  const addButton = component.querySelector(".add-subcomponent-button");
+  if (addButton) {
+    addButton.addEventListener("click", () => {
+      const choice = getTemplateCopy("template-choice-component");
+      createButtonClickEvent(choice, ".delete-component-button", function () {
+        choice.remove();
+      });
+
+      const choiceDropdown = choice.querySelector(".drop-down") as HTMLSelectElement;
+      if (choiceDropdown) {
+        const ids = getAllPageIDs();
+        updateDropDown(choiceDropdown, ids);
+      }
+
+      component.querySelector(".card-subcomponents").insertBefore(choice, addButton);
+    });
+  }
+
+  const dropdowns = component.querySelectorAll(".drop-down") as NodeListOf<HTMLSelectElement>;
+  if (dropdowns) {
+    dropdowns.forEach(dropdown => {
+      const ids = getAllPageIDs();
+      updateDropDown(dropdown, ids);
+    });
+  }
+
   card.insertBefore(component, creator);
-  card.removeChild(creator)
+  card.removeChild(creator);
+}
+
+function updateAllDropDowns() {
+  const dropdowns = document.querySelectorAll(".drop-down") as NodeListOf<HTMLSelectElement>;
+  const ids = getAllPageIDs();
+
+  dropdowns.forEach(dropdown => updateDropDown(dropdown, ids));
 }
 
 // Updates the event listeners for ever page card, ensure the first page card 
@@ -222,6 +251,49 @@ function updateDarkMode() {
   }
 }
 
+// ================ \\
+// HELPER FUNCTIONS \\
+// ================ \\
+
+function getTemplateCopy(id: string) {
+  const template = document.getElementById(id);
+  const clone = template.cloneNode(true) as HTMLElement;
+  clone.removeAttribute('id');
+  clone.classList.remove("hidden");
+
+  return clone;
+}
+
+function createButtonClickEvent(container: HTMLElement, query: string, func: (evt: Event) => any) {
+  const button = container.querySelector(query) as HTMLElement;
+  button.addEventListener("click", func);
+}
+
+function getAllPageIDs() {
+  const ids: string[] = [];
+  const pages = document.querySelectorAll(".page-card:not(.hidden)");
+  pages.forEach(page => { ids.push(page.id); });
+  return ids;
+}
+
+function updateDropDown(dropdown: HTMLSelectElement, values: string[]) {
+  const previous = dropdown.value; // If this is not "", we want the value to persist
+
+  dropdown.innerHTML = "";
+  for (let i = 0; i < values.length; i++) {
+    const option = document.createElement("option");
+
+    option.value = values[i];
+    option.innerHTML = values[i];
+
+    dropdown.appendChild(option);
+  }
+
+  if (previous) {
+    dropdown.value = previous;
+  }
+}
+
 // ======================= \\
 // DRAG AND DROP FUNCTIONS \\
 // ======================= \\
@@ -256,11 +328,14 @@ function drop(evt: any) {
 // ==================== \\
 
 function exportWorkflow() {
-  // const cards = document.querySelectorAll(".page-card");
+  const cards = document.querySelectorAll(".page-card");
 
-  // for (let i = 0; i < cards.length; i++) {
-  //   //
-  // }
+  for (let i = 0; i < cards.length; i++) {
+    const card = cards[i];
+    const components = card.querySelectorAll(".component-card");
+
+
+  }
 }
 
 // Give a reference to a DOM element (specifically a page card),

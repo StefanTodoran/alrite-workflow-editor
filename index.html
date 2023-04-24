@@ -20,7 +20,7 @@
 </head>
 
 <body>
-  <section class="page-card hidden" id="template-card">
+  <section class="page-card hidden" id="template-page-card">
     <div class="card page-card-header">
       <div class="page-card-label">
         <h1 contenteditable="true" onclick="event.stopPropagation();"></h1>
@@ -45,8 +45,8 @@
       </div>
     </div>
 
-    <div class="add-component-button">
-      <svg width="50" height="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <div class="add-component-button add-button">
+      <svg width="40" height="40" viewBox="5 5 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
         <circle cx="25" cy="25" r="17.5" fill="#E2E2E2" />
         <path
           d="M24.5056 14.8081H26.1218L26.1218 24.5056H35.8193L35.8193 26.1218L26.1218 26.1218V35.8193H24.5056V26.1218L14.8081 26.1218L14.8081 24.5056L24.5056 24.5056L24.5056 14.8081Z"
@@ -58,10 +58,11 @@
   <!-- NEW PAGE COMPONENT -->
   <div class="card component-card hidden" id="template-new-component" ondrop="drop(event)"
     ondragover="allowDrop(event)">
-    <select class="component-type">
+    <select class="component-type drop-down">
       <option value="TextInput">Text Input</option>
       <option value="Button">Button</option>
       <option value="MediaItem">Media Item</option>
+      <option value="MultipleChoice">Multiple Choice</option>
       <option value="Comparison">Comparison Logic</option>
     </select>
     <button class="create-component">Create</button>
@@ -125,11 +126,15 @@
       <span class="prop-input" style="--label: 'text'">
         <input type="text" class="prop-text" placeholder="Button text to display">
       </span>
-      <span class="prop-input" style="--label: 'link'">
-        <input type="text" class="prop-link" placeholder="Page ID to link to">
-      </span>
       <span class="prop-input optional" style="--label: 'hint'">
         <input type="text" class="prop-hint">
+      </span>
+      <span class="prop-input" style="--label: 'link'">
+        <div>
+          <select class="prop-link drop-down">
+          </select>
+          <button>Goto</button>
+        </div>
       </span>
     </div>
   </div>
@@ -153,10 +158,84 @@
 
     <div class="component-card-fields">
       <span class="prop-input" style="--label: 'fileName'">
-        <input type="text" class="prop-label" placeholder="e.g. chest_indrawing.mp4">
+        <input type="text" class="prop-fileName" placeholder="e.g. chest_indrawing.mp4">
       </span>
       <span class="prop-input optional" style="--label: 'label'">
-        <input type="text" class="prop-units" placeholder="e.g. 'Example of chest indrawing.'">
+        <input type="text" class="prop-label" placeholder="e.g. 'Example of chest indrawing.'">
+      </span>
+    </div>
+  </div>
+
+  <!-- MULTIPLE CHOICE PAGE COMPONENT -->
+  <div class="card component-card hidden" id="template-multiple-choice-component" draggable="true"
+    ondragstart="drag(event)" ondrop="drop(event)" ondragover="allowDrop(event)">
+    <div class="component-card-header">
+      <div>
+        <h1>Multiple Choice</h1>
+        <h2>Page Component</h2>
+      </div>
+
+      <svg class="card-button delete-component-button" viewBox="0 0 25 26" fill="none"
+        xmlns="http://www.w3.org/2000/svg">
+        <circle cx="12.5" cy="13" r="12.5" />
+        <path d="M6 6.5L12.5 11.5L19 6.5L14 13L19 19.5L12.5 14.5L6 19.5L11 13L6 6.5Z" fill="white" stroke="white"
+          stroke-width="2" stroke-linejoin="round" />
+      </svg>
+    </div>
+
+    <div class="component-card-fields">
+      <span class="prop-input" style="--label: 'label'">
+        <input type="text" class="prop-label" placeholder="Question text prompt">
+      </span>
+      <span class="prop-input" style="--label: 'multiselect'">
+        <input type="text" class="prop-multiselect" placeholder="Either true or false">
+      </span>
+      <span class="prop-input" style="--label: 'valueID'">
+        <input type="text" class="prop-valueID" placeholder="Unique identifier, e.g. input_01">
+      </span>
+    </div>
+
+    <div class="card card-subcomponents">
+      <svg class="add-subcomponent-button card-button" viewBox="5 5 40 40" fill="none"
+        xmlns="http://www.w3.org/2000/svg">
+        <circle cx="25" cy="25" r="17.5" fill="#E2E2E2" />
+        <path
+          d="M24.5056 14.8081H26.1218L26.1218 24.5056H35.8193L35.8193 26.1218L26.1218 26.1218V35.8193H24.5056V26.1218L14.8081 26.1218L14.8081 24.5056L24.5056 24.5056L24.5056 14.8081Z"
+          fill="white" stroke="white" stroke-width="2" stroke-linejoin="round" />
+      </svg>
+    </div>
+  </div>
+
+  <!-- CHOICE COMPONENT -->
+  <div class="sub-card component-card hidden" id="template-choice-component">
+    <div class="component-card-header">
+      <div>
+        <h1>Choice</h1>
+        <h2>Subcomponent</h2>
+      </div>
+
+      <svg class="card-button delete-component-button" viewBox="0 0 25 26" fill="none"
+        xmlns="http://www.w3.org/2000/svg">
+        <circle cx="12.5" cy="13" r="12.5" />
+        <path d="M6 6.5L12.5 11.5L19 6.5L14 13L19 19.5L12.5 14.5L6 19.5L11 13L6 6.5Z" fill="white" stroke="white"
+          stroke-width="2" stroke-linejoin="round" />
+      </svg>
+    </div>
+
+    <div class="component-card-fields">
+      <span class="prop-input" style="--label: 'text'">
+        <input type="text" class="prop-text" placeholder="Text this choice displays">
+      </span>
+      <span class="prop-input" style="--label: 'value'">
+        <input type="text" class="prop-value" placeholder="Value this choice corresponds to">
+      </span>
+      <!-- TODO: make this not visible if parent is multiselect! -->
+      <span class="prop-input" style="--label: 'link'">
+        <div>
+          <select class="prop-link drop-down">
+          </select>
+          <button>Goto</button>
+        </div>
       </span>
     </div>
   </div>
@@ -180,25 +259,33 @@
 
     <div class="component-card-fields">
       <span class="prop-input" style="--label: 'type'">
-        <input type="text" class="prop-text" placeholder=">, <, >=, <=, or =">
+        <input type="text" class="prop-type" placeholder=">, <, >=, <=, or =">
       </span>
       <span class="prop-input" style="--label: 'threshold'">
-        <input type="text" class="prop-hint" placeholder="e.g. 1000">
+        <input type="text" class="prop-threshold" placeholder="e.g. 1000">
       </span>
       <span class="prop-input" style="--label: 'valueID'">
-        <input type="text" class="prop-link" placeholder="Value ID to compare">
+        <input type="text" class="prop-valueID" placeholder="Value ID to compare">
       </span>
       <span class="prop-input" style="--label: 'satisfiedLink'">
-        <input type="text" class="prop-link" placeholder="Page ID to link to if value satisfies">
+        <div>
+          <select class="prop-satisfiedLink drop-down">
+          </select>
+          <button>Goto</button>
+        </div>
       </span>
       <span class="prop-input" style="--label: 'notSatisfiedLink'">
-        <input type="text" class="prop-link" placeholder="Page ID to link to otherwise">
+        <div>
+          <select class="prop-notSatisfiedLink drop-down">
+          </select>
+          <button>Goto</button>
+        </div>
       </span>
     </div>
   </div>
 
-  <div id="add-page-button">
-    <svg width="50" height="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <div id="add-page-button" class="add-button">
+    <svg width="55" height="55" viewBox="5 5 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
       <circle cx="25" cy="25" r="17.5" fill="#E2E2E2" />
       <path
         d="M24.5056 14.8081H26.1218L26.1218 24.5056H35.8193L35.8193 26.1218L26.1218 26.1218V35.8193H24.5056V26.1218L14.8081 26.1218L14.8081 24.5056L24.5056 24.5056L24.5056 14.8081Z"
@@ -238,10 +325,10 @@
 
   <!-- EXPORT BUTTON -->
   <svg id="export-button" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect width="100" height="100" rx="10" fill="#E2E2E2"/>
+    <rect width="100" height="100" rx="10" fill="#E2E2E2" />
     <circle cx="68.3501" cy="65.8" r="24.65" fill="#6FC387" />
-    <path d="M51.35 66.225L76.7 64.2063L70.85 58.15L84.5 66.225L70.85 74.3L76.7 68.2438L51.35 66.225Z" fill="white"
-      stroke="white" stroke-width="4" stroke-linejoin="round" />
+    <path d="M51.35 66.225L76.7 64.2063L70.85 58.15L84.5 66.225L70.85 74.3L76.7 68.2438L51.35 66.225Z" fill="#ECF4EE"
+      stroke="#ECF4EE" stroke-width="4" stroke-linejoin="round" />
     <path fill-rule="evenodd" clip-rule="evenodd"
       d="M48.375 8C53.0858 8 57.6082 8.80678 61.8115 10.2897C61.9297 10.3314 62.0477 10.3737 62.1654 10.4164C77.1434 15.8592 87.9879 29.9146 88.7115 46.5951C87.0755 44.7062 85.1914 43.038 83.1099 41.6412C81.1136 31.2827 74.5988 22.5331 65.6976 17.5243C68.4587 23.8718 70.3054 30.4491 71.2578 37.1495C70.0286 36.985 68.7743 36.9 67.5 36.9C67.0538 36.9 66.6101 36.9104 66.1689 36.931C64.9666 29.2054 62.4891 21.6801 58.7157 14.5353C55.4448 13.537 51.9726 13 48.375 13C28.8379 13 13 28.8379 13 48.375C13 52.2077 13.6095 55.898 14.7369 59.3543C22.2188 62.956 30.444 65.5181 39.4914 66.4853C39.5856 68.2319 39.8396 69.936 40.239 71.5832C32.1912 70.8544 24.7186 68.9409 17.7904 66.1621C23.6485 76.2133 34.3194 83.1149 46.6449 83.7084C48.317 85.5663 50.2338 87.1995 52.3446 88.5573C51.0386 88.6848 49.7144 88.75 48.375 88.75C31.21 88.75 16.5469 78.0385 10.7052 62.9352L10.6954 62.9101C8.95451 58.4 8 53.499 8 48.375C8 26.0765 26.0765 8 48.375 8Z"
       fill="#6FC387" />
@@ -249,7 +336,6 @@
       d="M45.875 9.27501V24.735C41.3744 24.982 37.1461 25.473 33.0319 26.2781C34.3116 21.9243 35.9427 17.5926 37.9009 13.2845L33.3491 11.2155C30.8933 16.6183 28.9228 22.0741 27.4842 27.5754C21.9384 29.0907 16.472 31.2568 10.6764 34.2545L12.9736 38.6956C17.5368 36.3353 21.8686 34.5234 26.2114 33.1592C25.3926 37.374 24.8918 41.6137 24.7295 45.875H10.125V50.875H24.6953C24.9762 62.3209 27.7378 73.9126 33.3736 85.5869L37.8764 83.4131C32.5908 72.4644 29.9796 61.612 29.6972 50.875H43.2316C45.1717 47.5371 47.7807 44.6361 50.875 42.3554V29.7968C66.1714 30.9312 73.2388 33.6083 84.2972 38.7425L86.4028 34.2075C74.8241 28.8317 67.1509 25.9571 50.875 24.7836V9.27501H45.875ZM31.6269 31.6881C36.168 30.6432 40.8281 30.0319 45.875 29.7428V45.875H29.7331C29.9256 41.1221 30.567 36.3926 31.6269 31.6881Z"
       fill="#6FC387" />
   </svg>
-
 
 </body>
 
