@@ -56,7 +56,8 @@
   </section>
 
   <!-- NEW PAGE COMPONENT -->
-  <div class="card component-card hidden" id="template-new-component" ondrop="drop(event)" ondragover="allowDrop(event)">
+  <div class="card component-card hidden" id="template-new-component" ondrop="drop(event)"
+    ondragover="allowDrop(event)">
     <select class="component-type">
       <option value="TextInput">Text Input</option>
       <option value="Button">Button</option>
@@ -70,8 +71,19 @@
   <!-- TEXT INPUT PAGE COMPONENT -->
   <div class="card component-card hidden" id="template-text-input-component" draggable="true" ondragstart="drag(event)"
     ondrop="drop(event)" ondragover="allowDrop(event)">
-    <h1>Text Input</h1>
-    <h2>Page Component</h2>
+    <div class="component-card-header">
+      <div>
+        <h1>Text Input</h1>
+        <h2>Page Component</h2>
+      </div>
+
+      <svg class="card-button delete-component-button" viewBox="0 0 25 26" fill="none"
+        xmlns="http://www.w3.org/2000/svg">
+        <circle cx="12.5" cy="13" r="12.5" />
+        <path d="M6 6.5L12.5 11.5L19 6.5L14 13L19 19.5L12.5 14.5L6 19.5L11 13L6 6.5Z" fill="white" stroke="white"
+          stroke-width="2" stroke-linejoin="round" />
+      </svg>
+    </div>
 
     <div class="component-card-fields">
       <span class="prop-input" style="--label: 'label'">
@@ -95,8 +107,19 @@
   <!-- BUTTON PAGE COMPONENT -->
   <div class="card component-card hidden" id="template-button-component" draggable="true" ondragstart="drag(event)"
     ondrop="drop(event)" ondragover="allowDrop(event)">
-    <h1>Button</h1>
-    <h2>Page Component</h2>
+    <div class="component-card-header">
+      <div>
+        <h1>Button</h1>
+        <h2>Page Component</h2>
+      </div>
+
+      <svg class="card-button delete-component-button" viewBox="0 0 25 26" fill="none"
+        xmlns="http://www.w3.org/2000/svg">
+        <circle cx="12.5" cy="13" r="12.5" />
+        <path d="M6 6.5L12.5 11.5L19 6.5L14 13L19 19.5L12.5 14.5L6 19.5L11 13L6 6.5Z" fill="white" stroke="white"
+          stroke-width="2" stroke-linejoin="round" />
+      </svg>
+    </div>
 
     <div class="component-card-fields">
       <span class="prop-input" style="--label: 'text'">
@@ -114,8 +137,19 @@
   <!-- MEDIA ITEM PAGE COMPONENT -->
   <div class="card component-card hidden" id="template-media-item-component" draggable="true" ondragstart="drag(event)"
     ondrop="drop(event)" ondragover="allowDrop(event)">
-    <h1>Media Item</h1>
-    <h2>Page Component</h2>
+    <div class="component-card-header">
+      <div>
+        <h1>Media Item</h1>
+        <h2>Page Component</h2>
+      </div>
+
+      <svg class="card-button delete-component-button" viewBox="0 0 25 26" fill="none"
+        xmlns="http://www.w3.org/2000/svg">
+        <circle cx="12.5" cy="13" r="12.5" />
+        <path d="M6 6.5L12.5 11.5L19 6.5L14 13L19 19.5L12.5 14.5L6 19.5L11 13L6 6.5Z" fill="white" stroke="white"
+          stroke-width="2" stroke-linejoin="round" />
+      </svg>
+    </div>
 
     <div class="component-card-fields">
       <span class="prop-input" style="--label: 'fileName'">
@@ -130,8 +164,19 @@
   <!-- COMPARISON LOGIC COMPONENT -->
   <div class="card component-card hidden" id="template-comparison-component" draggable="true" ondragstart="drag(event)"
     ondrop="drop(event)" ondragover="allowDrop(event)">
-    <h1>Comparison</h1>
-    <h2>Logic Component</h2>
+    <div class="component-card-header">
+      <div>
+        <h1>Comparison</h1>
+        <h2>Logic Component</h2>
+      </div>
+
+      <svg class="card-button delete-component-button" viewBox="0 0 25 26" fill="none"
+        xmlns="http://www.w3.org/2000/svg">
+        <circle cx="12.5" cy="13" r="12.5" />
+        <path d="M6 6.5L12.5 11.5L19 6.5L14 13L19 19.5L12.5 14.5L6 19.5L11 13L6 6.5Z" fill="white" stroke="white"
+          stroke-width="2" stroke-linejoin="round" />
+      </svg>
+    </div>
 
     <div class="component-card-fields">
       <span class="prop-input" style="--label: 'type'">
@@ -163,7 +208,7 @@
 
   <!-- DARK MODE BUTTON -->
   <svg id="dark-mode-button" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect width="100" height="100" rx="10" fill="#161616" />
+    <rect width="100" height="100" rx="10" fill="#545454" />
     <path opacity="0.5"
       d="M26.9449 88C29.7367 88 32 85.6228 32 82.6905C32 81.0602 31.3004 79.6015 30.1994 78.6275C30.2432 73.6227 22.8649 70.0284 18.652 73.2256C17.6096 72.4535 16.338 72 14.9655 72C11.4287 72 8.56158 75.0114 8.56158 78.7262C8.56158 78.8761 8.56625 79.0249 8.57544 79.1724C7.05347 79.9251 6 81.5506 6 83.4345C6 85.56 7.34093 87.3565 9.18272 87.9418L26.9449 88Z"
       fill="#6FC387" />
@@ -184,12 +229,27 @@
 
   <!-- LIGHT MODE BUTTON -->
   <svg id="light-mode-button" class="hidden" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect width="100" height="100" rx="10" fill="#EEEEEE" />
+    <rect width="100" height="100" rx="10" fill="#E2E2E2" />
     <circle cx="50" cy="50" r="31" fill="#6FC387" />
     <path
       d="M88 51.5H94C94.8284 51.5 95.5 50.8284 95.5 50C95.5 49.1716 94.8284 48.5 94 48.5H88C87.1716 48.5 86.5 49.1716 86.5 50C86.5 50.8284 87.1716 51.5 88 51.5ZM79.4749 22.7175L83.7175 18.4749C84.3033 17.8891 84.3033 16.9393 83.7175 16.3536C83.1317 15.7678 82.182 15.7678 81.5962 16.3536L77.3536 20.5962C76.7678 21.182 76.7678 22.1317 77.3536 22.7175C77.9393 23.3033 78.8891 23.3033 79.4749 22.7175ZM51.5 12V6C51.5 5.17157 50.8284 4.5 50 4.5C49.1716 4.5 48.5 5.17157 48.5 6V12C48.5 12.8284 49.1716 13.5 50 13.5C50.8284 13.5 51.5 12.8284 51.5 12ZM12 48.5H6C5.17157 48.5 4.5 49.1716 4.5 50C4.5 50.8284 5.17157 51.5 6 51.5H12C12.8284 51.5 13.5 50.8284 13.5 50C13.5 49.1716 12.8284 48.5 12 48.5ZM20.5251 77.2825L16.2825 81.5251C15.6967 82.1109 15.6967 83.0607 16.2825 83.6464C16.8683 84.2322 17.818 84.2322 18.4038 83.6464L22.6464 79.4038C23.2322 78.818 23.2322 77.8683 22.6464 77.2825C22.0607 76.6967 21.1109 76.6967 20.5251 77.2825ZM83.7175 81.5251L79.4749 77.2825C78.8891 76.6967 77.9393 76.6967 77.3536 77.2825C76.7678 77.8683 76.7678 78.818 77.3536 79.4038L81.5962 83.6464C82.182 84.2322 83.1317 84.2322 83.7175 83.6464C84.3033 83.0607 84.3033 82.1109 83.7175 81.5251ZM16.2825 18.4749L20.5251 22.7175C21.1109 23.3033 22.0607 23.3033 22.6464 22.7175C23.2322 22.1317 23.2322 21.182 22.6464 20.5962L18.4038 16.3536C17.818 15.7678 16.8683 15.7678 16.2825 16.3536C15.6967 16.9393 15.6967 17.8891 16.2825 18.4749ZM48.5 88V94C48.5 94.8284 49.1716 95.5 50 95.5C50.8284 95.5 51.5 94.8284 51.5 94V88C51.5 87.1716 50.8284 86.5 50 86.5C49.1716 86.5 48.5 87.1716 48.5 88Z"
       fill="#6FC387" stroke="#6FC387" stroke-linejoin="round" />
   </svg>
+
+  <!-- EXPORT BUTTON -->
+  <svg id="export-button" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="100" height="100" rx="10" fill="#E2E2E2"/>
+    <circle cx="68.3501" cy="65.8" r="24.65" fill="#6FC387" />
+    <path d="M51.35 66.225L76.7 64.2063L70.85 58.15L84.5 66.225L70.85 74.3L76.7 68.2438L51.35 66.225Z" fill="white"
+      stroke="white" stroke-width="4" stroke-linejoin="round" />
+    <path fill-rule="evenodd" clip-rule="evenodd"
+      d="M48.375 8C53.0858 8 57.6082 8.80678 61.8115 10.2897C61.9297 10.3314 62.0477 10.3737 62.1654 10.4164C77.1434 15.8592 87.9879 29.9146 88.7115 46.5951C87.0755 44.7062 85.1914 43.038 83.1099 41.6412C81.1136 31.2827 74.5988 22.5331 65.6976 17.5243C68.4587 23.8718 70.3054 30.4491 71.2578 37.1495C70.0286 36.985 68.7743 36.9 67.5 36.9C67.0538 36.9 66.6101 36.9104 66.1689 36.931C64.9666 29.2054 62.4891 21.6801 58.7157 14.5353C55.4448 13.537 51.9726 13 48.375 13C28.8379 13 13 28.8379 13 48.375C13 52.2077 13.6095 55.898 14.7369 59.3543C22.2188 62.956 30.444 65.5181 39.4914 66.4853C39.5856 68.2319 39.8396 69.936 40.239 71.5832C32.1912 70.8544 24.7186 68.9409 17.7904 66.1621C23.6485 76.2133 34.3194 83.1149 46.6449 83.7084C48.317 85.5663 50.2338 87.1995 52.3446 88.5573C51.0386 88.6848 49.7144 88.75 48.375 88.75C31.21 88.75 16.5469 78.0385 10.7052 62.9352L10.6954 62.9101C8.95451 58.4 8 53.499 8 48.375C8 26.0765 26.0765 8 48.375 8Z"
+      fill="#6FC387" />
+    <path fill-rule="evenodd" clip-rule="evenodd"
+      d="M45.875 9.27501V24.735C41.3744 24.982 37.1461 25.473 33.0319 26.2781C34.3116 21.9243 35.9427 17.5926 37.9009 13.2845L33.3491 11.2155C30.8933 16.6183 28.9228 22.0741 27.4842 27.5754C21.9384 29.0907 16.472 31.2568 10.6764 34.2545L12.9736 38.6956C17.5368 36.3353 21.8686 34.5234 26.2114 33.1592C25.3926 37.374 24.8918 41.6137 24.7295 45.875H10.125V50.875H24.6953C24.9762 62.3209 27.7378 73.9126 33.3736 85.5869L37.8764 83.4131C32.5908 72.4644 29.9796 61.612 29.6972 50.875H43.2316C45.1717 47.5371 47.7807 44.6361 50.875 42.3554V29.7968C66.1714 30.9312 73.2388 33.6083 84.2972 38.7425L86.4028 34.2075C74.8241 28.8317 67.1509 25.9571 50.875 24.7836V9.27501H45.875ZM31.6269 31.6881C36.168 30.6432 40.8281 30.0319 45.875 29.7428V45.875H29.7331C29.9256 41.1221 30.567 36.3926 31.6269 31.6881Z"
+      fill="#6FC387" />
+  </svg>
+
 
 </body>
 

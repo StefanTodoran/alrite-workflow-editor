@@ -114,6 +114,13 @@ select {
   border: 3px solid var(--alrite-green);
 }
 
+.component-card-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
 .page-card-header {
   display: flex;
   flex-direction: row;
@@ -151,10 +158,15 @@ select {
 }
 
 .disabled,
-.page-card:not(.selected) .add-component-button,
 .page-card:not(.selected) .component-type {
   pointer-events: none;
   opacity: 0.5;
+}
+
+.page-card:not(.selected) .add-component-button,
+.page-card:not(.selected) .delete-component-button {
+  pointer-events: none;
+  opacity: 0.2;
 }
 
 .prop-input {
@@ -236,18 +248,27 @@ select {
 }
 
 #dark-mode-button,
-#light-mode-button {
+#light-mode-button,
+#export-button {
   position: fixed;
   bottom: 10px;
-  left: 10px;
+  right: 10px;
   width: 40px;
   height: 40px;
   cursor: pointer;
   transition: transform 0.5s ease, opacity 0.5s ease;
 }
 
+#export-button {
+  right: 60px; /* distance from edge to dark/light mode button + button size + margin */
+}
+.darkMode #export-button rect {
+  fill: var(--light-background)
+}
+
 #dark-mode-button:hover,
-#light-mode-button:hover {
+#light-mode-button:hover,
+#export-button:hover {
   transform: scale(0.95);
   opacity: 0.75;
 }

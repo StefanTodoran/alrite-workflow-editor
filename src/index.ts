@@ -37,9 +37,10 @@ function init() {
 
   updatePageCardMoveButtons();
   document.getElementById("add-page-button").addEventListener("click", addNewPage);
+  document.getElementById("export-button").addEventListener("click", exportWorkflow);
 
   // Handling dark mode
-  // darkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  darkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
   document.getElementById("light-mode-button").addEventListener("click", toggleDarkMode);
   document.getElementById("dark-mode-button").addEventListener("click", toggleDarkMode);
   updateDarkMode();
@@ -158,6 +159,12 @@ function addComponentToCard(type: string, card: HTMLElement, creator: HTMLElemen
   component.classList.remove("hidden");
   component.id = `${card.id}.${type}.${id}`;
 
+  component.querySelector(".delete-component-button").addEventListener("click", () => {
+    if (window.confirm(`Are you sure you want to delete this "${type}" component?`)) {
+      component.remove(); // We don't use card.removeChild() because the card parent can change!
+    }
+  });
+
   card.insertBefore(component, creator);
   card.removeChild(creator)
 }
@@ -247,6 +254,14 @@ function drop(evt: any) {
 // ==================== \\
 // EXTRACTION FUNCTIONS \\
 // ==================== \\
+
+function exportWorkflow() {
+  // const cards = document.querySelectorAll(".page-card");
+
+  // for (let i = 0; i < cards.length; i++) {
+  //   //
+  // }
+}
 
 // Give a reference to a DOM element (specifically a page card),
 // creates a Page component for exporting purposes.
