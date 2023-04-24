@@ -19,7 +19,7 @@ export module Components {
     component: "MultipleChoice",
     
     // Unique id for the input value for this page component
-    valueID: string, 
+    valueID: string,
 
     // A text label, generally a question prompt
     label: string,
@@ -115,7 +115,7 @@ export module Components {
     component: "Comparison",
 
     type: string, // Valid types include ">", "<", ">=", "<=", "="
-    valueID: string, // Value which is compared to the threshold
+    targetValueID: string, // Value which is compared to the threshold
     threshold: any,
     satisfiedLink: string, // The pageID to link to given whether value satisfies the threshold given the comparison type
     notSatisfiedLink: string, // The pageID to link to given whether value satisfies the threshold given the comparison type
@@ -125,7 +125,7 @@ export module Components {
     component: "Selection",
     
     type: string, // Valid types include "all_selected", "at_least_one", "exactly_one", "none_selected"
-    valueIDs: string[],
+    targetValueIDs: string[],
     satisfiedLink: string, // The pageID to link to given when the value satisfies the selection type
     notSatisfiedLink: string, // The pageID to link to otherwise
   }

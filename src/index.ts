@@ -169,17 +169,22 @@ function addComponentToCard(type: string, card: HTMLElement, creator: HTMLElemen
         choice.remove();
       });
 
-      const choiceDropdown = choice.querySelector(".drop-down") as HTMLSelectElement;
+      const choiceDropdown = choice.querySelector(".drop-down.link-selector") as HTMLSelectElement;
       if (choiceDropdown) {
         const ids = getAllPageIDs();
         updateDropDown(choiceDropdown, ids);
+      }
+
+      const choiceGotos = choice.querySelectorAll(".goto-button");
+      if (choiceGotos) {
+        createGotoButtonListeners(choiceGotos);
       }
 
       component.querySelector(".card-subcomponents").insertBefore(choice, addButton);
     });
   }
 
-  const dropdowns = component.querySelectorAll(".drop-down") as NodeListOf<HTMLSelectElement>;
+  const dropdowns = component.querySelectorAll(".drop-down.link-selector") as NodeListOf<HTMLSelectElement>;
   if (dropdowns) {
     dropdowns.forEach(dropdown => {
       const ids = getAllPageIDs();
@@ -187,12 +192,17 @@ function addComponentToCard(type: string, card: HTMLElement, creator: HTMLElemen
     });
   }
 
+  const gotos = component.querySelectorAll(".goto-button");
+  if (gotos) {
+    createGotoButtonListeners(gotos);
+  }
+
   card.insertBefore(component, creator);
   card.removeChild(creator);
 }
 
 function updateAllDropDowns() {
-  const dropdowns = document.querySelectorAll(".drop-down") as NodeListOf<HTMLSelectElement>;
+  const dropdowns = document.querySelectorAll(".drop-down.link-selector") as NodeListOf<HTMLSelectElement>;
   const ids = getAllPageIDs();
 
   dropdowns.forEach(dropdown => updateDropDown(dropdown, ids));
@@ -292,6 +302,16 @@ function updateDropDown(dropdown: HTMLSelectElement, values: string[]) {
   if (previous) {
     dropdown.value = previous;
   }
+}
+
+function createGotoButtonListeners(buttons: NodeListOf<Element>) {
+  buttons.forEach(button => {
+    button.addEventListener("click", function () {
+      const target = (button.previousElementSibling as HTMLSelectElement).value;
+      selectedCard = target;
+      updateSelectedCard();
+    });
+  });
 }
 
 // ======================= \\
