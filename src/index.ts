@@ -351,15 +351,20 @@ function exportWorkflow() {
   const cards = document.querySelectorAll(".page-card:not(.hidden)") as NodeListOf<HTMLElement>;
   console.log("Starting workflow export...");
 
+  const workflow: { pages: Components.Page[] } = { pages: [] };
   for (let i = 0; i < cards.length; i++) {
     const card = cards[i];
-    extractPageCard(card);
+    const data = extractPageCard(card);
+    workflow.pages.push(data);
   }
+
+  console.log("Final workflow:\n", workflow);
 }
 
 // Give a reference to a DOM element (specifically a page card),
 // creates a Page component for exporting purposes.
-function extractPageCard(card: HTMLElement) : Components.Page {
+function extractPageCard(card: HTMLElement): Components.Page {
+  console.log("Gathering page data", card.id);
   const page = <Components.Page>{
     pageID: card.id,
     title: card.querySelector("h1").textContent,
@@ -371,18 +376,32 @@ function extractPageCard(card: HTMLElement) : Components.Page {
   const components = card.querySelectorAll(".card.component-card");
 
   components.forEach(component => {
-    // console.log(component.classList)
+    // We want only this component's props, not those of subcomponents
+    const props = component.querySelector(".component-card-fields").querySelectorAll(".prop-input");
 
-    const container = component.querySelector(".component-card-fields");
-    const props = container.querySelectorAll(".prop-input");
+    // The id is of the format 'pageID.type.number'
+    const type = component.id.split(".")[1];
+    const values: { [key: string]: any } = {};
 
     props.forEach(prop => {
       const input = prop.querySelector("input") || prop.querySelector("select");
-
-      console.log("\n\n", input.classList[0].slice(5));
-      console.log(input);
+      const propName = input.classList[0].slice(5);
+      values[propName] = input.value;
     });
+
+    page.content.push(createObjectFromProps(type, values));
   });
 
   return page;
+}
+
+function createObjectFromProps(type: string, values: { [key: string]: any }) {
+  const component: { [key: string]: any } = {};
+
+  for (const [key, value] of Object.entries(values)) {
+    if (value) component[key] = value;
+  }
+
+  component.component = type;
+  return component;
 }
