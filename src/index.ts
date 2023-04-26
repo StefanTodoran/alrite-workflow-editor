@@ -351,7 +351,11 @@ function exportWorkflow() {
   const cards = document.querySelectorAll(".page-card:not(.hidden)") as NodeListOf<HTMLElement>;
   console.log("Starting workflow export...");
 
-  const workflow: { pages: Components.Page[] } = { pages: [] };
+  const workflow: { name: string, pages: Components.Page[] } = { 
+    name: "IMCI",
+    pages: [],
+  };
+
   for (let i = 0; i < cards.length; i++) {
     const card = cards[i];
     const data = extractPageCard(card);
@@ -359,6 +363,21 @@ function exportWorkflow() {
   }
 
   console.log("Final workflow:\n", workflow);
+
+  const baseUrl = "http://127.0.0.1:8000";
+  console.log("Attempting to post to:", baseUrl);
+  
+  fetch(baseUrl+"/alrite/apis/workflows/"+workflow.name, {
+    // mode: 'cors',
+    method: "POST",
+    headers: { 
+      'Content-Type': 'application/json',
+      // 'Access-Control-Allow-Origin':'*'
+    },
+    body: JSON.stringify(workflow)
+  }).then(res => {
+    console.log("Post request complete! Response:", res);
+  });
 }
 
 // Give a reference to a DOM element (specifically a page card),
