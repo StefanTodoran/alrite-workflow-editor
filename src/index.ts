@@ -49,18 +49,46 @@ function init() {
   updatePageCardMoveButtons();
   document.getElementById("add-page-button").addEventListener("click", addNewPage);
   document.getElementById("export-button").addEventListener("click", exportWorkflow);
+  document.getElementById("import-button").addEventListener("click", triggerImport);
+  document.getElementById("importer").addEventListener("input", prepareReader);
 
   // Handling dark mode
   darkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
   document.getElementById("light-mode-button").addEventListener("click", toggleDarkMode);
   document.getElementById("dark-mode-button").addEventListener("click", toggleDarkMode);
   updateDarkMode();
+
+  const tooltip = document.getElementById("tooltip");
+  addEventListener("mousemove", function (evt: MouseEvent) {
+    const hovered = this.document.querySelectorAll(":hover");
+    const current = hovered[hovered.length - 1];
+
+    if (current && current.classList.contains("prop-input")) {
+      const text = current.querySelector(".tooltip-text");
+      if (text) {
+        tooltip.classList.add("active");
+        tooltip.innerHTML = text.innerHTML;
+      }
+    } else {
+      tooltip.classList.remove("active");
+    }
+
+    const x = evt.clientX, y = evt.clientY;
+    const bounds = tooltip.getBoundingClientRect();
+
+    tooltip.style.top = Math.min(window.innerHeight - bounds.height, y + 5) + 'px';
+    tooltip.style.left = Math.min(window.innerWidth - bounds.width - 20, x + 10) + 'px';
+
+    if (y + bounds.height > window.innerHeight) {
+      tooltip.style.top = y - 30 - bounds.height + 'px';
+    }
+  });
 }
 
-let newPageIndex = 0;
+let newPageIndex = 4;
 function addNewPage() {
   const page = <Components.Page>{
-    pageID: `new_page_${newPageIndex}`,
+    pageID: `page_${newPageIndex}`,
     title: "Blank Page",
     content: [],
   };
@@ -77,7 +105,7 @@ function addNewPage() {
 
 // Creates and adds a page card to the DOM, before the add button.
 // Populates it with the id and title and adds event listeners.
-function addPageCard(id: string, title: string) {
+function addPageCard(id: string, title: string, components?: HTMLElement[]) {
   const card = getTemplateCopy("template-page-card");
   card.id = id;
 
@@ -134,7 +162,7 @@ function addPageCard(id: string, title: string) {
 
     createButtonClickEvent(newComponent, ".create-component", function () {
       const typeInput = <HTMLInputElement>newComponent.querySelector(".component-type");
-      addComponentToCard(typeInput.value, card, newComponent, componentID);
+      addEmptyComponentToCard(typeInput.value, card, newComponent, componentID);
 
       addComponent.classList.remove("disabled");
       componentID++;
@@ -144,6 +172,10 @@ function addPageCard(id: string, title: string) {
     card.insertBefore(newComponent, addComponent);
   });
 
+  if (components) {
+    components.forEach(component => card.insertBefore(component, addComponent));
+  }
+
   const addButton = document.getElementById("add-page-button");
   body.insertBefore(card, addButton);
 }
@@ -151,9 +183,16 @@ function addPageCard(id: string, title: string) {
 // Given a card, a component type, and the reference to the "new component" card
 // which triggered this function call, creates a new empty component card of the
 // specified type, then replaces the "new component" card with the empty component card.
-function addComponentToCard(type: string, card: HTMLElement, creator: HTMLElement, id: number) {
+function addEmptyComponentToCard(type: string, card: HTMLElement, creator: HTMLElement, id: number) {
+  const component = createComponent(type, card.id, id);
+
+  card.insertBefore(component, creator);
+  card.removeChild(creator);
+}
+
+function createComponent(type: string, cardID: string, id: number, props?: { [key: string]: any }) {
   const component = getTemplateCopy(templates[type]);
-  component.id = `${card.id}.${type}.${id}`;
+  component.id = `${cardID}.${type}.${id}`;
 
   createButtonClickEvent(component, ".delete-component-button", function () {
     if (window.confirm(`Are you sure you want to delete this "${type}" component?`)) {
@@ -197,8 +236,13 @@ function addComponentToCard(type: string, card: HTMLElement, creator: HTMLElemen
     createGotoButtonListeners(gotos);
   }
 
-  card.insertBefore(component, creator);
-  card.removeChild(creator);
+  props;
+  // const fields = document.querySelector(".component-card-fields");
+  // for (const [key, value] of Object.entries(props)) {
+  //   const prop = document.createElement
+  // }
+
+  return component;
 }
 
 function updateAllDropDowns() {
@@ -211,7 +255,7 @@ function updateAllDropDowns() {
 // Updates the event listeners for ever page card, ensure the first page card 
 // does not have move left enabled, nor the last card have more right enabled.
 function updatePageCardMoveButtons() {
-  const cards = document.querySelectorAll(".page-card:not(.hidden)");
+  const cards = getAllPageCards();
 
   cards.forEach((card, index) => {
     const moveLeft = card.querySelector(".move-left-button");
@@ -265,6 +309,10 @@ function updateDarkMode() {
 // HELPER FUNCTIONS \\
 // ================ \\
 
+function getAllPageCards() {
+  return document.querySelectorAll(".page-card:not(.hidden)");
+}
+
 function getTemplateCopy(id: string) {
   const template = document.getElementById(id);
   const clone = template.cloneNode(true) as HTMLElement;
@@ -281,7 +329,7 @@ function createButtonClickEvent(container: HTMLElement, query: string, func: (ev
 
 function getAllPageIDs() {
   const ids: string[] = [];
-  const pages = document.querySelectorAll(".page-card:not(.hidden)");
+  const pages = getAllPageCards();
   pages.forEach(page => { ids.push(page.id); });
   return ids;
 }
@@ -347,11 +395,56 @@ function drop(evt: any) {
 // EXTRACTION FUNCTIONS \\
 // ==================== \\
 
+function triggerImport() {
+  const importer = document.getElementById("importer") as HTMLInputElement;
+  importer.value = null;
+  importer.click();
+}
+
+function prepareReader() {
+  const importer = document.getElementById("importer") as HTMLInputElement;
+  const reader = new FileReader();
+
+  reader.onload = importWorkflow;
+  reader.readAsText(importer.files[0]);
+}
+
+function importWorkflow(this: FileReader, event: ProgressEvent<FileReader>) {
+  let json;
+  if (typeof event.target.result === "string") {
+    json = JSON.parse(event.target.result);
+  } else {
+    json = String.fromCharCode.apply(null, new Uint8Array(event.target.result));
+  }
+
+  const pages = json.pages;
+  if (!pages) {
+    return; // TODO: notify user of invalid upload.
+  }
+  
+  const cards = getAllPageCards();
+  cards.forEach(card => card.remove());
+
+  pages.forEach((page: any) => {
+    const components = [];
+
+    for (let i = 0; i < page.content.length; i++) {
+      const props = page.content[i];
+      const type = props.component;
+      delete props.component;
+      const component = createComponent(type, page.pageID, i, page.content[i]);
+      components.push(component);
+    }
+    
+    addPageCard(page.pageID, page.title, components);
+  });
+}
+
 function exportWorkflow() {
-  const cards = document.querySelectorAll(".page-card:not(.hidden)") as NodeListOf<HTMLElement>;
+  const cards = getAllPageCards() as NodeListOf<HTMLElement>;
   console.log("Starting workflow export...");
 
-  const workflow: { name: string, pages: Components.Page[] } = { 
+  const workflow: { name: string, pages: Components.Page[] } = {
     name: "IMCI",
     pages: [],
   };
@@ -366,13 +459,11 @@ function exportWorkflow() {
 
   const baseUrl = "http://127.0.0.1:8000";
   console.log("Attempting to post to:", baseUrl);
-  
-  fetch(baseUrl+"/alrite/apis/workflows/"+workflow.name, {
-    // mode: 'cors',
+
+  fetch(baseUrl + "/alrite/apis/workflows/" + workflow.name + "/", {
     method: "POST",
-    headers: { 
-      'Content-Type': 'application/json',
-      // 'Access-Control-Allow-Origin':'*'
+    headers: {
+      "Content-Type": "application/json",
     },
     body: JSON.stringify(workflow)
   }).then(res => {

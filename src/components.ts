@@ -13,7 +13,7 @@ export module Components {
 
   export interface MediaItem extends PageComponent {
     fileName: string, // The file name of the image or video to display
-    label?: string, // Optional text to display underneatht the image or video
+    label?: string, // Optional text to display underneath the image or video
   }
 
   export interface MultipleChoice extends PageComponent {
@@ -50,7 +50,7 @@ export module Components {
     label: string,
 
     // Type of input to accept, e.g. "numeric", "alphanumeric", "default", "any"
-    // Default means alphabetical character input only, no numbers.
+    // Default means alphabetical character input only, no numbers
     type: string,
 
     units?: string, // If provided, displayed next to the TextInput, e.g. "cm" (optional)

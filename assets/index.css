@@ -4,6 +4,7 @@ body {
   --light-border: #E2E2E2;
   --light-background: #FBFBFB;
   --near-black: #262626;
+  --warning-orange: #ED6F2E;
 
   margin: 0;
   display: flex;
@@ -203,13 +204,13 @@ button {
   margin: 5px 5px;
 }
 
-.prop-input:before {
+.prop-input::before {
   content: var(--label) "*: ";
   opacity: 0.85;
   transition: color 0.5s ease;
 }
 
-.prop-input.optional:before {
+.prop-input.optional::before {
   content: var(--label) ": ";
   opacity: 0.55;
 }
@@ -237,6 +238,49 @@ button {
   margin-top: 10px;
   margin-bottom: 10px;
 }
+
+/* ============= */
+/* HOVER TOOLTIP */
+#tooltip {
+  content: var(--label);
+  color: var(--near-black);
+  background-color: var(--light-background);
+  border: 1px solid var(--light-border);
+  border-radius: 5px;
+  padding: 5px 10px;
+  position: fixed;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  z-index: 1;
+  pointer-events: none;
+}
+
+#tooltip.active {
+  opacity: 1;
+}
+
+.tooltip-text {
+  display: none;
+}
+/* HOVER TOOLTIP */
+/* ============= */
+
+/* ============ */
+/* INVALID PROP */
+.validation-invalid.component-card {
+  outline: 3px solid var(--warning-orange);
+}
+
+.validation-invalid.prop-input > input {
+  outline: 3px solid var(--warning-orange);
+  border-radius: 3px;
+}
+
+.validation-invalid.prop-input::before {
+  color: var(--warning-orange) !important;
+}
+/* INVALID PROP */
+/* ============ */
 
 #add-page-button {
   cursor: pointer;
@@ -266,7 +310,8 @@ button {
 
 #dark-mode-button,
 #light-mode-button,
-#export-button {
+#export-button,
+#import-button {
   position: fixed;
   bottom: 10px;
   right: 10px;
@@ -280,14 +325,24 @@ button {
   right: 60px;
   /* distance from edge to dark/light mode button + button size + margin */
 }
+#import-button {
+  right: 110px;
+}
 
 .darkMode #export-button rect {
   fill: var(--light-background)
 }
+.darkMode #import-button rect {
+  fill: var(--light-background)
+}
+.darkMode #import-button .needs-dark-fill {
+  fill: #4B7557
+}
 
 #dark-mode-button:hover,
 #light-mode-button:hover,
-#export-button:hover {
+#export-button:hover,
+#import-button:hover {
   transform: scale(0.95);
   opacity: 0.75;
 }
@@ -315,8 +370,9 @@ body.darkMode {
   --near-black: #262626;
 }
 
+.darkMode #tooltip,
 .darkMode h1,
 .darkMode h2,
-.darkMode .prop-input:before {
+.darkMode .prop-input::before {
   color: white
 }
