@@ -58,31 +58,7 @@ function init() {
   document.getElementById("dark-mode-button").addEventListener("click", toggleDarkMode);
   updateDarkMode();
 
-  const tooltip = document.getElementById("tooltip");
-  addEventListener("mousemove", function (evt: MouseEvent) {
-    const hovered = this.document.querySelectorAll(":hover");
-    const current = hovered[hovered.length - 1];
-
-    if (current && current.classList.contains("prop-input")) {
-      const text = current.querySelector(".tooltip-text");
-      if (text) {
-        tooltip.classList.add("active");
-        tooltip.innerHTML = text.innerHTML;
-      }
-    } else {
-      tooltip.classList.remove("active");
-    }
-
-    const x = evt.clientX, y = evt.clientY;
-    const bounds = tooltip.getBoundingClientRect();
-
-    tooltip.style.top = Math.min(window.innerHeight - bounds.height, y + 5) + 'px';
-    tooltip.style.left = Math.min(window.innerWidth - bounds.width - 20, x + 10) + 'px';
-
-    if (y + bounds.height > window.innerHeight) {
-      tooltip.style.top = y - 30 - bounds.height + 'px';
-    }
-  });
+  addEventListener("mousemove", updateTooltipPosition);
 }
 
 let newPageIndex = 4;
@@ -190,7 +166,20 @@ function addEmptyComponentToCard(type: string, card: HTMLElement, creator: HTMLE
   card.removeChild(creator);
 }
 
-function createComponent(type: string, cardID: string, id: number, props?: { [key: string]: any }) {
+/**
+ * REQUIRED:
+ * @param type The component type, name should match a component specified in components.ts
+ * @param cardID The component's unique ID contains the parent card ID to ensure it is unique.
+ * @param id A unique component number is also required.
+ * 
+ * OPTIONAL:
+ * @param props A dictionary of key, value pairs to pre-fill the props of the component with.
+ * @param overrideIDs Goto buttons in a component needs to know all existing page IDs in order to 
+ * populate their corresponding <select> element. This can be an issue if the component is being built
+ * before all pages have been built. This parameter can be used to get around this issue, by supplying
+ * all page IDs in advance.
+ */
+function createComponent(type: string, cardID: string, id: number, props?: { [key: string]: any }, overrideIDs?: string[]) {
   const component = getTemplateCopy(templates[type]);
   component.id = `${cardID}.${type}.${id}`;
 
@@ -201,57 +190,56 @@ function createComponent(type: string, cardID: string, id: number, props?: { [ke
   });
 
   const addButton = component.querySelector(".add-subcomponent-button");
+  const pageIDs = overrideIDs || getAllPageIDs();
+
   if (addButton) {
     addButton.addEventListener("click", () => {
-      const choice = getTemplateCopy("template-choice-component");
-      createButtonClickEvent(choice, ".delete-component-button", function () {
-        choice.remove();
-      });
-
-      const choiceDropdown = choice.querySelector(".drop-down.link-selector") as HTMLSelectElement;
-      if (choiceDropdown) {
-        const ids = getAllPageIDs();
-        updateDropDown(choiceDropdown, ids);
-      }
-
-      const choiceGotos = choice.querySelectorAll(".goto-button");
-      if (choiceGotos) {
-        createGotoButtonListeners(choiceGotos);
-      }
-
+      const choice = createChoiceSubComponent(pageIDs);
       component.querySelector(".card-subcomponents").insertBefore(choice, addButton);
     });
   }
 
-  const dropdowns = component.querySelectorAll(".drop-down.link-selector") as NodeListOf<HTMLSelectElement>;
-  if (dropdowns) {
-    dropdowns.forEach(dropdown => {
-      const ids = getAllPageIDs();
-      updateDropDown(dropdown, ids);
-    });
-  }
-
-  const gotos = component.querySelectorAll(".goto-button");
-  if (gotos) {
-    createGotoButtonListeners(gotos);
-  }
+  updateContainedDropDowns(component, pageIDs);
+  updateContainedGotoButtons(component);
+  updateContainedSliderButtons(component);
 
   if (props) {
-    const fields = component.querySelector(".component-card-fields");
-    for (const [key, value] of Object.entries(props)) {
-      const prop = fields.querySelector(`.prop-${key}`) as HTMLInputElement;
-      prop.value = value;
-    }
+    populateComponentFields(component, props, pageIDs);
   }
 
   return component;
 }
 
-function updateAllDropDowns() {
-  const dropdowns = document.querySelectorAll(".drop-down.link-selector") as NodeListOf<HTMLSelectElement>;
-  const ids = getAllPageIDs();
+function createChoiceSubComponent(pageIDs: string[]) {
+  const choice = getTemplateCopy("template-choice-component");
+  createButtonClickEvent(choice, ".delete-component-button", function () {
+    choice.remove();
+  });
 
-  dropdowns.forEach(dropdown => updateDropDown(dropdown, ids));
+  updateContainedDropDowns(choice, pageIDs);
+  updateContainedGotoButtons(choice);
+
+  return choice;
+}
+
+function populateComponentFields(component: HTMLElement, props: { [key: string]: any }, pageIDs: string[]) {
+  const fields = component.querySelector(".component-card-fields");
+
+  for (const [key, value] of Object.entries(props)) {
+    if (key === "choices") {
+      const subComponentsContainer = component.querySelector(".card-subcomponents");
+      const addButton = component.querySelector(".add-subcomponent-button");
+
+      value.forEach((choice: any) => {
+        const subcomponent = createChoiceSubComponent(pageIDs);
+        populateComponentFields(subcomponent, choice, pageIDs);
+        subComponentsContainer.insertBefore(subcomponent, addButton);
+      });
+    } else {
+      const prop = fields.querySelector(`.prop-${key}`) as (HTMLInputElement | HTMLSelectElement);
+      prop.value = value;
+    }
+  }
 }
 
 // Updates the event listeners for ever page card, ensure the first page card 
@@ -307,6 +295,32 @@ function updateDarkMode() {
   }
 }
 
+function updateTooltipPosition(evt: MouseEvent) {
+  const tooltip = document.getElementById("tooltip");
+  const hovered = this.document.querySelectorAll(":hover");
+  const current = hovered[hovered.length - 1];
+
+  if (current && current.classList.contains("prop-input")) {
+    const text = current.querySelector(".tooltip-text");
+    if (text) {
+      tooltip.classList.add("active");
+      tooltip.innerHTML = text.innerHTML;
+    }
+  } else {
+    tooltip.classList.remove("active");
+  }
+
+  const x = evt.clientX, y = evt.clientY;
+  const bounds = tooltip.getBoundingClientRect();
+
+  tooltip.style.top = Math.min(window.innerHeight - bounds.height, y + 5) + 'px';
+  tooltip.style.left = Math.min(window.innerWidth - bounds.width - 20, x + 10) + 'px';
+
+  if (y + bounds.height > window.innerHeight) {
+    tooltip.style.top = y - 30 - bounds.height + 'px';
+  }
+}
+
 // ================ \\
 // HELPER FUNCTIONS \\
 // ================ \\
@@ -330,10 +344,62 @@ function createButtonClickEvent(container: HTMLElement, query: string, func: (ev
 }
 
 function getAllPageIDs() {
-  const ids: string[] = [];
+  const IDs: string[] = [];
   const pages = getAllPageCards();
-  pages.forEach(page => { ids.push(page.id); });
-  return ids;
+  pages.forEach(page => { IDs.push(page.id); });
+  return IDs;
+}
+
+function updateContainedSliderButtons(container: HTMLElement) {
+  const sliders = container.querySelectorAll(".slider-button");
+  if (sliders) {
+    createSliderButtonListeners(sliders);
+  }
+}
+
+function createSliderButtonListeners(buttons: NodeListOf<Element>) {
+  buttons.forEach(button => {
+    button.addEventListener("click", function () {
+      button.classList.toggle("active");
+      button.closest(".card.component-card").classList.toggle("multiselect");
+    });
+  });
+}
+
+function updateContainedGotoButtons(container: HTMLElement) {
+  const gotos = container.querySelectorAll(".goto-button");
+  if (gotos) {
+    createGotoButtonListeners(gotos);
+  }
+}
+
+function createGotoButtonListeners(buttons: NodeListOf<Element>) {
+  buttons.forEach(button => {
+    button.addEventListener("click", function () {
+      const target = (button.previousElementSibling as HTMLSelectElement).value;
+      selectedCard = target;
+      updateSelectedCard();
+    });
+  });
+}
+
+// Used to update dropdowns when a new page is added or
+// an existing page is removed.
+function updateAllDropDowns() {
+  const dropdowns = document.querySelectorAll(".drop-down.link-selector") as NodeListOf<HTMLSelectElement>;
+  const IDs = getAllPageIDs();
+
+  dropdowns.forEach(dropdown => updateDropDown(dropdown, IDs));
+}
+
+// Used to initialize dropdowns in a new component.
+function updateContainedDropDowns(container: HTMLElement, IDs: string[]) {
+  const dropdowns = container.querySelectorAll(".drop-down.link-selector") as NodeListOf<HTMLSelectElement>;
+  if (dropdowns) {
+    dropdowns.forEach(dropdown => {
+      updateDropDown(dropdown, IDs);
+    });
+  }
 }
 
 function updateDropDown(dropdown: HTMLSelectElement, values: string[]) {
@@ -352,16 +418,6 @@ function updateDropDown(dropdown: HTMLSelectElement, values: string[]) {
   if (previous) {
     dropdown.value = previous;
   }
-}
-
-function createGotoButtonListeners(buttons: NodeListOf<Element>) {
-  buttons.forEach(button => {
-    button.addEventListener("click", function () {
-      const target = (button.previousElementSibling as HTMLSelectElement).value;
-      selectedCard = target;
-      updateSelectedCard();
-    });
-  });
 }
 
 // ======================= \\
@@ -407,11 +463,11 @@ function prepareReader() {
   const importer = document.getElementById("importer") as HTMLInputElement;
   const reader = new FileReader();
 
-  reader.onload = importWorkflow;
+  reader.onload = getJSON;
   reader.readAsText(importer.files[0]);
 }
 
-function importWorkflow(this: FileReader, event: ProgressEvent<FileReader>) {
+function getJSON(this: FileReader, event: ProgressEvent<FileReader>) {
   let json;
   if (typeof event.target.result === "string") {
     json = JSON.parse(event.target.result);
@@ -419,13 +475,22 @@ function importWorkflow(this: FileReader, event: ProgressEvent<FileReader>) {
     json = String.fromCharCode.apply(null, new Uint8Array(event.target.result));
   }
 
+  importWorkflow(json);
+}
+
+function importWorkflow(json: any) {
   const pages = json.pages;
   if (!pages) {
     return; // TODO: notify user of invalid upload.
   }
 
-  const cards = getAllPageCards();
-  cards.forEach(card => card.remove());
+  const old = getAllPageCards();
+  old.forEach(card => card.remove());
+
+  const IDs: string[] = [];
+  pages.forEach((page: any) => {
+    IDs.push(page.pageID);
+  });
 
   pages.forEach((page: any) => {
     const components = [];
@@ -434,7 +499,8 @@ function importWorkflow(this: FileReader, event: ProgressEvent<FileReader>) {
       const props = page.content[i];
       const type = props.component;
       delete props.component;
-      const component = createComponent(type, page.pageID, i, page.content[i]);
+
+      const component = createComponent(type, page.pageID, i, page.content[i], IDs);
       components.push(component);
     }
 
@@ -443,11 +509,14 @@ function importWorkflow(this: FileReader, event: ProgressEvent<FileReader>) {
 }
 
 function exportWorkflow() {
-  const cards = getAllPageCards() as NodeListOf<HTMLElement>;
-  console.log("Starting workflow export...");
+  const name = prompt("Please enter the workflow name: (case sensitive)");
+  if (name == null || name == "") {
+    return;
+  }
 
+  const cards = getAllPageCards() as NodeListOf<HTMLElement>;
   const workflow: { name: string, pages: Components.Page[] } = {
-    name: "IMCI",
+    name: name,
     pages: [],
   };
 
@@ -476,7 +545,6 @@ function exportWorkflow() {
 // Give a reference to a DOM element (specifically a page card),
 // creates a Page component for exporting purposes.
 function extractPageCard(card: HTMLElement): Components.Page {
-  console.log("Gathering page data", card.id);
   const page = <Components.Page>{
     pageID: card.id,
     title: card.querySelector("h1").textContent,
@@ -488,18 +556,27 @@ function extractPageCard(card: HTMLElement): Components.Page {
   const components = card.querySelectorAll(".card.component-card");
 
   components.forEach(component => {
-    // We want only this component's props, not those of subcomponents
+    // We want only this component's props, not those of subcomponents.
     const props = component.querySelector(".component-card-fields").querySelectorAll(".prop-input");
 
-    // The id is of the format 'pageID.type.number'
+    // The id is of the format 'pageID.type.number'.
     const type = component.id.split(".")[1];
-    const values: { [key: string]: any } = {};
+    const values = extractProps(props);
 
-    props.forEach(prop => {
-      const input = prop.querySelector("input") || prop.querySelector("select");
-      const propName = input.classList[0].slice(5);
-      values[propName] = input.value;
+    // This entire portion for subcomponents is exclusively to
+    // deal with multiple choice components and their nested choices.
+    const subcomponents = component.querySelectorAll(".sub-card.component-card");
+    const choices: { [key: string]: any; }[] = [];
+
+    subcomponents.forEach(subcomponent => {
+      const subprops = subcomponent.querySelectorAll(".prop-input");
+      const subvalues = extractProps(subprops);
+      choices.push(subvalues);
     });
+
+    if (choices) {
+      values["choices"] = choices;
+    }
 
     page.content.push(createObjectFromProps(type, values));
   });
@@ -507,11 +584,32 @@ function extractPageCard(card: HTMLElement): Components.Page {
   return page;
 }
 
+function extractProps(props: NodeListOf<Element>) {
+  const values: { [key: string]: any } = {};
+
+  props.forEach(prop => {
+    const input = prop.querySelector("input") || prop.querySelector("select");
+
+    if (input) {
+      const propName = input.classList[0].slice(5);
+      values[propName] = input.value;
+    } else {
+      // We have a slider button
+      const slider = prop.querySelector(".slider-button");
+      const propName = slider.classList[0].slice(5);
+
+      values[propName] = slider.classList.contains("active");
+    }
+  });
+
+  return values;
+}
+
 function createObjectFromProps(type: string, values: { [key: string]: any }) {
   const component: { [key: string]: any } = {};
 
   for (const [key, value] of Object.entries(values)) {
-    if (value) component[key] = value;
+    if (value !== undefined && value !== "") component[key] = value;
   }
 
   component.component = type;

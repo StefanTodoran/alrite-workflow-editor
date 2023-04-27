@@ -90,6 +90,13 @@ export module Components {
     pageID: string, // Must be unique, used for page linking
     title: string,
     content: PageComponent[],
+
+    // By default each page has two buttons, "Next" and "Prev". While "Prev" always returns to the page which
+    // linked to this page, the page "Next" sends to may depend on logic in the page. If no logic is triggered,
+    // defaultLink is the destination. However, LogicComponents trigger when "Next" is pressed and can override
+    // this defaultLink. If there are multiple LogicComponents, tiebreaking if multiple are satisfied is done
+    // based on order (highest on page has highest precedence). 
+    defaultLink: string, 
     conditionalLinks: LogicComponent[],
   }
 
@@ -107,13 +114,11 @@ export module Components {
     targetValueID: string, // Value which is compared to the threshold
     threshold: any,
     satisfiedLink: string, // The pageID to link to given whether value satisfies the threshold given the comparison type
-    notSatisfiedLink: string, // The pageID to link to given whether value satisfies the threshold given the comparison type
   }
 
   export interface SelectionLogic extends LogicComponent {
     type: string, // Valid types include "all_selected", "at_least_one", "exactly_one", "none_selected"
     targetValueIDs: string[],
     satisfiedLink: string, // The pageID to link to given when the value satisfies the selection type
-    notSatisfiedLink: string, // The pageID to link to otherwise
   }
 }

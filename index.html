@@ -195,8 +195,7 @@
   <!-- MULTIPLE CHOICE PAGE COMPONENT -->
   <div class="card component-card hidden" id="template-multiple-choice-component" ondrop="drop(event)"
     ondragover="allowDrop(event)">
-    <div class="component-card-header" draggable="true"
-    ondragstart="drag(event)">
+    <div class="component-card-header" draggable="true" ondragstart="drag(event)">
       <div>
         <h1>Multiple Choice</h1>
         <h2>Page Component</h2>
@@ -215,18 +214,20 @@
         <input type="text" class="prop-label" placeholder="Question text prompt">
         <p class="tooltip-text">Text indicating what the nurse should input.</p>
       </span>
-      <span class="prop-input" style="--label: 'multiselect'">
-        <input type="text" class="prop-multiselect" placeholder="Either true or false">
-        <p class="tooltip-text">
-          If true, multiple choice can be selected, so the choices will be checkboxes.<br>
-          Otherwise, only one option may be selected, so the choices will be radio buttons.
-        </p>
-      </span>
       <span class="prop-input" style="--label: 'valueID'">
         <input type="text" class="prop-valueID" placeholder="Unique identifier">
         <p class="tooltip-text">
           Unique id for the input value for this page component.<br>
           This will also be the name of the corresponding column in the patient database.
+        </p>
+      </span>
+      <span class="prop-input" style="--label: 'multiselect'">
+        <div class="prop-multiselect slider-button">
+          <div class="slider-knob"></div>
+        </div>
+        <p class="tooltip-text">
+          If true, multiple choice can be selected, so the choices will be checkboxes.<br>
+          Otherwise, only one option may be selected, so the choices will be radio buttons.
         </p>
       </span>
     </div>
@@ -261,25 +262,33 @@
     <div class="component-card-fields">
       <span class="prop-input" style="--label: 'text'">
         <input type="text" class="prop-text" placeholder="Text this choice displays">
+        <p class="tooltip-text">The text this choice displays.</p>
       </span>
       <span class="prop-input" style="--label: 'value'">
         <input type="text" class="prop-value" placeholder="Value this choice corresponds to">
+        <p class="tooltip-text">
+          The value associated with selecting this choice (can be the same or different to text).<br>
+          You might want this to be different if some logic is done based on this choice.
+        </p>
       </span>
-      <!-- TODO: make this not visible if parent is multiselect! -->
       <span class="prop-input" style="--label: 'link'">
         <div>
           <select class="prop-link drop-down link-selector">
           </select>
           <button class="goto-button">Goto</button>
         </div>
+        <p class="tooltip-text">
+          Page id that should this choice should link to if selected.<br>
+          Not valid if the multiple choice component has multiselect enabled.
+        </p>
       </span>
     </div>
   </div>
 
   <!-- COMPARISON LOGIC COMPONENT -->
-  <div class="card component-card hidden" id="template-comparison-component" draggable="true" ondragstart="drag(event)"
-    ondrop="drop(event)" ondragover="allowDrop(event)">
-    <div class="component-card-header">
+  <div class="card component-card hidden" id="template-comparison-component" ondrop="drop(event)"
+    ondragover="allowDrop(event)">
+    <div class="component-card-header" draggable="true" ondragstart="drag(event)">
       <div>
         <h1>Comparison</h1>
         <h2>Logic Component</h2>
@@ -323,18 +332,7 @@
           <button class="goto-button">Goto</button>
         </div>
         <p class="tooltip-text">
-          On pressing the "next" button, if the target value satisfies the threshold,<br>
-          the page that should be navigated to.
-        </p>
-      </span>
-      <span class="prop-input" style="--label: 'notSatisfiedLink'">
-        <div>
-          <select class="prop-notSatisfiedLink drop-down link-selector">
-          </select>
-          <button class="goto-button">Goto</button>
-        </div>
-        <p class="tooltip-text">
-          On pressing the "next" button, if the target value doesn't satisfy the threshold,<br>
+          On pressing the "Next" button, if the target value satisfies the threshold,<br>
           the page that should be navigated to.
         </p>
       </span>
