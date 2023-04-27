@@ -236,11 +236,13 @@ function createComponent(type: string, cardID: string, id: number, props?: { [ke
     createGotoButtonListeners(gotos);
   }
 
-  props;
-  // const fields = document.querySelector(".component-card-fields");
-  // for (const [key, value] of Object.entries(props)) {
-  //   const prop = document.createElement
-  // }
+  if (props) {
+    const fields = component.querySelector(".component-card-fields");
+    for (const [key, value] of Object.entries(props)) {
+      const prop = fields.querySelector(`.prop-${key}`) as HTMLInputElement;
+      prop.value = value;
+    }
+  }
 
   return component;
 }
@@ -371,7 +373,7 @@ function allowDrop(evt: any) {
 }
 
 function drag(evt: any) { // Called on drag start
-  evt.dataTransfer.setData("component", evt.target.id);
+  evt.dataTransfer.setData("component", evt.target.parentNode.id);
 }
 
 function drop(evt: any) {
@@ -421,7 +423,7 @@ function importWorkflow(this: FileReader, event: ProgressEvent<FileReader>) {
   if (!pages) {
     return; // TODO: notify user of invalid upload.
   }
-  
+
   const cards = getAllPageCards();
   cards.forEach(card => card.remove());
 
@@ -435,7 +437,7 @@ function importWorkflow(this: FileReader, event: ProgressEvent<FileReader>) {
       const component = createComponent(type, page.pageID, i, page.content[i]);
       components.push(component);
     }
-    
+
     addPageCard(page.pageID, page.title, components);
   });
 }
