@@ -9,9 +9,10 @@ var componentID = 0; // Used to ensure unique component ids in the HTML
 var templates: { [key: string]: string } = {
   // Page Components
   "TextInput": "template-text-input-component",
-  "Button": "template-button-component",
-  "MediaItem": "template-media-item-component",
   "MultipleChoice": "template-multiple-choice-component",
+  "MediaItem": "template-media-item-component",
+  "Button": "template-button-component",
+  "Counter": "template-counter-component",
 
   // Logic Components
   "Comparison": "template-comparison-component",
@@ -169,6 +170,7 @@ function addPageCard(id: string, title: string, defaultLink?: string, overrideID
   // We do this before adding the components to not
   // double up on event listeners.
   createGotoButtonListeners(card);
+  createSliderButtonListeners(card);
 
   if (components) {
     components.forEach(component => card.insertBefore(component, addComponent));
@@ -226,7 +228,7 @@ function createComponent(type: string, cardID: string, id: number, props?: { [ke
 
   updateContainedDropDowns(component, pageIDs);
   createGotoButtonListeners(component);
-  updateContainedSliderButtons(component);
+  createSliderButtonListeners(component);
 
   if (props) {
     populateComponentFields(component, props, pageIDs);
@@ -375,20 +377,23 @@ function getAllPageIDs() {
   return IDs;
 }
 
-function updateContainedSliderButtons(container: HTMLElement) {
+function createSliderButtonListeners(container: HTMLElement) {
   const sliders = container.querySelectorAll(".slider-button");
   if (sliders) {
-    createSliderButtonListeners(sliders);
-  }
-}
+    sliders.forEach(button => {
+      button.addEventListener("click", function () {
+        button.classList.toggle("active");
 
-function createSliderButtonListeners(buttons: NodeListOf<Element>) {
-  buttons.forEach(button => {
-    button.addEventListener("click", function () {
-      button.classList.toggle("active");
-      button.closest(".card.component-card").classList.toggle("multiselect");
+        if (button.classList.contains("prop-multiselect")) {
+          button.closest(".card.component-card").classList.toggle("multiselect");
+        }
+
+        if (button.classList.contains("prop-isDiagnosisPage")) {
+          button.closest(".page-card").classList.toggle("diagnosis-page");
+        }
+      });
     });
-  });
+  }
 }
 
 function createGotoButtonListeners(container: HTMLElement) {
@@ -587,38 +592,47 @@ function extractPageCard(card: HTMLElement): Components.Page {
     content: [],
   };
 
-  const defaultLink = card.querySelector(".settings-card-fields").querySelector(".prop-defaultLink") as HTMLSelectElement;
+  const settings = card.querySelector(".settings-card-fields");
+
+  const defaultLink = settings.querySelector(".prop-defaultLink") as HTMLSelectElement;
   page.defaultLink = defaultLink.value;
 
-  // All page and logic components have card and component-card
-  // class, subcomponents have sub-card and component-card class.
-  const components = card.querySelectorAll(".card.component-card");
+  const isDiagnosisPage = settings.querySelector(".prop-isDiagnosisPage") as HTMLSelectElement;
+  if (!isDiagnosisPage) {
+    // The diagnosis page should not have any custom content. This is
+    // a hard-coded page in the app and any modifications to it should
+    // be done by contacting the developers.
 
-  components.forEach(component => {
-    // We want only this component's props, not those of subcomponents.
-    const props = component.querySelector(".component-card-fields").querySelectorAll(".prop-input");
-
-    // The id is of the format 'pageID.type.number'.
-    const type = component.id.split(".")[1];
-    const values = extractProps(props);
-
-    // This entire portion for subcomponents is exclusively to
-    // deal with multiple choice components and their nested choices.
-    const subcomponents = component.querySelectorAll(".sub-card.component-card");
-    const choices: { [key: string]: any; }[] = [];
-
-    subcomponents.forEach(subcomponent => {
-      const subprops = subcomponent.querySelectorAll(".prop-input");
-      const subvalues = extractProps(subprops);
-      choices.push(subvalues);
+    // All page and logic components have card and component-card
+    // class, subcomponents have sub-card and component-card class.
+    const components = card.querySelectorAll(".card.component-card");
+  
+    components.forEach(component => {
+      // We want only this component's props, not those of subcomponents.
+      const props = component.querySelector(".component-card-fields").querySelectorAll(".prop-input");
+  
+      // The id is of the format 'pageID.type.number'.
+      const type = component.id.split(".")[1];
+      const values = extractProps(props);
+  
+      // This entire portion for subcomponents is exclusively to
+      // deal with multiple choice components and their nested choices.
+      const subcomponents = component.querySelectorAll(".sub-card.component-card");
+      const choices: { [key: string]: any; }[] = [];
+  
+      subcomponents.forEach(subcomponent => {
+        const subprops = subcomponent.querySelectorAll(".prop-input");
+        const subvalues = extractProps(subprops);
+        choices.push(subvalues);
+      });
+  
+      if (choices.length) {
+        values["choices"] = choices;
+      }
+  
+      page.content.push(createObjectFromProps(type, values));
     });
-
-    if (choices.length) {
-      values["choices"] = choices;
-    }
-
-    page.content.push(createObjectFromProps(type, values));
-  });
+  }
 
   return page;
 }

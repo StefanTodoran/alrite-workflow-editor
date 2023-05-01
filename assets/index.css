@@ -208,6 +208,7 @@ button {
 .disabled,
 .multiselect .prop-link,
 .multiselect .prop-link + .goto-button,
+.diagnosis-page .add-component-button,
 .page-card:not(.selected) .drop-down,
 .page-card:not(.selected) .drop-down {
   pointer-events: none;
@@ -351,7 +352,7 @@ button {
   cursor: pointer;
   padding-left: 5vw;
   padding-right: calc(5vw + 10px);
-  animation: fade-in forwards 0.5s ease;
+  animation: fade-in forwards 1s ease;
 }
 
 .page-card.selected .card-button>circle {
@@ -371,6 +372,10 @@ button {
 .page-card .card-button:hover>circle,
 .add-button:hover circle {
   fill: var(--alrite-green)
+}
+
+.diagnosis-page .component-card {
+  display: none;
 }
 
 #dark-mode-button,
