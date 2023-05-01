@@ -68,21 +68,25 @@ button {
   opacity: 0.5;
 }
 
+.settings-card h1,
 .component-card h1 {
   font-size: 20px;
   opacity: 0.85;
 }
 
+.settings-card h2,
 .component-card h2 {
   font-size: 12px;
   opacity: 0.35;
 }
 
+.settings-card,
 .component-card {
   white-space: nowrap;
   animation: fade-in forwards 1s ease;
 }
 
+.settings-card-fields,
 .component-card-fields {
   opacity: 0;
   max-height: 0;
@@ -91,6 +95,7 @@ button {
   transition: opacity 0.5s ease, max-height 0.5s ease, margin-top 0.5s ease;
 }
 
+.selected .settings-card-fields,
 .selected .component-card-fields {
   opacity: 1;
   max-height: 100vh;
@@ -140,7 +145,7 @@ button {
   transition: background-color 0.5s ease;
 }
 
-.card > .component-card-header {
+.card.component-card > .component-card-header {
   cursor: grab;
 }
 
@@ -165,6 +170,18 @@ button {
   margin-left: 5px;
   cursor: pointer;
   transition: opacity 0.5s ease;
+}
+
+.info-button {
+  width: 1em;
+  height: 1em;
+  margin-left: auto;
+  margin-right: 5px;
+  cursor: help;
+}
+
+.goto-button {
+  margin-left: 5px;
 }
 
 .add-subcomponent-button {
@@ -208,6 +225,7 @@ button {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  align-items: center;
   margin: 5px 5px;
 }
 
@@ -251,8 +269,8 @@ button {
 #tooltip {
   content: var(--label);
   color: var(--near-black);
-  background-color: var(--light-background);
-  border: 1px solid var(--light-border);
+  background-color: var(--light-border);
+  border: 1px solid var(--near-black);
   border-radius: 5px;
   padding: 5px 10px;
   font-size: 14px;
@@ -277,6 +295,7 @@ button {
 
 /* ============ */
 /* INVALID PROP */
+.validation-invalid.settings-card,
 .validation-invalid.component-card {
   outline: 3px solid var(--warning-orange);
 }
@@ -419,4 +438,9 @@ body.darkMode {
 .darkMode h2,
 .darkMode .prop-input::before {
   color: white
+}
+
+.darkMode #tooltip {
+  background-color: var(--light-background);
+  border: 1px solid var(--light-border)
 }

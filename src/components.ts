@@ -89,7 +89,7 @@ export module Components {
   export interface Page {
     pageID: string, // Must be unique, used for page linking
     title: string,
-    content: PageComponent[],
+    content: Component[],
 
     // By default each page has two buttons, "Next" and "Prev". While "Prev" always returns to the page which
     // linked to this page, the page "Next" sends to may depend on logic in the page. If no logic is triggered,
@@ -97,7 +97,6 @@ export module Components {
     // this defaultLink. If there are multiple LogicComponents, tiebreaking if multiple are satisfied is done
     // based on order (highest on page has highest precedence). 
     defaultLink: string, 
-    conditionalLinks: LogicComponent[],
   }
 
   // ============== \\

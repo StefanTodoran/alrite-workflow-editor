@@ -45,6 +45,7 @@ function init() {
     const page: Components.Page = dummyData[i];
     addPageCard(page.pageID, page.title);
   }
+  updateAllDropDowns();
 
   updatePageCardMoveButtons();
   document.getElementById("add-page-button").addEventListener("click", addNewPage);
@@ -61,7 +62,7 @@ function init() {
   addEventListener("mousemove", updateTooltipPosition);
 }
 
-let newPageIndex = 4;
+let newPageIndex = 1;
 function addNewPage() {
   const page = <Components.Page>{
     pageID: `page_${newPageIndex}`,
@@ -72,21 +73,38 @@ function addNewPage() {
   updatePageCardMoveButtons();
   updateAllDropDowns();
 
-  newPageIndex++;
   window.scrollTo({
     left: body.scrollWidth,
     behavior: "smooth",
   });
 }
 
-// Creates and adds a page card to the DOM, before the add button.
-// Populates it with the id and title and adds event listeners.
-function addPageCard(id: string, title: string, components?: HTMLElement[]) {
+/**
+ * Creates and adds a page card to the DOM, before the add button.
+ * Populates it with the id and title and adds event listeners.
+ * 
+ * REQUIRED:
+ * @param id A unique string page identifier is required.
+ * @param title The name of the page, this does not need to be unique.
+ * 
+ * OPTIONAL:
+ * @param defaultLink Sets the page defaultLink prop dropdown to this value.
+ * @param overrideIDs Sets the page defaultLink prop dropdown to have these 
+ * options (should be page IDs).
+ * @param components An array of components created via createComponent() to pre 
+ * add to the page component. Used when importing workflows.
+ */
+function addPageCard(id: string, title: string, defaultLink?: string, overrideIDs?: string[], components?: HTMLElement[]) {
   const card = getTemplateCopy("template-page-card");
   card.id = id;
 
   card.querySelector("h1").textContent = title;
   card.querySelector("h2").textContent = id;
+
+  if (defaultLink && overrideIDs) {
+    const defaultLinkSelect = card.querySelector(".prop-defaultLink") as HTMLSelectElement;
+    updateDropDown(defaultLinkSelect, overrideIDs, defaultLink);
+  }
 
   // Only selected cards can have their components edited.
   createButtonClickEvent(card, ".page-card-header", function () {
@@ -148,12 +166,19 @@ function addPageCard(id: string, title: string, components?: HTMLElement[]) {
     card.insertBefore(newComponent, addComponent);
   });
 
+  // We do this before adding the components to not
+  // double up on event listeners.
+  createGotoButtonListeners(card);
+
   if (components) {
     components.forEach(component => card.insertBefore(component, addComponent));
   }
 
   const addButton = document.getElementById("add-page-button");
   body.insertBefore(card, addButton);
+  
+  // To ensure the same index is never used twice.
+  newPageIndex++;
 }
 
 // Given a card, a component type, and the reference to the "new component" card
@@ -200,7 +225,7 @@ function createComponent(type: string, cardID: string, id: number, props?: { [ke
   }
 
   updateContainedDropDowns(component, pageIDs);
-  updateContainedGotoButtons(component);
+  createGotoButtonListeners(component);
   updateContainedSliderButtons(component);
 
   if (props) {
@@ -217,7 +242,7 @@ function createChoiceSubComponent(pageIDs: string[]) {
   });
 
   updateContainedDropDowns(choice, pageIDs);
-  updateContainedGotoButtons(choice);
+  createGotoButtonListeners(choice);
 
   return choice;
 }
@@ -300,8 +325,8 @@ function updateTooltipPosition(evt: MouseEvent) {
   const hovered = this.document.querySelectorAll(":hover");
   const current = hovered[hovered.length - 1];
 
-  if (current && current.classList.contains("prop-input")) {
-    const text = current.querySelector(".tooltip-text");
+  if (current.closest("svg.info-button")) {
+    const text = current.closest("svg.info-button").parentNode.querySelector(".tooltip-text");
     if (text) {
       tooltip.classList.add("active");
       tooltip.innerHTML = text.innerHTML;
@@ -313,7 +338,7 @@ function updateTooltipPosition(evt: MouseEvent) {
   const x = evt.clientX, y = evt.clientY;
   const bounds = tooltip.getBoundingClientRect();
 
-  tooltip.style.top = Math.min(window.innerHeight - bounds.height, y + 5) + 'px';
+  tooltip.style.top = Math.min(window.innerHeight - bounds.height, y + 10) + 'px';
   tooltip.style.left = Math.min(window.innerWidth - bounds.width - 20, x + 10) + 'px';
 
   if (y + bounds.height > window.innerHeight) {
@@ -366,21 +391,17 @@ function createSliderButtonListeners(buttons: NodeListOf<Element>) {
   });
 }
 
-function updateContainedGotoButtons(container: HTMLElement) {
-  const gotos = container.querySelectorAll(".goto-button");
-  if (gotos) {
-    createGotoButtonListeners(gotos);
-  }
-}
-
-function createGotoButtonListeners(buttons: NodeListOf<Element>) {
-  buttons.forEach(button => {
-    button.addEventListener("click", function () {
-      const target = (button.previousElementSibling as HTMLSelectElement).value;
-      selectedCard = target;
-      updateSelectedCard();
+function createGotoButtonListeners(container: HTMLElement) {
+  const buttons = container.querySelectorAll(".goto-button");
+  if (buttons) {
+    buttons.forEach(button => {
+      button.addEventListener("click", function () {
+        const target = (button.previousElementSibling as HTMLSelectElement).value;
+        selectedCard = target;
+        updateSelectedCard();
+      });
     });
-  });
+  }
 }
 
 // Used to update dropdowns when a new page is added or
@@ -402,8 +423,9 @@ function updateContainedDropDowns(container: HTMLElement, IDs: string[]) {
   }
 }
 
-function updateDropDown(dropdown: HTMLSelectElement, values: string[]) {
-  const previous = dropdown.value; // If this is not "", we want the value to persist
+function updateDropDown(dropdown: HTMLSelectElement, values: string[], value?: string) {
+  // If this is not "", we want the value to persist
+  const previous = value || dropdown.value; 
 
   dropdown.innerHTML = "";
   for (let i = 0; i < values.length; i++) {
@@ -432,13 +454,13 @@ function drag(evt: any) { // Called on drag start
   evt.dataTransfer.setData("component", evt.target.parentNode.id);
 }
 
-function drop(evt: any) {
+function drop(evt: any, target: string, before: boolean) {
   evt.preventDefault();
   const id = evt.dataTransfer.getData("component");
   const component = document.getElementById(id);
 
   // The component we want to move the dragged component above
-  const targetComponent = evt.target.closest(".card.component-card");
+  const targetComponent = evt.target.closest(target);
   const pageCard = targetComponent.parentNode;
 
   // Update the id (in case we were dragged to a new page)
@@ -446,7 +468,19 @@ function drop(evt: any) {
   const parts = component.id.split(".");
   component.id = `${pageCard.id}.${parts[1]}.${componentID++}`;
 
-  pageCard.insertBefore(component, targetComponent);
+  if (before) {
+    pageCard.insertBefore(component, targetComponent);
+  } else {
+    pageCard.insertBefore(component, targetComponent.nextSibling);
+  }
+}
+
+function dropBefore(evt: any) {
+  drop(evt, ".card.component-card", true);
+}
+
+function dropAfter(evt: any) {
+  drop(evt, ".card.settings-card", false);
 }
 
 // ==================== \\
@@ -504,8 +538,10 @@ function importWorkflow(json: any) {
       components.push(component);
     }
 
-    addPageCard(page.pageID, page.title, components);
+    addPageCard(page.pageID, page.title, page.defaultLink, IDs, components);
   });
+
+  updateAllDropDowns();
 }
 
 function exportWorkflow() {
@@ -550,6 +586,9 @@ function extractPageCard(card: HTMLElement): Components.Page {
     title: card.querySelector("h1").textContent,
     content: [],
   };
+
+  const defaultLink = card.querySelector(".settings-card-fields").querySelector(".prop-defaultLink") as HTMLSelectElement;
+  page.defaultLink = defaultLink.value;
 
   // All page and logic components have card and component-card
   // class, subcomponents have sub-card and component-card class.
