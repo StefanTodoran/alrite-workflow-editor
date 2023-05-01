@@ -59,7 +59,7 @@ function init() {
   document.getElementById("dark-mode-button").addEventListener("click", toggleDarkMode);
   updateDarkMode();
 
-  addEventListener("mousemove", updateTooltipPosition);
+  addEventListener("mousemove", updateTooltip);
 }
 
 let newPageIndex = 1;
@@ -320,7 +320,7 @@ function updateDarkMode() {
   }
 }
 
-function updateTooltipPosition(evt: MouseEvent) {
+function updateTooltip(evt: MouseEvent) {
   const tooltip = document.getElementById("tooltip");
   const hovered = this.document.querySelectorAll(":hover");
   const current = hovered[hovered.length - 1];
@@ -338,11 +338,11 @@ function updateTooltipPosition(evt: MouseEvent) {
   const x = evt.clientX, y = evt.clientY;
   const bounds = tooltip.getBoundingClientRect();
 
-  tooltip.style.top = Math.min(window.innerHeight - bounds.height, y + 10) + 'px';
+  tooltip.style.top = Math.min(window.innerHeight - bounds.height, y + 15) + 'px';
   tooltip.style.left = Math.min(window.innerWidth - bounds.width - 20, x + 10) + 'px';
 
-  if (y + bounds.height > window.innerHeight) {
-    tooltip.style.top = y - 30 - bounds.height + 'px';
+  if (y + bounds.height + 30 > window.innerHeight) {
+    tooltip.style.top = y - 20 - bounds.height + 'px';
   }
 }
 
@@ -613,7 +613,7 @@ function extractPageCard(card: HTMLElement): Components.Page {
       choices.push(subvalues);
     });
 
-    if (choices) {
+    if (choices.length) {
       values["choices"] = choices;
     }
 

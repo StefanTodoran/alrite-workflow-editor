@@ -280,6 +280,7 @@ button {
   opacity: 0;
   transform: scale(0.95);
   transition: opacity 0.25s ease, transform 0.25s ease;
+  white-space: nowrap;
 }
 
 #tooltip.active {
@@ -289,6 +290,7 @@ button {
 
 .tooltip-text {
   display: none;
+  white-space: nowrap;
 }
 /* HOVER TOOLTIP */
 /* ============= */
