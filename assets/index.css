@@ -118,6 +118,7 @@ button {
 
 .page-card.selected {
   flex-basis: 450px;
+  /* flex-basis: 900px; */
 }
 
 .card {
@@ -208,7 +209,11 @@ button {
 .disabled,
 .multiselect .prop-link,
 .multiselect .prop-link + .goto-button,
+
 .diagnosis-page .add-component-button,
+.diagnosis-page .prop-defaultLink,
+.diagnosis-page .prop-defaultLink + .goto-button,
+
 .page-card:not(.selected) .drop-down,
 .page-card:not(.selected) .drop-down {
   pointer-events: none;

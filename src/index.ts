@@ -16,6 +16,7 @@ var templates: { [key: string]: string } = {
 
   // Logic Components
   "Comparison": "template-comparison-component",
+  "Selection": "template-selection-component",
 }
 
 /**
@@ -61,6 +62,10 @@ function init() {
   updateDarkMode();
 
   addEventListener("mousemove", updateTooltip);
+
+  // Adds a confirmation prompt if the user attempts to
+  // close the tab or go back, so changes aren't lost.
+  window.onbeforeunload = () => { return true; };
 }
 
 let newPageIndex = 1;
@@ -99,8 +104,29 @@ function addPageCard(id: string, title: string, defaultLink?: string, overrideID
   const card = getTemplateCopy("template-page-card");
   card.id = id;
 
-  card.querySelector("h1").textContent = title;
+  const titleElement = card.querySelector("h1");
+  titleElement.textContent = title;
   card.querySelector("h2").textContent = id;
+
+  // We wish to avoid new lines in page titles, and we also
+  // select the card for convenience. Also we don't want click through.
+  titleElement.addEventListener("keydown", (evt) => {
+    if (evt.key === "Enter") {
+      (document.activeElement as HTMLElement).blur();
+      selectedCard = card.id;
+      updateSelectedCard();
+      evt.preventDefault();
+    }
+  });
+
+  // We don't want to allow the pasting of anything other than
+  // plain text, and we wish to remove new line characters.
+  titleElement.addEventListener("paste", (evt) => {
+    let text = evt.clipboardData.getData('text/plain');
+    text = text.replace(/(\n|\r)/g, "");
+    titleElement.innerText = text;
+    evt.preventDefault();
+  });
 
   if (defaultLink && overrideIDs) {
     const defaultLinkSelect = card.querySelector(".prop-defaultLink") as HTMLSelectElement;
@@ -111,17 +137,6 @@ function addPageCard(id: string, title: string, defaultLink?: string, overrideID
   createButtonClickEvent(card, ".page-card-header", function () {
     selectedCard = selectedCard === card.id ? null : card.id;
     updateSelectedCard();
-  });
-
-  // We wish to avoid newlines in page titles, and we also
-  // select the card for convenience. Also we don't want click through.
-  card.querySelector("h1").addEventListener("keydown", (evt) => {
-    if (evt.key === "Enter") {
-      (document.activeElement as HTMLElement).blur();
-      selectedCard = card.id;
-      updateSelectedCard();
-      evt.preventDefault();
-    }
   });
 
   // These buttons are used to rearrange page cards, the order has no 
@@ -178,7 +193,7 @@ function addPageCard(id: string, title: string, defaultLink?: string, overrideID
 
   const addButton = document.getElementById("add-page-button");
   body.insertBefore(card, addButton);
-  
+
   // To ensure the same index is never used twice.
   newPageIndex++;
 }
@@ -430,7 +445,7 @@ function updateContainedDropDowns(container: HTMLElement, IDs: string[]) {
 
 function updateDropDown(dropdown: HTMLSelectElement, values: string[], value?: string) {
   // If this is not "", we want the value to persist
-  const previous = value || dropdown.value; 
+  const previous = value || dropdown.value;
 
   dropdown.innerHTML = "";
   for (let i = 0; i < values.length; i++) {
@@ -598,7 +613,9 @@ function extractPageCard(card: HTMLElement): Components.Page {
   page.defaultLink = defaultLink.value;
 
   const isDiagnosisPage = settings.querySelector(".prop-isDiagnosisPage") as HTMLSelectElement;
-  if (!isDiagnosisPage) {
+  page.isDiagnosisPage = isDiagnosisPage.classList.contains("active");
+
+  if (!page.isDiagnosisPage) {
     // The diagnosis page should not have any custom content. This is
     // a hard-coded page in the app and any modifications to it should
     // be done by contacting the developers.
@@ -606,30 +623,30 @@ function extractPageCard(card: HTMLElement): Components.Page {
     // All page and logic components have card and component-card
     // class, subcomponents have sub-card and component-card class.
     const components = card.querySelectorAll(".card.component-card");
-  
+
     components.forEach(component => {
       // We want only this component's props, not those of subcomponents.
       const props = component.querySelector(".component-card-fields").querySelectorAll(".prop-input");
-  
+
       // The id is of the format 'pageID.type.number'.
       const type = component.id.split(".")[1];
       const values = extractProps(props);
-  
+
       // This entire portion for subcomponents is exclusively to
       // deal with multiple choice components and their nested choices.
       const subcomponents = component.querySelectorAll(".sub-card.component-card");
       const choices: { [key: string]: any; }[] = [];
-  
+
       subcomponents.forEach(subcomponent => {
         const subprops = subcomponent.querySelectorAll(".prop-input");
         const subvalues = extractProps(subprops);
         choices.push(subvalues);
       });
-  
+
       if (choices.length) {
         values["choices"] = choices;
       }
-  
+
       page.content.push(createObjectFromProps(type, values));
     });
   }

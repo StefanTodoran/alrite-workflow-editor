@@ -97,6 +97,8 @@ export module Components {
     // this defaultLink. If there are multiple LogicComponents, tiebreaking if multiple are satisfied is done
     // based on order (highest on page has highest precedence). 
     defaultLink: string, 
+
+    isDiagnosisPage: boolean,
   }
 
   // ============== \\
@@ -117,7 +119,7 @@ export module Components {
 
   export interface SelectionLogic extends LogicComponent {
     type: string, // Valid types include "all_selected", "at_least_one", "exactly_one", "none_selected"
-    targetValueIDs: string[],
+    targetValueID: string[],
     satisfiedLink: string, // The pageID to link to given when the value satisfies the selection type
   }
 }
