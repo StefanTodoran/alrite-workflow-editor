@@ -137,6 +137,12 @@ function addPageCard(id: string, title: string, defaultLink?: string, overrideID
   createButtonClickEvent(card, ".page-card-header", function () {
     selectedCard = selectedCard === card.id ? null : card.id;
     updateSelectedCard();
+    // if (selectedCard) {
+    //   setTimeout(function() {
+    //     const xPosition = card.getBoundingClientRect().left + window.scrollX;
+    //     window.scrollTo({ left: xPosition, behavior: 'smooth' });
+    //   }, 500);
+    // }
   });
 
   // These buttons are used to rearrange page cards, the order has no 

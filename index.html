@@ -63,12 +63,13 @@
           </select>
           <button class="goto-button">Goto</button>
           <p class="tooltip-text">
-            By default each page has two buttons, "Next" and "Prev". While "Prev" always returns to the page which<br>
-            linked to this page, the page "Next" sends to may depend on logic in the page. If no logic is triggered,<br>
-            defaultLink is the destination. <br><br>
-            However, LogicComponents trigger when "Next" is pressed and can override this defaultLink. If there are<br>
-            multiple LogicComponents, tiebreaking if multiple are satisfied is done based on order (highest on page<br>
-            has highest precedence).
+            By default each page has two buttons, "Next" and "Prev". While "Prev" always 
+            returns to the page which linked to this page, the page "Next" sends to may 
+            depend on logic in the page. If no logic is triggered, defaultLink is the 
+            destination. <br><br>
+            However, LogicComponents trigger when "Next" is pressed and can override this 
+            defaultLink. If there are multiple LogicComponents, tiebreaking if multiple 
+            are satisfied is done based on order (highest on page has highest precedence).
           </p>
         </span>
         <span class="prop-input" style="--label: 'isDiagnosisPage'">
@@ -82,8 +83,8 @@
             <div class="slider-knob"></div>
           </div>
           <p class="tooltip-text">
-            After all data has been collected, there is a special page displaying all the<br>
-            collected information and diagnoses. There should be only one page that is the<br>
+            After all data has been collected, there is a special page displaying all the
+            collected information and diagnoses. There should be only one page that is the
             diagnosis page. This page has no components.
           </p>
         </span>
@@ -145,7 +146,7 @@
             fill="white" />
         </svg>
         <input type="text" class="prop-label" placeholder="Text prompt">
-        <p class="tooltip-text">Text indicating what the nurse should input.</p>
+        <p class="tooltip-text">Text prompt indicating what the nurse should input.</p>
       </span>
       <span class="prop-input" style="--label: 'type'">
         <svg class="card-button info-button" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -156,8 +157,8 @@
         </svg>
         <input type="text" class="prop-type" placeholder="Valid input type">
         <p class="tooltip-text">
-          Type of input to accept, e.g. "numeric", "alphanumeric", "default", "any".<br>
-          Default means alphabetical character input only, no numbers.<br>
+          Type of input to accept, e.g. "numeric", "alphanumeric", "default", "any".<br><br>
+          Default means alphabetical character input only, no numbers.
           Any means no restrictions.
         </p>
       </span>
@@ -193,7 +194,7 @@
         </svg>
         <input type="text" class="prop-defaultValue">
         <p class="tooltip-text">
-          Default value to the text input should start off with.<br>
+          Default value to the text input should start off with.
           The type of this depends on type property.
         </p>
       </span>
@@ -326,7 +327,7 @@
             fill="white" />
         </svg>
         <input type="text" class="prop-label" placeholder="Question text prompt">
-        <p class="tooltip-text">Text indicating what the nurse should input.</p>
+        <p class="tooltip-text">Text prompt indicating what the nurse should input.</p>
       </span>
       <span class="prop-input" style="--label: 'valueID'">
         <svg class="card-button info-button" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -352,7 +353,7 @@
           <div class="slider-knob"></div>
         </div>
         <p class="tooltip-text">
-          If true, multiple choice can be selected, so the choices will be checkboxes.<br>
+          If true, multiple choice can be selected, so the choices will be checkboxes.
           Otherwise, only one option may be selected, so the choices will be radio buttons.
         </p>
       </span>
@@ -394,7 +395,7 @@
             fill="white" />
         </svg>
         <input type="text" class="prop-text" placeholder="Text this choice displays">
-        <p class="tooltip-text">The text this choice displays.</p>
+        <p class="tooltip-text">The text this choice displays, indicating when to select.</p>
       </span>
       <span class="prop-input" style="--label: 'value'">
         <svg class="card-button info-button" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -405,7 +406,7 @@
         </svg>
         <input type="text" class="prop-value" placeholder="Value this choice corresponds to">
         <p class="tooltip-text">
-          The value associated with selecting this choice (can be the same or different to text).<br>
+          The value associated with selecting this choice (can be the same or different to text).
           You might want this to be different if some logic is done based on this choice.
         </p>
       </span>
@@ -420,7 +421,7 @@
         </select>
         <button class="goto-button">Goto</button>
         <p class="tooltip-text">
-          Page id that should this choice should link to if selected.<br>
+          Page id that should this choice should link to if selected.
           Not valid if the multiple choice component has multiselect enabled.
         </p>
       </span>
@@ -464,7 +465,7 @@
         </svg>
         <input type="text" class="prop-hint">
         <p class="tooltip-text">
-          Optional supplement to the title indicating in more detail what should be<br>
+          Optional supplement to the title indicating in more detail what should be
           input, displayed underneath the title.
         </p>
       </span>
@@ -502,8 +503,8 @@
           <div class="slider-knob"></div>
         </div>
         <p class="tooltip-text">
-          If true, multiple choice can be selected, so the choices will be checkboxes.<br>
-          Otherwise, only one option may be selected, so the choices will be radio buttons.
+          Whether or not the nurse should be able to bypass the counting process and simply
+          type in a value.
         </p>
       </span>
     </div>
@@ -536,9 +537,9 @@
         </svg>
         <input type="text" class="prop-type" placeholder=">, <, >=, <=, or =">
         <p class="tooltip-text">
-          The type of comparison to be done. The left side of the operation<br>
+          The type of comparison to be done. The left side of the operation
           will be the target value, and the right will be the threshold. For example:<br><br>
-          If type is ">" threshold is 40 and targetValueID is "value_01", then<br>
+          If type is ">" threshold is 40 and targetValueID is "value_01", then
           the comparison would be: is value_01's value > 40?
         </p>
       </span>
@@ -563,7 +564,7 @@
         </svg>
         <input type="text" class="prop-targetValueID" placeholder="Value ID to compare">
         <p class="tooltip-text">
-          Unique id for some input value in another component on this page.<br>
+          Unique id for some input value in another component on this page.
           This value will be checked against the threshold.
         </p>
       </span>
@@ -578,7 +579,7 @@
         </select>
         <button class="goto-button">Goto</button>
         <p class="tooltip-text">
-          On pressing the "Next" button, if the target value satisfies the threshold,<br>
+          On pressing the "Next" button, if the target value satisfies the threshold,
           the page that should be navigated to.
         </p>
       </span>
@@ -625,7 +626,7 @@
         </svg>
         <input type="text" class="prop-targetValueID" placeholder="Value ID to compare">
         <p class="tooltip-text">
-          Unique id for some input value in another component on this page.<br>
+          Unique id for some input value in another component on this page.
           This value will be checked against the threshold.
         </p>
       </span>
@@ -640,7 +641,7 @@
         </select>
         <button class="goto-button">Goto</button>
         <p class="tooltip-text">
-          On pressing the "Next" button, if the target value satisfies the selection<br>
+          On pressing the "Next" button, if the target value satisfies the selection
           type, the page that should be navigated to.
         </p>
       </span>
