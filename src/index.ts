@@ -143,6 +143,7 @@ function addPageCard(id: string, title: string, isDiagnosisPage?: boolean, defau
   createButtonClickEvent(card, ".page-card-header", function () {
     selectedCard = selectedCard === card.id ? null : card.id;
     updateSelectedCard();
+    
     if (selectedCard) {
       const xPosition = card.getBoundingClientRect().left + window.scrollX;
       const windowHeight = window.innerWidth || document.documentElement.clientWidth;
@@ -482,20 +483,6 @@ function updateDropDown(dropdown: HTMLSelectElement, values: string[], value?: s
     dropdown.value = previous;
   }
 }
-
-// function isVerticallyOutsideViewport(element: HTMLElement) {
-//   const bounding = element.getBoundingClientRect();
-//   const windowHeight = window.innerWidth || document.documentElement.clientWidth;
-
-//   return bounding.top < 0 || bounding.bottom > windowHeight;
-// }
-
-// function isHorizontallyOutsideViewport(element: HTMLElement) {
-//   const bounding = element.getBoundingClientRect();
-//   const windowWidth = window.innerHeight || document.documentElement.clientHeight;
-
-//   return bounding.left < 0 || bounding.right > windowWidth;
-// }
 
 // ======================= \\
 // DRAG AND DROP FUNCTIONS \\
