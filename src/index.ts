@@ -95,12 +95,13 @@ function addNewPage() {
  * 
  * OPTIONAL:
  * @param defaultLink Sets the page defaultLink prop dropdown to this value.
+ * @param isDiagnosisPage Sets the page isDiagnosisPage slider button to this value.
  * @param overrideIDs Sets the page defaultLink prop dropdown to have these 
  * options (should be page IDs).
  * @param components An array of components created via createComponent() to pre 
  * add to the page component. Used when importing workflows.
  */
-function addPageCard(id: string, title: string, defaultLink?: string, overrideIDs?: string[], components?: HTMLElement[]) {
+function addPageCard(id: string, title: string, isDiagnosisPage?: boolean, defaultLink?: string, overrideIDs?: string[], components?: HTMLElement[]) {
   const card = getTemplateCopy("template-page-card");
   card.id = id;
 
@@ -133,16 +134,21 @@ function addPageCard(id: string, title: string, defaultLink?: string, overrideID
     updateDropDown(defaultLinkSelect, overrideIDs, defaultLink);
   }
 
+  if (isDiagnosisPage) {
+    const diagnosisSlider = card.querySelector(".prop-isDiagnosisPage");
+    diagnosisSlider.classList.add("active");
+  }
+
   // Only selected cards can have their components edited.
   createButtonClickEvent(card, ".page-card-header", function () {
     selectedCard = selectedCard === card.id ? null : card.id;
     updateSelectedCard();
-    // if (selectedCard) {
-    //   setTimeout(function() {
-    //     const xPosition = card.getBoundingClientRect().left + window.scrollX;
-    //     window.scrollTo({ left: xPosition, behavior: 'smooth' });
-    //   }, 500);
-    // }
+    if (selectedCard) {
+      const xPosition = card.getBoundingClientRect().left + window.scrollX;
+      const windowHeight = window.innerWidth || document.documentElement.clientWidth;
+
+      window.scrollTo({ left: xPosition - (windowHeight / 3), behavior: 'smooth' });
+    }
   });
 
   // These buttons are used to rearrange page cards, the order has no 
@@ -186,6 +192,9 @@ function addPageCard(id: string, title: string, defaultLink?: string, overrideID
 
     addComponent.classList.add("disabled"); // No new components until the current one is created.
     card.insertBefore(newComponent, addComponent);
+
+    const yPosition = newComponent.getBoundingClientRect().top + window.scrollY;
+    window.scrollTo({ top: yPosition, behavior: "smooth" });
   });
 
   // We do this before adding the components to not
@@ -212,6 +221,9 @@ function addEmptyComponentToCard(type: string, card: HTMLElement, creator: HTMLE
 
   card.insertBefore(component, creator);
   card.removeChild(creator);
+
+  const yPosition = component.getBoundingClientRect().top + window.scrollY;
+  window.scrollTo({ top: yPosition, behavior: "smooth" });
 }
 
 /**
@@ -244,6 +256,9 @@ function createComponent(type: string, cardID: string, id: number, props?: { [ke
     addButton.addEventListener("click", () => {
       const choice = createChoiceSubComponent(pageIDs);
       component.querySelector(".card-subcomponents").insertBefore(choice, addButton);
+      
+      const yPosition = choice.getBoundingClientRect().top + window.scrollY;
+      window.scrollTo({ top: yPosition, behavior: "smooth" });
     });
   }
 
@@ -468,6 +483,20 @@ function updateDropDown(dropdown: HTMLSelectElement, values: string[], value?: s
   }
 }
 
+// function isVerticallyOutsideViewport(element: HTMLElement) {
+//   const bounding = element.getBoundingClientRect();
+//   const windowHeight = window.innerWidth || document.documentElement.clientWidth;
+
+//   return bounding.top < 0 || bounding.bottom > windowHeight;
+// }
+
+// function isHorizontallyOutsideViewport(element: HTMLElement) {
+//   const bounding = element.getBoundingClientRect();
+//   const windowWidth = window.innerHeight || document.documentElement.clientHeight;
+
+//   return bounding.left < 0 || bounding.right > windowWidth;
+// }
+
 // ======================= \\
 // DRAG AND DROP FUNCTIONS \\
 // ======================= \\
@@ -564,7 +593,7 @@ function importWorkflow(json: any) {
       components.push(component);
     }
 
-    addPageCard(page.pageID, page.title, page.defaultLink, IDs, components);
+    addPageCard(page.pageID, page.title, page.isDiagnosisPage, page.defaultLink, IDs, components);
   });
 
   updateAllDropDowns();

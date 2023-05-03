@@ -7,7 +7,7 @@ body {
   --warning-orange: #ED6F2E;
 
   margin: 0;
-  padding-bottom: 10vh;
+  /* padding-bottom: 10vh; */
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -119,7 +119,6 @@ button {
 
 .page-card.selected {
   flex-basis: 450px;
-  /* flex-basis: 900px; */
 }
 
 .card {
