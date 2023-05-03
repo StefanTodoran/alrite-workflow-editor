@@ -137,6 +137,7 @@ function addPageCard(id: string, title: string, isDiagnosisPage?: boolean, defau
   if (isDiagnosisPage) {
     const diagnosisSlider = card.querySelector(".prop-isDiagnosisPage");
     diagnosisSlider.classList.add("active");
+    card.classList.add("diagnosis-page");
   }
 
   // Only selected cards can have their components edited.
@@ -440,6 +441,7 @@ function createGotoButtonListeners(container: HTMLElement) {
         const target = (button.previousElementSibling as HTMLSelectElement).value;
         selectedCard = target;
         updateSelectedCard();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       });
     });
   }
@@ -471,9 +473,11 @@ function updateDropDown(dropdown: HTMLSelectElement, values: string[], value?: s
   dropdown.innerHTML = "";
   for (let i = 0; i < values.length; i++) {
     const option = document.createElement("option");
+    const target = document.getElementById(values[i]);
+    const title = target?.querySelector("h1").textContent;
 
     option.value = values[i];
-    option.innerHTML = values[i];
+    option.innerHTML = `${title} (${values[i]})`;
 
     dropdown.appendChild(option);
   }

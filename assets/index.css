@@ -118,7 +118,8 @@ button {
 }
 
 .page-card.selected {
-  flex-basis: 450px;
+  /* flex-basis: 450px; */
+  flex-basis: 550px;
 }
 
 .card {
