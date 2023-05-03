@@ -118,7 +118,8 @@ button {
 }
 
 .page-card.selected {
-  flex-basis: 450px;
+  /* flex-basis: 450px; */
+  flex-basis: 550px;
 }
 
 .card {
@@ -391,10 +392,7 @@ button {
   display: none;
 }
 
-#dark-mode-button,
-#light-mode-button,
-#export-button,
-#import-button {
+.util-button {
   position: fixed;
   bottom: 10px;
   right: 10px;
@@ -411,21 +409,26 @@ button {
 #import-button {
   right: 110px;
 }
+#file-import-button {
+  right: 160px;
+}
 
 .darkMode #export-button rect {
   fill: var(--light-background)
 }
-.darkMode #import-button rect {
+.darkMode #import-button rect,
+.darkMode #file-import-button rect {
   fill: var(--light-background)
 }
-.darkMode #import-button .needs-dark-fill {
+.darkMode #file-import-button .needs-dark-fill {
   fill: #4B7557
 }
 
 #dark-mode-button:hover,
 #light-mode-button:hover,
 #export-button:hover,
-#import-button:hover {
+#import-button:hover,
+#file-import-button:hover {
   transform: scale(0.95);
   opacity: 0.75;
 }

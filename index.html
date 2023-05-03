@@ -63,12 +63,12 @@
           </select>
           <button class="goto-button">Goto</button>
           <p class="tooltip-text">
-            By default each page has two buttons, "Next" and "Prev". While "Prev" always 
-            returns to the page which linked to this page, the page "Next" sends to may 
-            depend on logic in the page. If no logic is triggered, defaultLink is the 
+            By default each page has two buttons, "Next" and "Prev". While "Prev" always
+            returns to the page which linked to this page, the page "Next" sends to may
+            depend on logic in the page. If no logic is triggered, defaultLink is the
             destination. <br><br>
-            However, LogicComponents trigger when "Next" is pressed and can override this 
-            defaultLink. If there are multiple LogicComponents, tiebreaking if multiple 
+            However, LogicComponents trigger when "Next" is pressed and can override this
+            defaultLink. If there are multiple LogicComponents, tiebreaking if multiple
             are satisfied is done based on order (highest on page has highest precedence).
           </p>
         </span>
@@ -585,7 +585,7 @@
       </span>
     </div>
   </div>
-  
+
   <!-- SELECTION LOGIC COMPONENT -->
   <div class="card component-card hidden" id="template-selection-component" ondrop="dropBefore(event)"
     ondragover="allowDrop(event)">
@@ -661,7 +661,7 @@
   </div>
 
   <!-- DARK MODE BUTTON -->
-  <svg id="dark-mode-button" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg class="util-button" id="dark-mode-button" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
     <rect width="100" height="100" rx="10" fill="#545454" />
     <path opacity="0.5"
       d="M26.9449 88C29.7367 88 32 85.6228 32 82.6905C32 81.0602 31.3004 79.6015 30.1994 78.6275C30.2432 73.6227 22.8649 70.0284 18.652 73.2256C17.6096 72.4535 16.338 72 14.9655 72C11.4287 72 8.56158 75.0114 8.56158 78.7262C8.56158 78.8761 8.56625 79.0249 8.57544 79.1724C7.05347 79.9251 6 81.5506 6 83.4345C6 85.56 7.34093 87.3565 9.18272 87.9418L26.9449 88Z"
@@ -682,7 +682,7 @@
   </svg>
 
   <!-- LIGHT MODE BUTTON -->
-  <svg id="light-mode-button" class="hidden" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg class="util-button" id="light-mode-button" class="hidden" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
     <rect width="100" height="100" rx="10" fill="#E2E2E2" />
     <circle cx="50" cy="50" r="31" fill="#6FC387" />
     <path
@@ -691,10 +691,10 @@
   </svg>
 
   <!-- EXPORT BUTTON -->
-  <svg id="export-button" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg class="util-button" id="export-button" style="--label: Upload" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
     <rect width="100" height="100" rx="10" fill="#E2E2E2" />
     <circle cx="68.3501" cy="65.8" r="24.65" fill="#6FC387" />
-    <path d="M51.35 66.225L76.7 64.2063L70.85 58.15L84.5 66.225L70.85 74.3L76.7 68.2438L51.35 66.225Z" fill="#ECF4EE"
+    <path d="M69.075 82.15L67.0562 56.8L61 62.65L69.075 49L77.15 62.65L71.0937 56.8L69.075 82.15Z" fill="#ECF4EE"
       stroke="#ECF4EE" stroke-width="4" stroke-linejoin="round" />
     <path fill-rule="evenodd" clip-rule="evenodd"
       d="M48.375 8C53.0858 8 57.6082 8.80678 61.8115 10.2897C61.9297 10.3314 62.0477 10.3737 62.1654 10.4164C77.1434 15.8592 87.9879 29.9146 88.7115 46.5951C87.0755 44.7062 85.1914 43.038 83.1099 41.6412C81.1136 31.2827 74.5988 22.5331 65.6976 17.5243C68.4587 23.8718 70.3054 30.4491 71.2578 37.1495C70.0286 36.985 68.7743 36.9 67.5 36.9C67.0538 36.9 66.6101 36.9104 66.1689 36.931C64.9666 29.2054 62.4891 21.6801 58.7157 14.5353C55.4448 13.537 51.9726 13 48.375 13C28.8379 13 13 28.8379 13 48.375C13 52.2077 13.6095 55.898 14.7369 59.3543C22.2188 62.956 30.444 65.5181 39.4914 66.4853C39.5856 68.2319 39.8396 69.936 40.239 71.5832C32.1912 70.8544 24.7186 68.9409 17.7904 66.1621C23.6485 76.2133 34.3194 83.1149 46.6449 83.7084C48.317 85.5663 50.2338 87.1995 52.3446 88.5573C51.0386 88.6848 49.7144 88.75 48.375 88.75C31.21 88.75 16.5469 78.0385 10.7052 62.9352L10.6954 62.9101C8.95451 58.4 8 53.499 8 48.375C8 26.0765 26.0765 8 48.375 8Z"
@@ -705,8 +705,22 @@
   </svg>
 
   <!-- IMPORT BUTTON -->
+  <svg class="util-button" id="import-button" style="--label: Download" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="100" height="100" rx="10" fill="#E2E2E2" />
+    <circle cx="31.6499" cy="32.65" r="24.65" transform="rotate(-180 31.6499 32.65)" fill="#6FC387" />
+    <path d="M30.925 16.3L32.9437 41.65L39 35.8L30.925 49.45L22.85 35.8L28.9062 41.65L30.925 16.3Z" fill="#ECF4EE"
+      stroke="#ECF4EE" stroke-width="4" stroke-linejoin="round" />
+    <path fill-rule="evenodd" clip-rule="evenodd"
+      d="M51.625 90.45C46.9142 90.45 42.3918 89.6432 38.1885 88.1603C38.0703 88.1186 37.9523 88.0763 37.8346 88.0336C22.8566 82.5908 12.0121 68.5354 11.2885 51.8549C12.9245 53.7438 14.8086 55.412 16.8901 56.8088C18.8864 67.1672 25.4012 75.9169 34.3024 80.9257C31.5413 74.5782 29.6946 68.0008 28.7422 61.3005C29.9714 61.465 31.2257 61.55 32.5 61.55C32.9462 61.55 33.3899 61.5396 33.8311 61.519C35.0334 69.2446 37.5109 76.7699 41.2843 83.9147C44.5552 84.913 48.0274 85.45 51.625 85.45C71.1621 85.45 87 69.6121 87 50.075C87 46.2423 86.3905 42.552 85.2631 39.0957C77.7812 35.494 69.556 32.9319 60.5087 31.9647C60.4144 30.2181 60.1605 28.514 59.761 26.8668C67.8088 27.5956 75.2814 29.5091 82.2097 32.2879C76.3516 22.2367 65.6806 15.3351 53.3551 14.7416C51.683 12.8837 49.7662 11.2505 47.6554 9.89266C48.9614 9.76522 50.2856 9.69999 51.625 9.69999C68.79 9.69999 83.4531 20.4115 89.2949 35.5147L89.3046 35.5399C91.0455 40.0499 92 44.951 92 50.075C92 72.3735 73.9235 90.45 51.625 90.45Z"
+      fill="#6FC387" />
+    <path fill-rule="evenodd" clip-rule="evenodd"
+      d="M54.125 89.175L54.125 73.715C58.6256 73.468 62.8539 72.977 66.9681 72.1719C65.6884 76.5257 64.0573 80.8574 62.0991 85.1655L66.6509 87.2345C69.1067 81.8317 71.0772 76.3759 72.5158 70.8746C78.0616 69.3593 83.528 67.1932 89.3236 64.1955L87.0264 59.7544C82.4632 62.1147 78.1314 63.9266 73.7886 65.2908C74.6074 61.076 75.1082 56.8363 75.2706 52.575L89.875 52.575L89.875 47.575L75.3047 47.575C75.0238 36.1291 72.2622 24.5374 66.6264 12.8631L62.1236 15.0369C67.4092 25.9856 70.0204 36.838 70.3028 47.575L56.7684 47.575C54.8283 50.9129 52.2193 53.8139 49.125 56.0946L49.125 68.6532C33.8286 67.5188 26.7612 64.8417 15.7028 59.7075L13.5972 64.2425C25.1759 69.6183 32.8491 72.4929 49.125 73.6664L49.125 89.175L54.125 89.175ZM68.3731 66.7619C63.832 67.8068 59.1719 68.4181 54.125 68.7072L54.125 52.575L70.2669 52.575C70.0744 57.3279 69.433 62.0574 68.3731 66.7619Z"
+      fill="#6FC387" />
+  </svg>
+
+  <!-- IMPORT FROM FILE BUTTON -->
   <input type="file" id="importer" style="display:none" />
-  <svg id="import-button" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg class="util-button" id="file-import-button" style="--label: File Import" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
     <rect width="100" height="100" rx="10" fill="#E2E2E2" />
     <path
       d="M21 18.5H54.1005C55.294 18.5 56.4386 18.9741 57.2825 19.818L70.182 32.7175C71.0259 33.5614 71.5 34.706 71.5 35.8995V85C71.5 87.4853 69.4853 89.5 67 89.5H21C18.5147 89.5 16.5 87.4853 16.5 85V23C16.5 20.5147 18.5147 18.5 21 18.5Z"
