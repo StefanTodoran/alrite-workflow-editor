@@ -52,7 +52,8 @@ function init() {
   updatePageCardMoveButtons();
   document.getElementById("add-page-button").addEventListener("click", addNewPage);
   document.getElementById("export-button").addEventListener("click", exportWorkflow);
-  document.getElementById("import-button").addEventListener("click", triggerImport);
+  document.getElementById("import-button").addEventListener("click", fetchWorkflow);
+  document.getElementById("file-import-button").addEventListener("click", triggerFileImport);
   document.getElementById("importer").addEventListener("input", prepareReader);
 
   // Handling dark mode
@@ -257,7 +258,7 @@ function createComponent(type: string, cardID: string, id: number, props?: { [ke
     addButton.addEventListener("click", () => {
       const choice = createChoiceSubComponent(pageIDs);
       component.querySelector(".card-subcomponents").insertBefore(choice, addButton);
-      
+
       const yPosition = choice.getBoundingClientRect().top + window.scrollY;
       window.scrollTo({ top: yPosition, behavior: "smooth" });
     });
@@ -364,12 +365,17 @@ function updateTooltip(evt: MouseEvent) {
   const hovered = this.document.querySelectorAll(":hover");
   const current = hovered[hovered.length - 1];
 
+  let content = undefined;
   if (current.closest("svg.info-button")) {
     const text = current.closest("svg.info-button").parentNode.querySelector(".tooltip-text");
-    if (text) {
-      tooltip.classList.add("active");
-      tooltip.innerHTML = text.innerHTML;
-    }
+    content = text?.innerHTML;
+  } else if (current.closest("svg.util-button")) {
+    content = current.closest("svg.util-button").style.getPropertyValue('--label');
+  }
+
+  if (content) {
+    tooltip.innerHTML = content;
+    tooltip.classList.add("active");
   } else {
     tooltip.classList.remove("active");
   }
@@ -546,7 +552,7 @@ function dropAfter(evt: any) {
 // EXTRACTION FUNCTIONS \\
 // ==================== \\
 
-function triggerImport() {
+function triggerFileImport() {
   const importer = document.getElementById("importer") as HTMLInputElement;
   importer.value = null;
   importer.click();
@@ -569,6 +575,25 @@ function getJSON(this: FileReader, event: ProgressEvent<FileReader>) {
   }
 
   importWorkflow(json);
+}
+
+function fetchWorkflow() {
+  const name = prompt("Please enter the name of the workflow to import: (case sensitive)");
+  if (name == null || name == "") {
+    return;
+  }
+
+  const baseUrl = "http://127.0.0.1:8000";
+  console.log("Attempting to get from:", baseUrl);
+
+  fetch(baseUrl + "/alrite/apis/workflows/" + name + "/", {
+    method: "GET",
+    headers: {
+      "Accept": "application/json",
+    },
+  })
+    .then(res => res.json())
+    .then(res => importWorkflow(res));
 }
 
 function importWorkflow(json: any) {
@@ -604,7 +629,7 @@ function importWorkflow(json: any) {
 }
 
 function exportWorkflow() {
-  const name = prompt("Please enter the workflow name: (case sensitive)");
+  const name = prompt("Please enter the name to export the workflow as: (case sensitive)");
   if (name == null || name == "") {
     return;
   }
