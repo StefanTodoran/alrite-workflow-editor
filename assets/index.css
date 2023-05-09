@@ -1,7 +1,7 @@
 body {
-  /* --alrite-rgb: 111, 195, 135; */
+  --alrite-rgb: 111, 195, 135;
   --alrite-green: #6FC387;
-  --light-green: #ECF4EE;
+  --light-green: #E5F1E8;
 
   --light-border: #E2E2E2;
   --dark-border: #909090;
@@ -48,6 +48,10 @@ input,
 option,
 select {
   font-weight: 200;
+}
+
+input:focus-visible {
+  outline-color: var(--alrite-green);
 }
 
 button {
@@ -134,7 +138,8 @@ button {
   width: 100%;
 
   color: var(--near-black);
-  transition: border 0.5s ease, background-color 0.5s ease;
+  transition: border 0.5s ease, background-color 0.5s ease, outline 0.5s ease;
+  outline: 1px solid transparent;
 }
 
 .selected .card {
@@ -143,11 +148,11 @@ button {
 }
 
 .selected .card-subcomponents {
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(var(--alrite-rgb), 0.1);
 }
 
 .selected .card:hover {
-  /* border: 3px solid var(--alrite-green); */
+  outline: 1px solid var(--alrite-green);
 }
 
 .component-card-header {
@@ -158,7 +163,7 @@ button {
   transition: background-color 0.5s ease;
 }
 
-.card.component-card > .component-card-header {
+.card.component-card>.component-card-header {
   cursor: grab;
 }
 
@@ -224,11 +229,11 @@ button {
 
 .disabled,
 .multiselect .prop-link,
-.multiselect .prop-link + .goto-button,
+.multiselect .prop-link+.goto-button,
 
 .diagnosis-page .add-component-button,
 .diagnosis-page .prop-defaultLink,
-.diagnosis-page .prop-defaultLink + .goto-button,
+.diagnosis-page .prop-defaultLink+.goto-button,
 
 .page-card:not(.selected) .drop-down,
 .page-card:not(.selected) .drop-down {
@@ -271,6 +276,12 @@ button {
   transition: opacity 0.5s ease;
 }
 
+/* .drop-down {
+  Would have this but on stupid firefox this messes up
+  the other drop-down styles... 
+  border-radius: 5px;
+} */
+
 .add-component-button,
 .add-button {
   cursor: pointer;
@@ -292,6 +303,7 @@ button {
 
 /* ============= */
 /* HOVER TOOLTIP */
+
 #tooltip {
   content: var(--label);
   color: var(--near-black);
@@ -322,24 +334,41 @@ button {
   max-width: 30em;
   /* white-space: nowrap; */
 }
+
 /* HOVER TOOLTIP */
 /* ============= */
 
 /* ============ */
 /* INVALID PROP */
+
 .validation-invalid.settings-card,
 .validation-invalid.component-card {
-  outline: 3px solid var(--warning-orange);
+  outline: 3px solid var(--warning-orange) !important;
 }
 
-.validation-invalid.prop-input > input {
-  outline: 3px solid var(--warning-orange);
+.validation-invalid.prop-input>select,
+.validation-invalid.prop-input>input {
+  outline: 3px solid var(--warning-orange) !important;
   border-radius: 3px;
 }
 
 .validation-invalid.prop-input::before {
   color: var(--warning-orange) !important;
 }
+
+.validation-invalid.prop-input {
+  position: relative;
+  margin-bottom: 45px;
+}
+
+.validation-invalid.prop-input::after {
+  content: var(--error-message);
+  color: var(--warning-orange);
+  position: absolute;
+  top: 30px;
+  right: 0;
+}
+
 /* INVALID PROP */
 /* ============ */
 
@@ -355,6 +384,7 @@ button {
   background-color: var(--color);
   transition: background-color 0.5s ease;
 }
+
 .slider-button.active {
   --color: var(--alrite-green);
 }
@@ -371,9 +401,11 @@ button {
   background-color: white;
   transition: border 0.5s ease, left 0.5s ease;
 }
+
 .active .slider-knob {
   left: 26px;
 }
+
 /* SLIDER BUTTON */
 /* ============= */
 
@@ -414,16 +446,20 @@ button {
   width: 40px;
   height: 40px;
   cursor: pointer;
-  transition: transform 0.5s ease, opacity 0.5s ease;
+  transition: transform 0.5s ease, opacity 0.5s ease, border 0.5s ease;
+  border: 2px solid transparent;
+  border-radius: 8px;
 }
 
 #export-button {
   right: 60px;
   /* distance from edge to dark/light mode button + button size + margin */
 }
+
 #import-button {
   right: 110px;
 }
+
 #file-import-button {
   right: 160px;
 }
@@ -431,21 +467,38 @@ button {
 .darkMode #export-button rect {
   fill: var(--light-background)
 }
+
 .darkMode #import-button rect,
 .darkMode #file-import-button rect {
   fill: var(--light-background)
 }
+
 .darkMode #file-import-button .needs-dark-fill {
   fill: #4B7557
 }
 
-#dark-mode-button:hover,
-#light-mode-button:hover,
-#export-button:hover,
-#import-button:hover,
-#file-import-button:hover {
-  transform: scale(0.95);
-  opacity: 0.75;
+.util-button:hover {
+  /* transform: scale(0.95);
+  opacity: 0.75; */
+  border: 2px solid var(--alrite-green)
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px
+}
+
+::-webkit-scrollbar-track {
+  background: none
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--light-border);
+  border-radius: 6px
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--dark-border)
 }
 
 @keyframes fade-in {
@@ -477,10 +530,6 @@ body.darkMode {
 .darkMode h2,
 .darkMode .prop-input::before {
   color: white
-}
-
-.darkMode .selected .card-subcomponents {
-  background-color: rgba(33, 33, 33, 0.1);
 }
 
 .darkMode #tooltip {

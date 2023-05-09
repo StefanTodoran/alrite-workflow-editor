@@ -43,26 +43,28 @@ function init() {
   // close the tab or go back, so changes aren't lost.
   window.onbeforeunload = () => { return true; };
 
-  const dummyWorkflow = {pages: [
-    <Components.Page>{
-      pageID: "page_1",
-      title: "First Page",
-      defaultLink: "page_2",
-      content: [],
-    },
-    <Components.Page>{
-      pageID: "page_2",
-      title: "Second Page",
-      defaultLink: "page_3",
-      content: [],
-    },
-    <Components.Page>{
-      pageID: "page_3",
-      title: "Diagnosis Page",
-      isDiagnosisPage: true,
-      content: [],
-    },
-  ]};
+  const dummyWorkflow = {
+    pages: [
+      <Components.Page>{
+        pageID: "page_1",
+        title: "First Page",
+        defaultLink: "page_2",
+        content: [],
+      },
+      <Components.Page>{
+        pageID: "page_2",
+        title: "Second Page",
+        defaultLink: "page_3",
+        content: [],
+      },
+      <Components.Page>{
+        pageID: "page_3",
+        title: "Diagnosis Page",
+        isDiagnosisPage: true,
+        content: [],
+      },
+    ]
+  };
   importWorkflow(dummyWorkflow);
 }
 
@@ -142,7 +144,7 @@ function addPageCard(id: string, title: string, isDiagnosisPage?: boolean, defau
   createButtonClickEvent(card, ".page-card-header", function () {
     selectedCard = selectedCard === card.id ? null : card.id;
     updateSelectedCard();
-    
+
     if (selectedCard) {
       const xPosition = card.getBoundingClientRect().left + window.scrollX;
       const windowHeight = window.innerWidth || document.documentElement.clientWidth;
@@ -385,7 +387,7 @@ function updateTooltip(evt: MouseEvent) {
   tooltip.style.left = Math.min(window.innerWidth - bounds.width - 20, x + 10) + 'px';
 
   if (y + bounds.height + 30 > window.innerHeight) {
-    tooltip.style.top = y - 20 - bounds.height + 'px';
+    tooltip.style.top = y - 30 - bounds.height + 'px';
   }
 }
 
@@ -641,10 +643,9 @@ function exportWorkflow() {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(workflow)
-  }).then(res => {
-    console.log("Post response:", res);
-    console.log("Response JSON:", res.json());
-  });
+  })
+    .then(res => res.json())
+    .then(json => handleValidation(json));
 }
 
 // Give a reference to a DOM element (specifically a page card),
@@ -710,12 +711,12 @@ function extractProps(props: NodeListOf<Element>) {
     const input = prop.querySelector("input") || prop.querySelector("select");
 
     if (input) {
-      const propName = input.classList[0].slice(5);
+      const propName = getPropName(input);
       values[propName] = input.value;
     } else {
       // We have a slider button
       const slider = prop.querySelector(".slider-button");
-      const propName = slider.classList[0].slice(5);
+      const propName = getPropName(slider);
 
       values[propName] = slider.classList.contains("active");
     }
@@ -733,4 +734,49 @@ function createObjectFromProps(type: string, values: { [key: string]: any }) {
 
   component.component = type;
   return component;
+}
+
+function getPropName(propInput: Element) {
+  return propInput.classList[0].slice(5);
+}
+
+function markPropInvalid(propInput: Element, errorMessage: string) {
+  propInput.parentElement.classList.add("validation-invalid");
+  propInput.parentElement.style.setProperty('--error-message', `'${errorMessage}'`);
+}
+
+function handleValidation(response: any) {
+  for (let i = 0; i < response.pages.length; i++) {
+    const page = response.pages[i] as Components.Page;
+    displayValidationData(page);
+  }
+}
+
+function displayValidationData(page: Components.Page) {
+  const card = document.getElementById(page.pageID);
+  const settings = card.querySelector(".settings-card-fields");
+
+  if (page.defaultLink) {
+    const defaultLink = settings.querySelector(".prop-defaultLink");
+    markPropInvalid(defaultLink, page.defaultLink);
+    card.querySelector(".settings-card").classList.add("validation-invalid");
+  }
+
+  // All page and logic components have card and component-card
+  // class, subcomponents have sub-card and component-card class.
+  const components = card.querySelectorAll(".card.component-card");
+  for (let i = 0; i < components.length; i++) {
+    const validation = page.content[i] as { [key: string]: any };
+    const props = components[i].querySelector(".component-card-fields").querySelectorAll(".prop-input");
+
+    props.forEach(prop => {
+      const input = prop.querySelector("input") || prop.querySelector("select") || prop.querySelector(".slider-button");
+      const propName = getPropName(input);
+
+      if (validation[propName]) {
+        markPropInvalid(input, validation[propName]);
+        components[i].classList.add("validation-invalid");
+      }
+    })
+  }
 }
