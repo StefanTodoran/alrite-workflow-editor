@@ -25,31 +25,6 @@ var templates: { [key: string]: string } = {
 function init() {
   body = document.querySelector("body");
 
-  const dummyData = [
-    <Components.Page>{
-      pageID: "page_1",
-      title: "First Page",
-      content: [],
-    },
-    <Components.Page>{
-      pageID: "page_2",
-      title: "Second Page",
-      content: [],
-    },
-    <Components.Page>{
-      pageID: "page_3",
-      title: "Final Page",
-      content: [],
-    },
-  ];
-
-  for (let i = 0; i < dummyData.length; i++) {
-    const page: Components.Page = dummyData[i];
-    addPageCard(page.pageID, page.title);
-  }
-  updateAllDropDowns();
-
-  updatePageCardMoveButtons();
   document.getElementById("add-page-button").addEventListener("click", addNewPage);
   document.getElementById("export-button").addEventListener("click", exportWorkflow);
   document.getElementById("import-button").addEventListener("click", fetchWorkflow);
@@ -67,6 +42,28 @@ function init() {
   // Adds a confirmation prompt if the user attempts to
   // close the tab or go back, so changes aren't lost.
   window.onbeforeunload = () => { return true; };
+
+  const dummyWorkflow = {pages: [
+    <Components.Page>{
+      pageID: "page_1",
+      title: "First Page",
+      defaultLink: "page_2",
+      content: [],
+    },
+    <Components.Page>{
+      pageID: "page_2",
+      title: "Second Page",
+      defaultLink: "page_3",
+      content: [],
+    },
+    <Components.Page>{
+      pageID: "page_3",
+      title: "Diagnosis Page",
+      isDiagnosisPage: true,
+      content: [],
+    },
+  ]};
+  importWorkflow(dummyWorkflow);
 }
 
 let newPageIndex = 1;
@@ -645,7 +642,8 @@ function exportWorkflow() {
     },
     body: JSON.stringify(workflow)
   }).then(res => {
-    console.log("Post request complete! Response:", res);
+    console.log("Post response:", res);
+    console.log("Response JSON:", res.json());
   });
 }
 

@@ -1,7 +1,10 @@
 body {
+  /* --alrite-rgb: 111, 195, 135; */
   --alrite-green: #6FC387;
   --light-green: #ECF4EE;
+
   --light-border: #E2E2E2;
+  --dark-border: #909090;
   --light-background: #FBFBFB;
   --near-black: #262626;
   --warning-orange: #ED6F2E;
@@ -139,6 +142,14 @@ button {
   border: 3px solid var(--alrite-green);
 }
 
+.selected .card-subcomponents {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.selected .card:hover {
+  /* border: 3px solid var(--alrite-green); */
+}
+
 .component-card-header {
   display: flex;
   flex-direction: row;
@@ -157,6 +168,10 @@ button {
   justify-content: space-between;
   align-items: center;
   cursor: pointer;
+}
+
+.page-card:not(.selected) .page-card-header:hover {
+  border-color: var(--dark-border);
 }
 
 .card-buttons-container {
@@ -452,6 +467,7 @@ body.darkMode {
 
   --light-green: #27442F;
   --light-border: #7E7E7E;
+  --dark-border: #d1d1d1;
   --light-background: #545454;
   --near-black: #262626;
 }
@@ -461,6 +477,10 @@ body.darkMode {
 .darkMode h2,
 .darkMode .prop-input::before {
   color: white
+}
+
+.darkMode .selected .card-subcomponents {
+  background-color: rgba(33, 33, 33, 0.1);
 }
 
 .darkMode #tooltip {
