@@ -1,7 +1,9 @@
 body {
   --alrite-rgb: 111, 195, 135;
   --alrite-green: #6FC387;
+
   --light-green: #E5F1E8;
+  --dark-green: #27442F;
 
   --light-border: #E2E2E2;
   --dark-border: #909090;
@@ -15,6 +17,7 @@ body {
   flex-direction: row;
   align-items: center;
   overflow-y: scroll;
+  min-height: 100vh;
   transition: background-color 0.5s ease;
 }
 
@@ -89,7 +92,7 @@ button {
 }
 
 .settings-card,
-.component-card {
+.component-card:not(.new-component-card) {
   white-space: nowrap;
   animation: fade-in forwards 1s ease;
 }
@@ -120,13 +123,13 @@ button {
   flex-basis: 300px;
   flex-shrink: 0;
   height: calc(100vh - 20px);
-  transition: flex-basis 0.5s ease;
+  transition: flex-basis 0.5s ease, padding 0.5s ease;
   animation: fade-in forwards 1s ease;
 }
 
 .page-card.selected {
-  /* flex-basis: 450px; */
   flex-basis: 550px;
+  /* padding: 10px 30px; */
 }
 
 .card {
@@ -139,7 +142,7 @@ button {
 
   color: var(--near-black);
   transition: border 0.5s ease, background-color 0.5s ease, outline 0.5s ease;
-  outline: 1px solid transparent;
+  outline: 2px solid transparent;
 }
 
 .selected .card {
@@ -152,7 +155,20 @@ button {
 }
 
 .selected .card:hover {
-  outline: 1px solid var(--alrite-green);
+}
+
+.selected .card.card-subcomponents:focus-within,
+.selected .card.component-card:not(.new-component-card):focus-within {
+  outline: 2px solid var(--dark-green);
+}
+
+.new-component-card {
+  animation: pulse 1s;
+  box-shadow: 0 0 0.1em 1em transparent;
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(var(--alrite-rgb), 0.5); }
 }
 
 .component-card-header {
@@ -519,6 +535,8 @@ body.darkMode {
   background-color: var(--near-black);
 
   --light-green: #27442F;
+  --dark-green: #E5F1E8;
+
   --light-border: #7E7E7E;
   --dark-border: #d1d1d1;
   --light-background: #545454;
