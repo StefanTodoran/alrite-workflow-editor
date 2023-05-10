@@ -100,6 +100,9 @@ function addPageCard(id: string, title: string, isDiagnosisPage?: boolean, defau
     }
   });
 
+  // TODO: Add event listener for titleElement updating dropdowns
+  // if the name is changed!
+
   // We don't want to allow the pasting of anything other than
   // plain text, and we wish to remove new line characters.
   titleElement.addEventListener("paste", (evt) => {
