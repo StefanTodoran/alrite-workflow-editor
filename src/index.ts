@@ -1,6 +1,8 @@
 import { Components } from "./components";
 
 window.addEventListener("load", init);
+const baseUrl = "http://127.0.0.1:8000"; // Url of the django server
+
 var body: HTMLElement = null; // Just a nice shorthand to have
 var selectedCard: string = null; // The currently selected page card
 var darkMode: boolean = false;
@@ -27,7 +29,7 @@ function init() {
 
   document.getElementById("add-page-button").addEventListener("click", addNewPage);
   document.getElementById("export-button").addEventListener("click", exportWorkflow);
-  document.getElementById("import-button").addEventListener("click", fetchWorkflow);
+  document.getElementById("import-button").addEventListener("click", promptAndFetchWorkflow);
   document.getElementById("file-import-button").addEventListener("click", triggerFileImport);
   document.getElementById("importer").addEventListener("input", prepareReader);
 
@@ -43,29 +45,7 @@ function init() {
   // close the tab or go back, so changes aren't lost.
   window.onbeforeunload = () => { return true; };
 
-  const dummyWorkflow = {
-    pages: [
-      <Components.Page>{
-        pageID: "page_1",
-        title: "First Page",
-        defaultLink: "page_2",
-        content: [],
-      },
-      <Components.Page>{
-        pageID: "page_2",
-        title: "Second Page",
-        defaultLink: "page_3",
-        content: [],
-      },
-      <Components.Page>{
-        pageID: "page_3",
-        title: "Diagnosis Page",
-        isDiagnosisPage: true,
-        content: [],
-      },
-    ]
-  };
-  importWorkflow(dummyWorkflow);
+  populatePageOnStartup();
 }
 
 let newPageIndex = 1;
@@ -287,6 +267,12 @@ function createChoiceSubComponent(pageIDs: string[]) {
   return choice;
 }
 
+/**
+ * REQUIRED:
+ * @param component Target component whose properties should be updated.
+ * @param props A dictionary of prop names to values.
+ * @param pageIDs Some component props need to know all pageIDs.
+ */
 function populateComponentFields(component: HTMLElement, props: { [key: string]: any }, pageIDs: string[]) {
   const fields = component.querySelector(".component-card-fields");
 
@@ -391,9 +377,9 @@ function updateTooltip(evt: MouseEvent) {
   }
 }
 
-// ================ \\
-// HELPER FUNCTIONS \\
-// ================ \\
+// ======================= \\
+// EDITOR HELPER FUNCTIONS \\
+// ======================= \\
 
 function getAllPageCards() {
   return document.querySelectorAll(".page-card:not(.hidden)");
@@ -534,9 +520,44 @@ function dropAfter(evt: any) {
   drop(evt, ".card.settings-card", false);
 }
 
-// ==================== \\
-// EXTRACTION FUNCTIONS \\
-// ==================== \\
+// ========================= \\
+// IMPORT / EXPORT FUNCTIONS \\
+// ========================= \\
+
+function populatePageOnStartup() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const workflowName = urlParams.get("workflow");
+  const versionNumber = urlParams.get("version");
+
+  if (workflowName) {
+    fetchWorkflow(workflowName, versionNumber);
+  } else {
+    const dummyWorkflow = {
+      pages: [
+        <Components.Page>{
+          pageID: "page_1",
+          title: "First Page",
+          defaultLink: "page_2",
+          content: [],
+        },
+        <Components.Page>{
+          pageID: "page_2",
+          title: "Second Page",
+          defaultLink: "page_3",
+          content: [],
+        },
+        <Components.Page>{
+          pageID: "page_3",
+          title: "Diagnosis Page",
+          isDiagnosisPage: true,
+          content: [],
+        },
+      ]
+    };
+
+    importWorkflow(dummyWorkflow);
+  }
+}
 
 function triggerFileImport() {
   const importer = document.getElementById("importer") as HTMLInputElement;
@@ -563,16 +584,24 @@ function getJSON(this: FileReader, event: ProgressEvent<FileReader>) {
   importWorkflow(json);
 }
 
-function fetchWorkflow() {
+function promptAndFetchWorkflow() {
   const name = prompt("Please enter the name of the workflow to import: (case sensitive)");
   if (name == null || name == "") {
     return;
   }
 
-  const baseUrl = "http://127.0.0.1:8000";
+  fetchWorkflow(name);
+}
+
+function fetchWorkflow(name: string, version?: string) {
   console.log("Attempting to get from:", baseUrl);
 
-  fetch(baseUrl + "/alrite/apis/workflows/" + name + "/", {
+  let target = baseUrl + "/alrite/apis/workflows/" + name + "/";
+  if (version) {
+    target += version + "/";
+  }
+
+  fetch(target, {
     method: "GET",
     headers: {
       "Accept": "application/json",
@@ -633,8 +662,6 @@ function exportWorkflow() {
   }
 
   console.log("Final workflow:\n", workflow);
-
-  const baseUrl = "http://127.0.0.1:8000";
   console.log("Attempting to post to:", baseUrl);
 
   fetch(baseUrl + "/alrite/apis/workflows/" + workflow.name + "/", {
@@ -647,6 +674,46 @@ function exportWorkflow() {
     .then(res => res.json())
     .then(json => handleValidation(json));
 }
+
+function handleValidation(response: any) {
+  for (let i = 0; i < response.pages.length; i++) {
+    const page = response.pages[i] as Components.Page;
+    displayValidationData(page);
+  }
+}
+
+function displayValidationData(page: Components.Page) {
+  const card = document.getElementById(page.pageID);
+  const settings = card.querySelector(".settings-card-fields");
+
+  if (page.defaultLink) {
+    const defaultLink = settings.querySelector(".prop-defaultLink");
+    markPropInvalid(defaultLink, page.defaultLink);
+    card.querySelector(".settings-card").classList.add("validation-invalid");
+  }
+
+  // All page and logic components have card and component-card
+  // class, subcomponents have sub-card and component-card class.
+  const components = card.querySelectorAll(".card.component-card");
+  for (let i = 0; i < components.length; i++) {
+    const validation = page.content[i] as { [key: string]: any };
+    const props = components[i].querySelector(".component-card-fields").querySelectorAll(".prop-input");
+
+    props.forEach(prop => {
+      const input = prop.querySelector("input") || prop.querySelector("select") || prop.querySelector(".slider-button");
+      const propName = getPropName(input);
+
+      if (validation[propName]) {
+        markPropInvalid(input, validation[propName]);
+        components[i].classList.add("validation-invalid");
+      }
+    })
+  }
+}
+
+// ======================= \\
+// IMPORT / EXPORT HELPERS \\
+// ======================= \\
 
 // Give a reference to a DOM element (specifically a page card),
 // creates a Page component for exporting purposes.
@@ -743,40 +810,4 @@ function getPropName(propInput: Element) {
 function markPropInvalid(propInput: Element, errorMessage: string) {
   propInput.parentElement.classList.add("validation-invalid");
   propInput.parentElement.style.setProperty('--error-message', `'${errorMessage}'`);
-}
-
-function handleValidation(response: any) {
-  for (let i = 0; i < response.pages.length; i++) {
-    const page = response.pages[i] as Components.Page;
-    displayValidationData(page);
-  }
-}
-
-function displayValidationData(page: Components.Page) {
-  const card = document.getElementById(page.pageID);
-  const settings = card.querySelector(".settings-card-fields");
-
-  if (page.defaultLink) {
-    const defaultLink = settings.querySelector(".prop-defaultLink");
-    markPropInvalid(defaultLink, page.defaultLink);
-    card.querySelector(".settings-card").classList.add("validation-invalid");
-  }
-
-  // All page and logic components have card and component-card
-  // class, subcomponents have sub-card and component-card class.
-  const components = card.querySelectorAll(".card.component-card");
-  for (let i = 0; i < components.length; i++) {
-    const validation = page.content[i] as { [key: string]: any };
-    const props = components[i].querySelector(".component-card-fields").querySelectorAll(".prop-input");
-
-    props.forEach(prop => {
-      const input = prop.querySelector("input") || prop.querySelector("select") || prop.querySelector(".slider-button");
-      const propName = getPropName(input);
-
-      if (validation[propName]) {
-        markPropInvalid(input, validation[propName]);
-        components[i].classList.add("validation-invalid");
-      }
-    })
-  }
 }
