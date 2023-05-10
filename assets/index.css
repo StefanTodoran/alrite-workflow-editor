@@ -455,29 +455,35 @@ button {
   display: none;
 }
 
-.util-button {
+/* ============ */
+/* UTIL SECTION */
+
+#utility-section {
   position: fixed;
-  bottom: 10px;
-  right: 10px;
+  bottom: 5px;
+  right: 5px;
+  padding: 6.5px 5px;
+  display: flex;
+  flex-direction: row-reverse;
+  border-radius: 5px;
+  border: 3px solid var(--light-border);
+}
+
+#utility-section::before {
+  content: var(--workflow-name);
+  position: absolute;
+  bottom: 100%;
+  color: var(--dark-green);
+}
+
+.util-button {
   width: 40px;
   height: 40px;
+  margin: 0 3px;
   cursor: pointer;
   transition: transform 0.5s ease, opacity 0.5s ease, border 0.5s ease;
   border: 2px solid transparent;
   border-radius: 8px;
-}
-
-#export-button {
-  right: 60px;
-  /* distance from edge to dark/light mode button + button size + margin */
-}
-
-#import-button {
-  right: 110px;
-}
-
-#file-import-button {
-  right: 160px;
 }
 
 .darkMode #export-button rect {

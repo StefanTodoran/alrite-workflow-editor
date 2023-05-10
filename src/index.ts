@@ -526,13 +526,20 @@ function dropAfter(evt: any) {
 
 function populatePageOnStartup() {
   const urlParams = new URLSearchParams(window.location.search);
+  
+  const blankFlow = urlParams.get("blank");
   const workflowName = urlParams.get("workflow");
   const versionNumber = urlParams.get("version");
 
+  if (blankFlow) {
+    return;
+  }
+  
   if (workflowName) {
     fetchWorkflow(workflowName, versionNumber);
   } else {
     const dummyWorkflow = {
+      name: "New Workflow",
       pages: [
         <Components.Page>{
           pageID: "page_1",
@@ -590,6 +597,9 @@ function promptAndFetchWorkflow() {
     return;
   }
 
+  // This prompts if you'd like to leave the page...
+  // window.location.assign("?workflow=" + name);
+
   fetchWorkflow(name);
 }
 
@@ -613,9 +623,11 @@ function fetchWorkflow(name: string, version?: string) {
 
 function importWorkflow(json: any) {
   const pages = json.pages;
-  if (!pages) {
+  if (!pages || !json.name) {
     return; // TODO: notify user of invalid upload.
   }
+
+  updateDisplayName(json.name);
 
   const old = getAllPageCards();
   old.forEach(card => card.remove());
@@ -660,9 +672,12 @@ function exportWorkflow() {
     const data = extractPageCard(card);
     workflow.pages.push(data);
   }
-
+  
   console.log("Final workflow:\n", workflow);
   console.log("Attempting to post to:", baseUrl);
+  
+  // TODO: Verify if workflow posted successfully,
+  // and add an override warnings option.
 
   fetch(baseUrl + "/alrite/apis/workflows/" + workflow.name + "/", {
     method: "POST",
@@ -673,6 +688,8 @@ function exportWorkflow() {
   })
     .then(res => res.json())
     .then(json => handleValidation(json));
+
+  updateDisplayName(name);
 }
 
 function handleValidation(response: any) {
@@ -810,4 +827,8 @@ function getPropName(propInput: Element) {
 function markPropInvalid(propInput: Element, errorMessage: string) {
   propInput.parentElement.classList.add("validation-invalid");
   propInput.parentElement.style.setProperty('--error-message', `'${errorMessage}'`);
+}
+
+function updateDisplayName(workflowName: string) {
+  document.getElementById("utility-section").style.setProperty("--workflow-name", `'${workflowName}'`);
 }
