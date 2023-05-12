@@ -1,3 +1,12 @@
+<h1 style="
+    display: flex;
+    align-items: center;
+    color: #6FC387;
+    font-weight: bold;">
+    <img src="assets/logo.png" style="height: 1.5em;"/>
+    ALRITE WORKFLOW EDITOR
+</h1>
+
 # Usage Overview
 
 It is recommended to use either Chrome or Firefox. While the editor may work with other browsers, only Chrome and Firefox are extensively tested. It is also recommended that you keep this guide document open during the workflow editing process.
@@ -8,7 +17,7 @@ The basic page setup lays out pages horizontally with their respective component
 
 In the bottom right you can find the utility buttons. Hover over these to see their labels. Using these buttons one can import a workflow from a `.json` file or from the server, one can upload their workflow to the server, and the editor's theme can also be changed.
 
-Page order is irrelevant and has no effect on the workflow, it is merely for user convenience. Component order does matter, and components can be reordered by drag and drop. They can also be moved to different pages.
+Page order is irrelevant and has no effect on the workflow, it is merely for user convenience. The only exception to this is the first page, which is the entry point for the workflow. Component order does matter, and components can be reordered by drag and drop. They can also be moved to different pages.
 
 ## Branching Logic
 
@@ -34,105 +43,97 @@ A component's `valueID` is also used to make branching logic work. Specifically,
 
 # Component Specifications
 
-`Page`
+**`Page`**
 
-    pageID: string, // Must be unique, used for page linking
-    title: string,
-    content: Component[],
+***title***: The title of the page, usually one or two words indicating the purpose of the page.
+***pageID***: A unique identifier for the page used for branching logic and page linking.
+***defaultLink***: The the next page to go to, barring any logic occuring on the page.
+***isDiagnosisPage***: Whether this is the diagnosis page or not.
 
-    // By default each page has two buttons, "Next" and "Prev". While "Prev" always returns to the page which
-    // linked to this page, the page "Next" sends to may depend on logic in the page. If no logic is triggered,
-    // defaultLink is the destination. However, LogicComponents trigger when "Next" is pressed and can override
-    // this defaultLink. If there are multiple LogicComponents, tiebreaking if multiple are satisfied is done
-    // based on order (highest on page has highest precedence). 
-    defaultLink: string, 
+By default each page has two buttons, "Next" and "Prev". While "Prev" always returns to the page which
+linked to this page, the page "Next" sends to may depend on logic in the page. If no logic is triggered,
+`defaultLink` is the destination. However, LogicComponents trigger when "Next" is pressed and can override
+this `defaultLink`. If there are multiple LogicComponents, tiebreaking if multiple are satisfied is done
+based on order (highest on page has highest precedence). 
 
-    isDiagnosisPage: boolean,
+The diagnosis page is the end of the workflow. This page cannot be customized. It is included in the workflow editor so that it can be linked to, indicating the end of the workflow.
 
 ## Page Components
 
-`Paragraph` (PageComponent)
+**`Paragraph`** (PageComponent)
 
-    text: string
+***text***: Some paragraph style text content.
 
-`MediaItem` (PageComponent)
+A basic element representing a chunk of text on the page. It has a single property, `text`, which is the text content it should display.
 
-    fileName: string, // The file name of the image or video to display
-    label?: string, // Optional text to display underneath the image or video
+**`MediaItem`** (PageComponent)
 
-`MultipleChoice` (PageComponent)
+***fileName***: The file name of the media to display.<br>
+***label***: (optional) Some text caption describing the media.
 
-    // Unique id for the input value for this page component
-    valueID: string,
+Another basic element, used to display images or videos within the application. These files must be upload to the application through the ALRITE dashboard. The `fileName` property should be the same file name the uploaded image or video has. The optional `label` property displays a text caption underneath the media.
 
-    // A text label, generally a question prompt
-    label: string,
+**`MultipleChoice`** (PageComponent)
 
-    // A set of choices or answers for the question
-    choices: Choice[],
+***valueID***: A unique identifier for the data collected by this component.<br>
+***label***: A text label, generally a quesiton prompt.<br>
+***multiselect***: Whether multiple options can be selected, or only one.
 
-    // Whether the user can select multiple options
-    multiselect: boolean,
+One of the basic building blocks of any workflow, this component represents both a multiple choice input with radio buttons where only one option can be selected, or a checkbox component where any number of boxes can be selected. If the component has `multiselect` disabled, each `Choice` subcomponent can have a `link` property that can override the `Page`'s `defaultLink` property, however this property is optional. If the component has `multiselect` enabled, then to do branching logic use a `SelectionLogic` component.
 
-`Choice` (SubComponent)
+**`Choice`** (SubComponent)
 
-    The text this choice displays, e.g. "Option A"
-    text: string,
+***text***: The text this choice displays to the nurse.<br>
+***value***: This can be the same as text, but is what will actually be recorded to the database if this choice is selected. You might want this to be different if some logic is done based on this choice.<br>
+***link***: (optional) The pageID of the `Page` that this choice should link to if selected (not valid if parent has multiselect).
 
-    // The value associated with selecting this choice (can be same or different to text)
-    // You might want this to be different if some logic is done based on this choice
-    value: any,
+**`TextInput`** (PageComponent)
 
-    // Page id that this choice should link to if selected (not valid if parent has multiselect)
-    link?: string,
+***valueID***: A unique identifier for the data collected by this component.<br>
+***label***: Text indicating what should be input, generally a question or prompt.<br>
+***type***: Type of input to accept. Valid options include "numeric", "alphanumeric", "default", "any".
+Default means alphabetical character input only, no numbers. Any means no restrictions.<br>
+***units***: (optional) If provided, displayed next to the TextInput, e.g. "cm".<br>
+***defaultValue***: (optional) The does not need to start empty. If provided, the component will start with this value filled in already. The type of this should match the property (don't give a `defaultValue` with letters in a numeric `TextInput`).
 
-`TextInput` (PageComponent)
+Another important building block of any workflow, if there is not a designated component specifically for collecting some type of information, `TextInput` can almost always do the trick.
 
-    // Unique id for the input value for this page component
-    valueID: string,
+**`Button`** (PageComponent)
 
-    // Text indicating what should be input
-    label: string,
+***text***: The button's display text, for example "Skip".
+***link***: The pageID of the `Page` this button opens when pressed.
+***hint***: (optional) Displayed above button detailing when/why to skip.
 
-    // Type of input to accept, e.g. "numeric", "alphanumeric", "default", "any"
-    // Default means alphabetical character input only, no numbers
-    type: string,
+This component should almost never be used. Generally, navigating through the workflow should be done via the "Next" (and "Prev") button on each `Page`, which you can manipulate using Logic Components and `MultipleChoice` components. However, if for example you want a certain `Page` to be skipable without the nurse needing to fill out the information, that is a place where `Button` would be useful.
 
-    units?: string, // If provided, displayed next to the TextInput, e.g. "cm" (optional)
-    defaultValue?: any, // The type of this depends on type property (optional)
+**`Counter`** (PageComponent)
 
-`Button` (PageComponent)
-
-    // The button's display text, defaults to "Next"
-    text?: string,
-
-    hint?: string, // Displayed above button detailing, when/why to skip (optional)
-    link: string, // The pageID this button skips to if pressed
-
-`Counter` (PageComponent)
-
-    // Unique id for the input value for this page component
-    valueID: string,
-
-    title: string,
-    hint?: string,
-    timeLimit: number, // Given in seconds
-    offerManualInput: boolean,
+***valueID***: A unique identifier for the data collected by this component.<br>
+***title***: A short word or phrase name for the counter, e.g. "Respiratory Rate".<br>
+***hint***: (optional) Longer text description indicating what is being counted.<br>
+***timeLimit***: How long to count for, given in seconds.<br>
+***offerManualInput***: True or false, whether the counter can be bypassed by directly typing in a value.
 
 ## Logic Components
 
-`ComparisonLogic` (LogicComponent)
+**`ComparisonLogic`** (LogicComponent)
 
-    type: string, // Valid types include ">", "<", ">=", "<=", "="
-    targetValueID: string, // Value which is compared to the threshold
-    threshold: any,
-    satisfiedLink: string, // The pageID to link to given whether value satisfies the threshold given the comparison type
+***type***: The type of comparison to be done, valid types include ">", "<", ">=", "<=", "=".<br>
+***targetValueID***: The `valueID` of the component whose value will be compared to the threshold. Will be on the left hand side of the comparison.<br>
+***threshold***: A number that is compared to the `valueID`, this will be on the right hand side of the comparison.<br>
+***satisfiedLink***: The `pageID` of the `Page` to go to if the value satisfies the threshold given the comparison type.
+
+This component is used to do logic with numbers. For example, say a page should lead to one of several different pages based on a child's temperature. We might have a `TextInput` with `valueID` "child_temp" where the child's temperature will be collected in Celsius. Perhaps we want to go to a certain page if the child's temperature is normal, and another page if they have a fever. To accomplish this, we would se the operation `type` to ">", since we want to see if "child_temp" is greater than some threshold. Then, we would set `targetValueID` to "child_temp", and `threshold` to say, 38. Finally, we would set the `satisfiedLink` to the fever page's `pageID`, and have the current page's `defaultLink` be the `pageID` of the normal temperature page.
+
+For a sample workflow showing a (slightly more complex) example of using comparison branching logic, click the link below. It is more easy to digest when it is laid out visually. You will notice in the example that there are multiple `ComparisonLogic` components, and that their order is intentional; it reflects which should have the highest precedence in the case that multiple are satisfied.
+
+TODO
     
-`SelectionLogic` (LogicComponent)
+**`SelectionLogic`** (LogicComponent)
 
-    type: string, // Valid types include "all_selected", "at_least_one", "exactly_one", "none_selected"
-    targetValueID: string[],
-    satisfiedLink: string, // The pageID to link to given when the value satisfies the selection type
+***type***: Valid types include "all_selected", "at_least_one", "exactly_one", "none_selected".<br>
+***targetValueID***: The `valueID` of a `MultipleChoice` component to look at.<br>
+***satisfiedLink***: The `pageID` of the `Page` to go to if the selection satisfies the selection type.
 
 # Making Changes
 

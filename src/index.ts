@@ -103,8 +103,8 @@ function addPageCard(id: string, title: string, isDiagnosisPage?: boolean, defau
 
   // TODO: Add event listener for titleElement updating dropdowns
   // if the name is changed!
-  titleElement.addEventListener("input", (evt) => {
-    console.log("test");
+  titleElement.addEventListener("input", () => {
+    updateAllDropDowns();
   });
 
   // We don't want to allow the pasting of anything other than

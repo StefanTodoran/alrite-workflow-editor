@@ -106,13 +106,13 @@ export module Components {
   export interface ComparisonLogic extends LogicComponent {
     type: string, // Valid types include ">", "<", ">=", "<=", "="
     targetValueID: string, // Value which is compared to the threshold
-    threshold: any,
+    threshold: number,
     satisfiedLink: string, // The pageID to link to given whether value satisfies the threshold given the comparison type
   }
 
   export interface SelectionLogic extends LogicComponent {
     type: string, // Valid types include "all_selected", "at_least_one", "exactly_one", "none_selected"
-    targetValueID: string[],
+    targetValueID: string,
     satisfiedLink: string, // The pageID to link to given when the value satisfies the selection type
   }
 }
