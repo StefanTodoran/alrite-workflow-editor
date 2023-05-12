@@ -13,6 +13,7 @@ var templates: { [key: string]: string } = {
   "TextInput": "template-text-input-component",
   "MultipleChoice": "template-multiple-choice-component",
   "MediaItem": "template-media-item-component",
+  "Paragraph": "template-paragraph-component",
   "Button": "template-button-component",
   "Counter": "template-counter-component",
 
@@ -102,6 +103,9 @@ function addPageCard(id: string, title: string, isDiagnosisPage?: boolean, defau
 
   // TODO: Add event listener for titleElement updating dropdowns
   // if the name is changed!
+  titleElement.addEventListener("input", (evt) => {
+    console.log("test");
+  });
 
   // We don't want to allow the pasting of anything other than
   // plain text, and we wish to remove new line characters.
@@ -127,13 +131,6 @@ function addPageCard(id: string, title: string, isDiagnosisPage?: boolean, defau
   createButtonClickEvent(card, ".page-card-header", function () {
     selectedCard = selectedCard === card.id ? null : card.id;
     updateSelectedCard();
-
-    if (selectedCard) {
-      const xPosition = card.getBoundingClientRect().left + window.scrollX;
-      const windowHeight = window.innerWidth || document.documentElement.clientWidth;
-
-      window.scrollTo({ left: xPosition - (windowHeight / 3), behavior: 'smooth' });
-    }
   });
 
   // These buttons are used to rearrange page cards, the order has no 
@@ -289,6 +286,13 @@ function populateComponentFields(component: HTMLElement, props: { [key: string]:
         populateComponentFields(subcomponent, choice, pageIDs);
         subComponentsContainer.insertBefore(subcomponent, addButton);
       });
+    } else if (key === "multiselect") {
+      const prop = fields.querySelector(`.prop-${key}`);
+
+      if (value) {
+        prop.classList.add("active");
+        component.classList.add("multiselect");
+      }
     } else {
       const prop = fields.querySelector(`.prop-${key}`) as (HTMLInputElement | HTMLSelectElement);
       prop.value = value;
@@ -327,6 +331,13 @@ function updateSelectedCard() {
 
   allCards.forEach(card => card.classList.remove("selected"));
   if (newSelected) newSelected.classList.add("selected");
+
+  if (newSelected) {
+    const xPosition = newSelected.getBoundingClientRect().left + window.scrollX;
+    const windowHeight = window.innerWidth || document.documentElement.clientWidth;
+
+    window.scrollTo({ left: xPosition - (windowHeight / 3), behavior: 'smooth' });
+  }
 }
 
 function toggleDarkMode() {
@@ -434,9 +445,13 @@ function createGotoButtonListeners(container: HTMLElement) {
     buttons.forEach(button => {
       button.addEventListener("click", function () {
         const target = (button.previousElementSibling as HTMLSelectElement).value;
-        selectedCard = target;
-        updateSelectedCard();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        // It is null as a string because dropdown values are always
+        // strings, unfortunately.
+        if (target !== "null") {
+          selectedCard = target;
+          updateSelectedCard();
+        }
       });
     });
   }
@@ -464,8 +479,15 @@ function updateContainedDropDowns(container: HTMLElement, IDs: string[]) {
 function updateDropDown(dropdown: HTMLSelectElement, values: string[], value?: string) {
   // If this is not "", we want the value to persist
   const previous = value || dropdown.value;
-
   dropdown.innerHTML = "";
+
+  if (dropdown.classList.contains("optional")) {
+    const option = document.createElement("option");
+    option.value = null;
+    option.innerHTML = "none";
+    dropdown.appendChild(option);
+  }
+
   for (let i = 0; i < values.length; i++) {
     const option = document.createElement("option");
     const target = document.getElementById(values[i]);
@@ -529,7 +551,7 @@ function dropAfter(evt: any) {
 
 function populatePageOnStartup() {
   const urlParams = new URLSearchParams(window.location.search);
-  
+
   const blankFlow = urlParams.get("blank");
   const workflowName = urlParams.get("workflow");
   const versionNumber = urlParams.get("version");
@@ -537,7 +559,7 @@ function populatePageOnStartup() {
   if (blankFlow) {
     return;
   }
-  
+
   if (workflowName) {
     fetchWorkflow(workflowName, versionNumber);
   } else {
@@ -675,10 +697,10 @@ function exportWorkflow() {
     const data = extractPageCard(card);
     workflow.pages.push(data);
   }
-  
+
   console.log("Final workflow:\n", workflow);
   console.log("Attempting to post to:", baseUrl);
-  
+
   // TODO: Verify if workflow posted successfully,
   // and add an override warnings option.
 
@@ -720,7 +742,7 @@ function displayValidationData(page: Components.Page) {
     const props = components[i].querySelector(".component-card-fields").querySelectorAll(".prop-input");
 
     props.forEach(prop => {
-      const input = prop.querySelector("input") || prop.querySelector("select") || prop.querySelector(".slider-button");
+      const input = getPropInput(prop) || prop.querySelector(".slider-button");
       const propName = getPropName(input);
 
       if (validation[propName]) {
@@ -795,7 +817,7 @@ function extractProps(props: NodeListOf<Element>) {
   const values: { [key: string]: any } = {};
 
   props.forEach(prop => {
-    const input = prop.querySelector("input") || prop.querySelector("select");
+    const input = getPropInput(prop);
 
     if (input) {
       const propName = getPropName(input);
@@ -821,6 +843,10 @@ function createObjectFromProps(type: string, values: { [key: string]: any }) {
 
   component.component = type;
   return component;
+}
+
+function getPropInput(prop: Element) {
+  return prop.querySelector("input") || prop.querySelector("select") || prop.querySelector("textarea");
 }
 
 function getPropName(propInput: Element) {

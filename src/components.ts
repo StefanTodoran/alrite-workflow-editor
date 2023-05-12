@@ -2,6 +2,21 @@ export module Components {
 
   export interface Component { }
 
+  export interface Page {
+    pageID: string, // Must be unique, used for page linking
+    title: string,
+    content: Component[],
+
+    // By default each page has two buttons, "Next" and "Prev". While "Prev" always returns to the page which
+    // linked to this page, the page "Next" sends to may depend on logic in the page. If no logic is triggered,
+    // defaultLink is the destination. However, LogicComponents trigger when "Next" is pressed and can override
+    // this defaultLink. If there are multiple LogicComponents, tiebreaking if multiple are satisfied is done
+    // based on order (highest on page has highest precedence). 
+    defaultLink: string, 
+
+    isDiagnosisPage: boolean,
+  }
+
   // =============== \\
   // PAGE COMPONENTS \\
   // =============== \\
@@ -9,6 +24,10 @@ export module Components {
   export interface PageComponent extends Component {
     // Represents any page component that has a 
     // visual element to display on the page.
+  }
+
+  export interface Paragraph extends PageComponent {
+    text: string,
   }
 
   export interface MediaItem extends PageComponent {
@@ -73,32 +92,6 @@ export module Components {
     hint?: string,
     timeLimit: number, // Given in seconds
     offerManualInput: boolean,
-  }
-
-  export interface Modal extends PageComponent {
-    pageID: string,
-    // Must be unique, used for link properties on other components
-    // To link to a modal via it's pageID, a component must specify that ID and the modal must be on the same page
-
-    title: string,
-    content: string[], // Each string is displayed as a separate paragraph
-    buttons: Button[], // Navigation used to exit the modal
-    showCloseButton: boolean, // Whether to display a button that closes the modal, returning the the current (parent) page
-  }
-
-  export interface Page {
-    pageID: string, // Must be unique, used for page linking
-    title: string,
-    content: Component[],
-
-    // By default each page has two buttons, "Next" and "Prev". While "Prev" always returns to the page which
-    // linked to this page, the page "Next" sends to may depend on logic in the page. If no logic is triggered,
-    // defaultLink is the destination. However, LogicComponents trigger when "Next" is pressed and can override
-    // this defaultLink. If there are multiple LogicComponents, tiebreaking if multiple are satisfied is done
-    // based on order (highest on page has highest precedence). 
-    defaultLink: string, 
-
-    isDiagnosisPage: boolean,
   }
 
   // ============== \\

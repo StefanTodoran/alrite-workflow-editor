@@ -51,12 +51,17 @@ A component's `valueID` is also used to make branching logic work. Specifically,
 
 ## Page Components
 
+`Paragraph` (PageComponent)
+
+    text: string
+
 `MediaItem` (PageComponent)
 
     fileName: string, // The file name of the image or video to display
     label?: string, // Optional text to display underneath the image or video
 
-    MultipleChoice (PageComponent)
+`MultipleChoice` (PageComponent)
+
     // Unique id for the input value for this page component
     valueID: string,
 
@@ -113,17 +118,6 @@ A component's `valueID` is also used to make branching logic work. Specifically,
     hint?: string,
     timeLimit: number, // Given in seconds
     offerManualInput: boolean,
-
-`Modal` (PageComponent)
-
-    pageID: string,
-    // Must be unique, used for link properties on other components
-    // To link to a modal via it's pageID, a component must specify that ID and the modal must be on the same page
-
-    title: string,
-    content: string[], // Each string is displayed as a separate paragraph
-    buttons: Button[], // Navigation used to exit the modal
-    showCloseButton: boolean, // Whether to display a button that closes the modal, returning the the current (parent) page
 
 ## Logic Components
 
