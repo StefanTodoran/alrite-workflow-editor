@@ -823,7 +823,7 @@ function extractProps(props: NodeListOf<Element>) {
       const propName = getPropName(input);
       values[propName] = input.value;
     } else {
-      // We have a slider button
+      // We have a slider button, it's value is extracted differently
       const slider = prop.querySelector(".slider-button");
       const propName = getPropName(slider);
 
