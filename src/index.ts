@@ -103,8 +103,8 @@ function addPageCard(id: string, title: string, isDiagnosisPage?: boolean, defau
 
   // TODO: Add event listener for titleElement updating dropdowns
   // if the name is changed!
-  titleElement.addEventListener("input", (evt) => {
-    console.log("test");
+  titleElement.addEventListener("input", () => {
+    updateAllDropDowns();
   });
 
   // We don't want to allow the pasting of anything other than
@@ -823,7 +823,7 @@ function extractProps(props: NodeListOf<Element>) {
       const propName = getPropName(input);
       values[propName] = input.value;
     } else {
-      // We have a slider button
+      // We have a slider button, it's value is extracted differently
       const slider = prop.querySelector(".slider-button");
       const propName = getPropName(slider);
 

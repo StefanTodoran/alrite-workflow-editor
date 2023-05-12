@@ -158,8 +158,6 @@ button {
   background-color: rgba(var(--alrite-rgb), 0.1);
 }
 
-.selected .card:hover {}
-
 .selected .card.card-subcomponents:focus-within,
 .selected .card.component-card:not(.new-component-card):focus-within {
   outline: 2px solid var(--dark-green);
@@ -172,7 +170,7 @@ button {
 
 @keyframes pulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(var(--alrite-rgb), 0.5);
+    box-shadow: 0 0 0 0 rgba(var(--alrite-rgb), 0.75);
   }
 }
 
