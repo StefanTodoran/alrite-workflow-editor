@@ -1,11 +1,4 @@
-<h1 style="
-    display: flex;
-    align-items: center;
-    color: #6FC387;
-    font-weight: bold;">
-    <img src="assets/logo.png" style="height: 1.5em;"/>
-    ALRITE WORKFLOW EDITOR
-</h1>
+<img src="assets/banner.png" style="width: 100%;"/>
 
 # Usage Overview
 
