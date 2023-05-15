@@ -136,6 +136,22 @@ http://127.0.0.1:8000/alrite/editor/?workflow=Fever_Logic
 
 # Making Changes
 
+## Running Locally
+
 Run `tsc npx -w` to tell the TypeScript compiler to watch for changes. Then, open index.html in the browser. Any changes you make the the HTML, CSS or TypeScript should be updated on refresh.
 
-If working with the server, run `python -m http.server 8080` to serve the editor at http://localhost:8080/. Otherwise, you may encounter cors issues when exporting if opening the file directly in your browser.
+If working with the server, run `python manage.py runserver`, and make sure you are editing the subcomponent alrite editor found in the `static` folder. Otherwise, you will have to push and pull every time you want the server to reflect your changes.
+
+## Adding Components
+
+* Create an interface and documentation object for the component in `components.ts`
+* Add an option to the new page component (id "template-new-component") in `index.html`
+* Create a template of the component in `index.html`
+  * Look through existing components and the related code to make sure you understand how everything works first
+  * Copy another similar component type for the structure
+  * Notice how props are done: the class of the input, select or textarea is very important!
+  * You shouldn't change much other than the id, the `h1` content, and props 
+* Add the HTML template component's id to `templates` in `index.ts`
+* Add the required props to `requiredProps` in `validation.py` 
+  * This is found in the django server's `alrite` directory
+  * You will also need to modify the validation function with any special validation logic specific to the new component

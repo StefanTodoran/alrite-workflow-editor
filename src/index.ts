@@ -19,6 +19,7 @@ var templates: { [key: string]: string } = {
   // Logic Components
   "Comparison": "template-comparison-component",
   "Selection": "template-selection-component",
+  "Validation": "template-validation-component",
 }
 
 /**
@@ -600,7 +601,6 @@ function populatePageOnStartup() {
     fetchWorkflow(workflowName, versionNumber);
   } else {
     const dummyWorkflow = {
-      name: "New Workflow",
       pages: [
         <Components.Page>{
           pageID: "page_1",
@@ -623,7 +623,7 @@ function populatePageOnStartup() {
       ]
     };
 
-    importWorkflow(dummyWorkflow);
+    importWorkflow(dummyWorkflow, true);
   }
 }
 
@@ -682,13 +682,22 @@ function fetchWorkflow(name: string, version?: string) {
     .then(res => importWorkflow(res));
 }
 
-function importWorkflow(json: any) {
+/**
+ * Populates the page based on the given workflow object.
+ * Assumes the object the be valid, besides the minor check that it
+ * has a name and pages.
+ * @param json The target workflow object
+ * @param dummy Whether this is a dummy workflow, which does not need a name
+ * @returns 
+ */
+function importWorkflow(json: any, dummy?: true) {
   const pages = json.pages;
-  if (!pages || !json.name) {
+  if (!pages || (!dummy && !json.name)) {
+    // If we don't have a name, a dummy workflow is still valid
     return; // TODO: notify user of invalid upload.
   }
 
-  updateDisplayName(json.name);
+  if (json.name) updateDisplayName(json.name);
 
   const old = getAllPageCards();
   old.forEach(card => card.remove());
@@ -718,7 +727,7 @@ function importWorkflow(json: any) {
 
 function postWorkflow(onlyValidate: boolean) {
   let name = getDisplayName();
-  if (!onlyValidate) {
+  if (!onlyValidate && !name) {
     name = prompt("Please enter the name to export the workflow as: (case sensitive)");
     if (name == null || name == "") {
       return;

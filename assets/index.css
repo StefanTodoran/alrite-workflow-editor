@@ -470,8 +470,8 @@ button {
 
 #utility-section {
   position: fixed;
-  bottom: 5px;
-  right: 5px;
+  bottom: 10px;
+  right: 10px;
   padding: 6.5px 5px;
   display: flex;
   flex-direction: row-reverse;
@@ -497,7 +497,7 @@ button {
   height: 40px;
   margin: 0 3px 1px;
   cursor: pointer;
-  transition: transform 0.5s ease, opacity 0.5s ease, border 0.5s ease;
+  transition: transform 0.1s ease, opacity 0.1s ease, border 0.5s ease;
   border: 2px solid transparent;
   border-radius: 8px;
 }
@@ -507,9 +507,15 @@ button {
 }
 
 .util-button:hover {
-  /* transform: scale(0.95);
-  opacity: 0.75; */
   border: 2px solid var(--alrite-green)
+}
+
+#dark-mode-button.hidden,
+#light-mode-button.hidden,
+.util-button:active {
+  border: 2px solid var(--alrite-green);
+  transform: scale(0.95);
+  opacity: 0.75;
 }
 
 ::-webkit-scrollbar {

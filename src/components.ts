@@ -116,6 +116,12 @@ export module Components {
     satisfiedLink: string, // The pageID to link to given when the value satisfies the selection type
   }
 
+  export interface ValidationLogic extends LogicComponent {
+    type: string, // Valid types include ">", "<", ">=", "<=", "="
+    targetValueID: string, // Value which is compared to the threshold
+    threshold: number,
+  }
+
   // ============= \\
   // DOCUMENTATION \\
   // ============= \\
@@ -147,7 +153,7 @@ export let documentation: { [key: string]: any } = {
   },
   "TextInput": {
     "label": "Text prompt indicating what the nurse should input.",
-    "type": 'Type of input to accept, e.g. "numeric", "alphanumeric", "default", "any".<br><br>Default is the same as text and means alphabetical character input only, no numbers. Any means no restrictions.',
+    "type": 'Type of input to accept, e.g. "numeric", "alphanumeric", "text", "any".<br><br>Default is the same as text and means alphabetical character input only, no numbers. Any means no restrictions.',
     "valueID": "Unique id for the input value for this page component. This will also be the name of the corresponding column in the patient database.",
     "units": 'If provided, displayed next to the TextInput, e.g. "cm".',
     "defaultValue": "Default value to the text input should start off with. The type of this depends on type property.",
@@ -175,5 +181,10 @@ export let documentation: { [key: string]: any } = {
     "type": 'The type of comparison to be done. Valid types include:<br>"all_selected", "at_least_one", "exactly_one", "none_selected"',
     "targetValueID": "Unique id for some input value in another component on this page. This value will be checked against the threshold.",
     "satisfiedLink": 'On pressing the "Next" button, if the target value satisfies the selection type, the page that should be navigated to.',
+  },
+  "Validation": {
+    "type": `The type of comparison to be done. The left side of the operation will be the target value, and the right will be the threshold. For example:<br><br>If type is ">" threshold is 40 and targetValueID is "value_01", then the comparison would be: is value_01's value > 40?`,
+    "threshold": "Threshold the target value will be compared to.",
+    "targetValueID": "Unique id for some input value in another component on this page. This value will be checked against the threshold.",
   },
 }
