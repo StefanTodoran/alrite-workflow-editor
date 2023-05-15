@@ -502,16 +502,7 @@ button {
   border-radius: 8px;
 }
 
-.darkMode #export-button rect {
-  fill: var(--light-background)
-}
-
-.darkMode #import-button rect,
-.darkMode #file-import-button rect {
-  fill: var(--light-background)
-}
-
-.darkMode #file-import-button .needs-dark-fill {
+.darkMode .needs-dark-fill {
   fill: #4B7557
 }
 

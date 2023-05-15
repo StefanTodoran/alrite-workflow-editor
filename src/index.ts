@@ -29,7 +29,10 @@ function init() {
   body = document.querySelector("body");
 
   document.getElementById("add-page-button").addEventListener("click", addNewPage);
-  document.getElementById("export-button").addEventListener("click", exportWorkflow);
+
+  document.getElementById("export-button").addEventListener("click", function () { postWorkflow(false) });
+  document.getElementById("validate-button").addEventListener("click", function () { postWorkflow(true) });
+
   document.getElementById("import-button").addEventListener("click", promptAndFetchWorkflow);
   document.getElementById("file-import-button").addEventListener("click", triggerFileImport);
   document.getElementById("importer").addEventListener("input", prepareReader);
@@ -370,25 +373,24 @@ function updateTooltip(evt: MouseEvent) {
   const current = hovered[hovered.length - 1];
 
   let content = undefined;
-  if (current.closest(".component-card") && current.closest("svg.info-button")) {
+  if (current.closest(".component-card") && current.closest(".info-button")) {
     // If we are in a component card and hovering its info button, we can easily
     // get the component and property types, and look in the documentation.
 
     const componentType = getComponentInfo(current.closest(".component-card")).type;
-    const propType = getPropName(current.closest("svg.info-button").nextElementSibling);
-    console.log(componentType, propType);
+    const propType = getPropName(current.closest(".info-button").nextElementSibling);
     content = `[${propType}] ${documentation[componentType][propType]}`;
   }
-  
+
   // If the documentation search didn't get anything, use the tooltip class
   // in the HTML as a fallback.
-  if (!content && current.closest("svg.info-button")) {
-    const text = current.closest("svg.info-button").parentNode.querySelector(".tooltip-text");
+  if (!content && current.closest(".info-button")) {
+    const text = current.closest(".info-button").parentNode.querySelector(".tooltip-text");
     content = text?.innerHTML;
-  } else if (current.closest("svg.util-button")) {
+  } else if (current.closest(".util-button")) {
     // Otherwise we check if we are hovering a util button, these store
     // their tooltip data in their style.
-    content = current.closest("svg.util-button").style.getPropertyValue('--label');
+    content = current.closest(".util-button").style.getPropertyValue('--label');
   }
 
   if (content) {
@@ -527,7 +529,7 @@ function createUniqueID(length: number) {
   const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   const charactersLength = characters.length;
   let counter = 0;
-  
+
   while (counter < length) {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
     counter += 1;
@@ -716,12 +718,16 @@ function importWorkflow(json: any) {
   updateAllDropDowns();
 }
 
-function exportWorkflow() {
-  let name = prompt("Please enter the name to export the workflow as: (case sensitive)");
-  if (name == null || name == "") {
-    return;
+function postWorkflow(onlyValidate: boolean) {
+  let name = getDisplayName();
+  if (!onlyValidate) {
+    name = prompt("Please enter the name to export the workflow as: (case sensitive)");
+    if (name == null || name == "") {
+      return;
+    }
   }
   name = name.replace(/ /g, "_");
+  name = name.replace(/'/g, "");
 
   const cards = getAllPageCards() as NodeListOf<HTMLElement>;
   const workflow: { name: string, pages: Components.Page[] } = {
@@ -741,7 +747,9 @@ function exportWorkflow() {
   // TODO: Verify if workflow posted successfully,
   // and add an override warnings option.
 
-  fetch(baseUrl + "/alrite/apis/workflows/" + workflow.name + "/", {
+  const endpoint = onlyValidate ? "/alrite/apis/validation" : "/alrite/apis/workflows/" + workflow.name;
+
+  fetch(baseUrl + endpoint + "/", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -896,6 +904,10 @@ function markPropInvalid(propInput: Element, errorMessage: string) {
 
 function updateDisplayName(workflowName: string) {
   document.getElementById("utility-section").style.setProperty("--workflow-name", `'${workflowName.replace(/_/g, " ")}'`);
+}
+
+function getDisplayName() {
+  return document.getElementById("utility-section").style.getPropertyValue("--workflow-name");
 }
 
 function getComponentInfo(component: Element) {
