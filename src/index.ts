@@ -1,7 +1,6 @@
 import { Components, documentation } from "./components";
 
 window.addEventListener("load", init);
-const baseUrl = "http://127.0.0.1:8000"; // Url of the django server
 
 var body: HTMLElement = null; // Just a nice shorthand to have
 var selectedCard: string = null; // The currently selected page card
@@ -667,12 +666,11 @@ function promptAndFetchWorkflow() {
 }
 
 function fetchWorkflow(name: string, version?: string) {
-  console.log("Attempting to get from:", baseUrl);
-
-  let target = baseUrl + "/alrite/apis/workflows/" + name + "/";
+  let target = "/alrite/apis/workflows/" + name + "/";
   if (version) {
     target += version + "/";
   }
+  console.log("Attempting to get from:", target);
 
   fetch(target, {
     method: "GET",
@@ -742,14 +740,13 @@ function postWorkflow(onlyValidate: boolean) {
   }
 
   console.log("Final workflow:\n", workflow);
-  console.log("Attempting to post to:", baseUrl);
-
+  
   // TODO: Verify if workflow posted successfully,
   // and add an override warnings option.
+  const endpoint = onlyValidate ? "validation" : "workflows/" + workflow.name;
+  console.log("Attempting to post to:", "/alrite/apis/" + endpoint + "/");
 
-  const endpoint = onlyValidate ? "/alrite/apis/validation" : "/alrite/apis/workflows/" + workflow.name;
-
-  fetch(baseUrl + endpoint + "/", {
+  fetch("/alrite/apis/" + endpoint + "/", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
