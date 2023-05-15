@@ -12,6 +12,10 @@ In the bottom right you can find the utility buttons. Hover over these to see th
 
 Page order is irrelevant and has no effect on the workflow, it is merely for user convenience. The only exception to this is the first page, which is the entry point for the workflow. Component order does matter, and components can be reordered by drag and drop. They can also be moved to different pages.
 
+<img src="assets/prop_name.png" style="width: 100%; border: 1px solid gray; border-radius: 5px;"/>
+
+In the above image we can see the user hovering a tooltip for more information about what the input type property on the `TextInput` component should be. Notice the wort "type" in parenthesis in the tooltip, this is the *name* of the property. If you wanted more information about this property, this property name in parenthesis is how it would be referred to in this usage document. The "Input Type" label is merely for convenience.
+
 ## Branching Logic
 
 Each page automatically will have a "Next" and "Prev" button. The "Prev" button will always return to the previous page. The "Next" button has more complex behavior and is used to create branching logic within a workflow. By default, the "Next" button goes to the page specified by the `defaultLink` property.
@@ -84,12 +88,14 @@ One of the basic building blocks of any workflow, this component represents both
 
 ***valueID***: A unique identifier for the data collected by this component.<br>
 ***label***: Text indicating what should be input, generally a question or prompt.<br>
-***type***: Type of input to accept. Valid options include "numeric", "alphanumeric", "default", "any".
+***type***: Type of input to accept. Valid options include "numeric", "alphanumeric", "text, "any".
 Default means alphabetical character input only, no numbers. Any means no restrictions.<br>
 ***units***: (optional) If provided, displayed next to the TextInput, e.g. "cm".<br>
 ***defaultValue***: (optional) The does not need to start empty. If provided, the component will start with this value filled in already. The type of this should match the property (don't give a `defaultValue` with letters in a numeric `TextInput`).
 
-Another important building block of any workflow, if there is not a designated component specifically for collecting some type of information, `TextInput` can almost always do the trick.
+Another important building block of any workflow, if there is not a designated component specifically for collecting some type of information, `TextInput` can almost always do the trick. 
+
+The `type` property can be a bit confusing, particularly "text, and "any". Text means only character input, while any means any input, including text and numbers (like alphanumeric) but also any other input type. You probably don't need to use "any", it is included for completion purposes.
 
 **`Button`** (PageComponent)
 
@@ -120,7 +126,7 @@ This component is used to do logic with numbers. For example, say a page should 
 
 For a sample workflow showing a (slightly more complex) example of using comparison branching logic, click the link below. It is more easy to digest when it is laid out visually. You will notice in the example that there are multiple `ComparisonLogic` components, and that their order is intentional; it reflects which should have the highest precedence in the case that multiple are satisfied.
 
-TODO
+http://127.0.0.1:8000/alrite/editor/?workflow=Fever_Logic
     
 **`SelectionLogic`** (LogicComponent)
 

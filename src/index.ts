@@ -1,4 +1,4 @@
-import { Components } from "./components";
+import { Components, documentation } from "./components";
 
 window.addEventListener("load", init);
 const baseUrl = "http://127.0.0.1:8000"; // Url of the django server
@@ -49,10 +49,11 @@ function init() {
   populatePageOnStartup();
 }
 
-let newPageIndex = 1;
+// let newPageIndex = 1;
 function addNewPage() {
   const page = <Components.Page>{
-    pageID: `page_${newPageIndex}`,
+    // pageID: `page_${newPageIndex}`,
+    pageID: createUniqueID(5),
     title: "Blank Page",
     content: [],
   };
@@ -192,7 +193,7 @@ function addPageCard(id: string, title: string, isDiagnosisPage?: boolean, defau
   body.insertBefore(card, addButton);
 
   // To ensure the same index is never used twice.
-  newPageIndex++;
+  // newPageIndex++;
 }
 
 // Given a card, a component type, and the reference to the "new component" card
@@ -257,6 +258,9 @@ function createComponent(type: string, cardID: string, id: number, props?: { [ke
 
 function createChoiceSubComponent(pageIDs: string[]) {
   const choice = getTemplateCopy("template-choice-component");
+  choice.id = `.Choice.${componentID}`;
+  componentID++;
+
   createButtonClickEvent(choice, ".delete-component-button", function () {
     choice.remove();
   });
@@ -366,10 +370,24 @@ function updateTooltip(evt: MouseEvent) {
   const current = hovered[hovered.length - 1];
 
   let content = undefined;
-  if (current.closest("svg.info-button")) {
+  if (current.closest(".component-card") && current.closest("svg.info-button")) {
+    // If we are in a component card and hovering its info button, we can easily
+    // get the component and property types, and look in the documentation.
+
+    const componentType = getComponentInfo(current.closest(".component-card")).type;
+    const propType = getPropName(current.closest("svg.info-button").nextElementSibling);
+    console.log(componentType, propType);
+    content = `[${propType}] ${documentation[componentType][propType]}`;
+  }
+  
+  // If the documentation search didn't get anything, use the tooltip class
+  // in the HTML as a fallback.
+  if (!content && current.closest("svg.info-button")) {
     const text = current.closest("svg.info-button").parentNode.querySelector(".tooltip-text");
     content = text?.innerHTML;
   } else if (current.closest("svg.util-button")) {
+    // Otherwise we check if we are hovering a util button, these store
+    // their tooltip data in their style.
     content = current.closest("svg.util-button").style.getPropertyValue('--label');
   }
 
@@ -504,9 +522,26 @@ function updateDropDown(dropdown: HTMLSelectElement, values: string[], value?: s
   }
 }
 
+function createUniqueID(length: number) {
+  let result = "id_";
+  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  const charactersLength = characters.length;
+  let counter = 0;
+  
+  while (counter < length) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    counter += 1;
+  }
+
+  return result;
+}
+
 // ======================= \\
 // DRAG AND DROP FUNCTIONS \\
 // ======================= \\
+
+// For some reason after changing the TS compiler options,
+// these functions don't get detected anymore...
 
 function allowDrop(evt: any) {
   evt.preventDefault();
@@ -579,7 +614,7 @@ function populatePageOnStartup() {
           content: [],
         },
         <Components.Page>{
-          pageID: "page_3",
+          pageID: "diag_page",
           title: "Diagnosis Page",
           isDiagnosisPage: true,
           content: [],
@@ -617,10 +652,11 @@ function getJSON(this: FileReader, event: ProgressEvent<FileReader>) {
 }
 
 function promptAndFetchWorkflow() {
-  const name = prompt("Please enter the name of the workflow to import: (case sensitive)");
+  let name = prompt("Please enter the name of the workflow to import: (case sensitive)");
   if (name == null || name == "") {
     return;
   }
+  name = name.replace(/ /g, "_");
 
   // This prompts if you'd like to leave the page...
   // window.location.assign("?workflow=" + name);
@@ -681,10 +717,11 @@ function importWorkflow(json: any) {
 }
 
 function exportWorkflow() {
-  const name = prompt("Please enter the name to export the workflow as: (case sensitive)");
+  let name = prompt("Please enter the name to export the workflow as: (case sensitive)");
   if (name == null || name == "") {
     return;
   }
+  name = name.replace(/ /g, "_");
 
   const cards = getAllPageCards() as NodeListOf<HTMLElement>;
   const workflow: { name: string, pages: Components.Page[] } = {
@@ -787,8 +824,7 @@ function extractPageCard(card: HTMLElement): Components.Page {
       // We want only this component's props, not those of subcomponents.
       const props = component.querySelector(".component-card-fields").querySelectorAll(".prop-input");
 
-      // The id is of the format 'pageID.type.number'.
-      const type = component.id.split(".")[1];
+      const type = getComponentInfo(component).type;
       const values = extractProps(props);
 
       // This entire portion for subcomponents is exclusively to
@@ -859,5 +895,13 @@ function markPropInvalid(propInput: Element, errorMessage: string) {
 }
 
 function updateDisplayName(workflowName: string) {
-  document.getElementById("utility-section").style.setProperty("--workflow-name", `'${workflowName}'`);
+  document.getElementById("utility-section").style.setProperty("--workflow-name", `'${workflowName.replace(/_/g, " ")}'`);
+}
+
+function getComponentInfo(component: Element) {
+  // The id is of the format 'pageID.type.number'.
+  return {
+    parentPageID: component.id.split(".")[0],
+    type: component.id.split(".")[1],
+  };
 }

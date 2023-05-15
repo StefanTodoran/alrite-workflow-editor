@@ -25,7 +25,8 @@ body,
 button,
 input,
 option,
-select {
+select,
+textarea {
   font-family: 'Poppins', sans-serif;
 }
 
@@ -58,7 +59,13 @@ input:focus-visible {
 }
 
 textarea {
-  min-width: 75%;
+  min-width: 65%;
+  font-weight: lighter;
+  font-size: 13px;
+}
+
+input {
+  min-width: 50%;
 }
 
 button {
@@ -335,7 +342,7 @@ button {
   z-index: 1;
   pointer-events: none;
   opacity: 0;
-  transform: scale(0.95);
+  /* transform: scale(0.95); */
   transition: opacity 0.25s ease, transform 0.25s ease;
   /* white-space: nowrap; */
   width: fit-content;
@@ -468,7 +475,7 @@ button {
   padding: 6.5px 5px;
   display: flex;
   flex-direction: row-reverse;
-  border-radius: 5px;
+  border-radius: 10px;
   border: 3px solid var(--light-border);
   background-color: white;
 }
@@ -488,7 +495,7 @@ button {
 .util-button {
   width: 40px;
   height: 40px;
-  margin: 0 3px;
+  margin: 0 3px 1px;
   cursor: pointer;
   transition: transform 0.5s ease, opacity 0.5s ease, border 0.5s ease;
   border: 2px solid transparent;
