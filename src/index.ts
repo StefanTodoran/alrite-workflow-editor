@@ -40,6 +40,8 @@ function init() {
   document.getElementById("file-import-button").addEventListener("click", triggerFileImport);
   document.getElementById("importer").addEventListener("input", prepareReader);
 
+  document.getElementById("file-download-button").addEventListener("click", downloadToFile);
+
   // Handling dark mode
   darkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
   document.getElementById("light-mode-button").addEventListener("click", toggleDarkMode);
@@ -559,7 +561,7 @@ function updateComparisonPreview(component: HTMLElement) {
       comparisonPreview.innerText = typeInput.value;
       comparisonPreview.style.setProperty("--targetValueID", `'${targetValueIDInput.value}'`);
       comparisonPreview.style.setProperty("--threshold", `'${thresholdInput.value}'`);
-      
+
       comparisonPreview.classList.add("active");
     } else {
       comparisonPreview.classList.remove("active");
@@ -670,6 +672,16 @@ function populatePageOnStartup() {
   }
 }
 
+function downloadToFile() {
+  const workflow = extractWorkflowData(true);
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(workflow));
+
+  const downloader = document.getElementById("downloader");
+  downloader.setAttribute("href", dataStr);
+  downloader.setAttribute("download", "workflow.json");
+  downloader.click();
+}
+
 function triggerFileImport() {
   const importer = document.getElementById("importer") as HTMLInputElement;
   importer.value = null;
@@ -769,29 +781,12 @@ function importWorkflow(json: any, dummy?: true) {
 }
 
 function postWorkflow(onlyValidate: boolean) {
-  let name = getDisplayName();
-  if (!onlyValidate && !name) {
-    name = prompt("Please enter the name to export the workflow as: (case sensitive)");
-    if (name == null || name == "") {
-      return;
-    }
-  }
-  name = name.replace(/ /g, "_");
-  name = name.replace(/'/g, "");
-
-  const cards = getAllPageCards() as NodeListOf<HTMLElement>;
-  const workflow: { name: string, pages: Components.Page[] } = {
-    name: name,
-    pages: [],
-  };
-
-  for (let i = 0; i < cards.length; i++) {
-    const card = cards[i];
-    const data = extractPageCard(card);
-    workflow.pages.push(data);
+  const workflow = extractWorkflowData(onlyValidate);
+  if (!workflow) {
+    return;
   }
 
-  console.log("Final workflow:\n", workflow);
+  console.log("Workflow Object:\n", workflow);
 
   // TODO: Verify if workflow posted successfully,
   // and add an override warnings option.
@@ -808,7 +803,7 @@ function postWorkflow(onlyValidate: boolean) {
     .then(res => res.json())
     .then(json => handleValidation(json));
 
-  updateDisplayName(name);
+  updateDisplayName(workflow.name);
 }
 
 function handleValidation(response: any) {
@@ -854,6 +849,32 @@ function displayValidationData(page: Components.Page) {
 // ======================= \\
 // IMPORT / EXPORT HELPERS \\
 // ======================= \\
+
+function extractWorkflowData(needsName: boolean) {
+  let name = getDisplayName();
+  if (needsName && !name) {
+    name = prompt("Please enter the name to export the workflow as: (case sensitive)");
+    if (name == null || name == "") {
+      return undefined;
+    }
+  }
+  name = name.replace(/ /g, "_");
+  name = name.replace(/'/g, "");
+
+  const cards = getAllPageCards() as NodeListOf<HTMLElement>;
+  const workflow: { name: string, pages: Components.Page[] } = {
+    name: name,
+    pages: [],
+  };
+
+  for (let i = 0; i < cards.length; i++) {
+    const card = cards[i];
+    const data = extractPageCard(card);
+    workflow.pages.push(data);
+  }
+
+  return workflow;
+}
 
 function promptWorkflowName() {
   let name = prompt("Please enter a name for the diagnosis workflow: (case sensitive)");
