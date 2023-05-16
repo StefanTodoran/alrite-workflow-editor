@@ -506,6 +506,7 @@ button {
   position: absolute;
   bottom: 100%;
   color: var(--dark-green);
+  white-space: nowrap;
   text-shadow:
     1px 1px 0 whitesmoke,
     1px -1px 0 whitesmoke,
@@ -552,18 +553,12 @@ button {
   transform: scale(0.95);
 }
 
-.darkMode .comparison-logic-preview::before,
-.darkMode .comparison-logic-preview::after {
-  color: var(--near-black);
-  transition: color 0.5s ease;
-}
-
 .comparison-logic-preview {
   height: 0;
   margin: 0 5px 0;
   opacity: 0;
   font-size: 18px;
-  color: var(--alrite-green);
+  color: var(--near-black);
   border: 1px solid transparent;
   transition:
     opacity 0.25s ease,
@@ -576,15 +571,40 @@ button {
     border 0.5s ease;
 }
 
+.selected .comparison-logic-preview {
+  color: var(--alrite-green);
+}
+
 .comparison-logic-preview.active {
   height: 27px;
   /* height of size 18px font is 27px */
-  margin: 2.5px 5px 20px;
+  margin: 15px 0 0;
   opacity: 1;
   padding: 10px 0;
+  border: 3px solid var(--light-border);
+  background-color: transparent;
+  border-radius: 10px;
+}
+
+.selected .comparison-logic-preview.active {
+  margin: 15px 0 15px;
+}
+
+.selected .comparison-logic-preview.active {
   border: 3px solid var(--alrite-green);
   background-color: rgba(var(--alrite-rgb), 0.1);
-  border-radius: 10px;
+}
+
+.comparison-logic-preview::before,
+.comparison-logic-preview::after {
+  color: var(--near-black);
+  transition: color 0.5s ease, opacity 0.5s ease;
+  opacity: 0.5;
+}
+
+.selected .comparison-logic-preview::before,
+.selected .comparison-logic-preview::after {
+  opacity: 1;
 }
 
 .comparison-logic-preview::before {
