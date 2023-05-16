@@ -117,7 +117,7 @@ This component should almost never be used. Generally, navigating through the wo
 
 **`ComparisonLogic`** (LogicComponent)
 
-***type***: The type of comparison to be done, valid types include ">", "<", ">=", "<=", "=".<br>
+***type***: The type of comparison to be done, valid types include ">", "<", ">=", "<=", "=". The notations ">=" and "<=" mean "greater than or equal to" and "less than or equal to" respectively.<br>
 ***targetValueID***: The `valueID` of the component whose value will be compared to the threshold. Will be on the left hand side of the comparison.<br>
 ***threshold***: A number that is compared to the `valueID`, this will be on the right hand side of the comparison.<br>
 ***satisfiedLink***: The `pageID` of the `Page` to go to if the value satisfies the threshold given the comparison type.
@@ -133,6 +133,16 @@ http://127.0.0.1:8000/alrite/editor/?workflow=Fever_Logic
 ***type***: Valid types include "all_selected", "at_least_one", "exactly_one", "none_selected".<br>
 ***targetValueID***: The `valueID` of a `MultipleChoice` component to look at.<br>
 ***satisfiedLink***: The `pageID` of the `Page` to go to if the selection satisfies the selection type.
+
+**`ValidationLogic`** (LogicComponent)
+
+***type***: The type of comparison to be done, valid types include ">", "<", ">=", "<=", "=". The notations ">=" and "<=" mean "greater than or equal to" and "less than or equal to" respectively.<br>
+***targetValueID***: The `valueID` of the component whose value will be compared to the threshold. Will be on the left hand side of the comparison.<br>
+***threshold***: A number that is compared to the `valueID`, this will be on the right hand side of the comparison.
+
+Unlike the above two logic components, `ValidationLogic` components are not used to create branching but rather for input validation. By default, all input components are required before "Next" can be pressed. However, to validate said inputs this component is necessary. 
+
+If the expression described by a `ValidationLogic` component is satisfied, the page's "Next" button will be disabled, just like it would be if an input component on the page was not filled out. Like with other logic components, multiple `ValidationLogic` components can be used on the same page, and the `valueID`s they target do not need to necessarily correspond to components on that page.
 
 # Making Changes
 

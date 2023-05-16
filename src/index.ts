@@ -33,6 +33,9 @@ function init() {
   document.getElementById("export-button").addEventListener("click", function () { postWorkflow(false) });
   document.getElementById("validate-button").addEventListener("click", function () { postWorkflow(true) });
 
+  document.getElementById("toggle-menu-button").addEventListener("click", toggleUtilMenu);
+  document.getElementById("rename-button").addEventListener("click", promptWorkflowName);
+
   document.getElementById("import-button").addEventListener("click", promptAndFetchWorkflow);
   document.getElementById("file-import-button").addEventListener("click", triggerFileImport);
   document.getElementById("importer").addEventListener("input", prepareReader);
@@ -248,12 +251,24 @@ function createComponent(type: string, cardID: string, id: number, props?: { [ke
     });
   }
 
+  const comparisonPreview = component.querySelector(".comparison-logic-preview") as HTMLElement;
+  if (comparisonPreview) {
+    const typeInput = component.querySelector(".prop-type") as HTMLInputElement;
+    const targetValueIDInput = component.querySelector(".prop-targetValueID") as HTMLInputElement;
+    const thresholdInput = component.querySelector(".prop-threshold") as HTMLInputElement;
+
+    typeInput.addEventListener("input", () => { updateComparisonPreview(component) });
+    thresholdInput.addEventListener("input", () => { updateComparisonPreview(component) });
+    targetValueIDInput.addEventListener("input", () => { updateComparisonPreview(component) });
+  }
+
   updateContainedDropDowns(component, pageIDs);
   createGotoButtonListeners(component);
   createSliderButtonListeners(component);
 
   if (props) {
     populateComponentFields(component, props, pageIDs);
+    updateComparisonPreview(component);
   }
 
   return component;
@@ -347,6 +362,10 @@ function updateSelectedCard() {
   }
 }
 
+function toggleUtilMenu() {
+  document.getElementById("utility-section").classList.toggle("minimized");
+}
+
 function toggleDarkMode() {
   darkMode = !darkMode;
   updateDarkMode();
@@ -371,27 +390,31 @@ function updateTooltip(evt: MouseEvent) {
   const tooltip = document.getElementById("tooltip");
   const hovered = this.document.querySelectorAll(":hover");
   const current = hovered[hovered.length - 1];
-
   let content = undefined;
-  if (current.closest(".component-card") && current.closest(".info-button")) {
-    // If we are in a component card and hovering its info button, we can easily
-    // get the component and property types, and look in the documentation.
 
-    const componentType = getComponentInfo(current.closest(".component-card")).type;
-    const propType = getPropName(current.closest(".info-button").nextElementSibling);
-    content = `[${propType}] ${documentation[componentType][propType]}`;
+  const infoButton = current.closest(".info-button");
+  if (infoButton) {
+    const propType = getPropName(infoButton.nextElementSibling);
+    let componentType;
+
+    if (current.closest(".component-card")) {
+      // If we are in a component card we can easily get the component types with this helper.
+      componentType = getComponentInfo(current.closest(".component-card")).type;
+    }
+
+    if (current.closest(".settings-card")) {
+      // If we are in the settings card we just want the documentation for page.
+      componentType = "Page";
+    }
+
+    content = `<p class="tooltip">(${propType})</p>`;
+    content += `${documentation[componentType][propType]}`;
   }
 
-  // If the documentation search didn't get anything, use the tooltip class
-  // in the HTML as a fallback.
-  if (!content && current.closest(".info-button")) {
-    const text = current.closest(".info-button").parentNode.querySelector(".tooltip-text");
-    content = text?.innerHTML;
-  } else if (current.closest(".util-button")) {
-    // Otherwise we check if we are hovering a util button, these store
-    // their tooltip data in their style.
-    content = current.closest(".util-button").style.getPropertyValue('--label');
-  }
+  // Otherwise we check if we are hovering a util button, these store
+  // their tooltip data in their style.
+  const utilButton = current.closest(".util-button");
+  if (utilButton) content = utilButton.style.getPropertyValue('--label');
 
   if (content) {
     tooltip.innerHTML = content;
@@ -524,6 +547,26 @@ function updateDropDown(dropdown: HTMLSelectElement, values: string[], value?: s
   }
 }
 
+function updateComparisonPreview(component: HTMLElement) {
+  const comparisonPreview = component.querySelector(".comparison-logic-preview") as HTMLElement;
+
+  if (comparisonPreview) {
+    const typeInput = component.querySelector(".prop-type") as HTMLInputElement;
+    const targetValueIDInput = component.querySelector(".prop-targetValueID") as HTMLInputElement;
+    const thresholdInput = component.querySelector(".prop-threshold") as HTMLInputElement;
+
+    if (typeInput.value && targetValueIDInput.value && thresholdInput.value) {
+      comparisonPreview.innerText = typeInput.value;
+      comparisonPreview.style.setProperty("--targetValueID", `'${targetValueIDInput.value}'`);
+      comparisonPreview.style.setProperty("--threshold", `'${thresholdInput.value}'`);
+      
+      comparisonPreview.classList.add("active");
+    } else {
+      comparisonPreview.classList.remove("active");
+    }
+  }
+}
+
 function createUniqueID(length: number) {
   let result = "id_";
   const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -653,7 +696,7 @@ function getJSON(this: FileReader, event: ProgressEvent<FileReader>) {
 }
 
 function promptAndFetchWorkflow() {
-  let name = prompt("Please enter the name of the workflow to import: (case sensitive)");
+  let name = promptWorkflowName();
   if (name == null || name == "") {
     return;
   }
@@ -749,7 +792,7 @@ function postWorkflow(onlyValidate: boolean) {
   }
 
   console.log("Final workflow:\n", workflow);
-  
+
   // TODO: Verify if workflow posted successfully,
   // and add an override warnings option.
   const endpoint = onlyValidate ? "validation" : "workflows/" + workflow.name;
@@ -769,6 +812,10 @@ function postWorkflow(onlyValidate: boolean) {
 }
 
 function handleValidation(response: any) {
+  // Clear any existing validation data first
+  const invalid = document.querySelectorAll(".validation-invalid");
+  invalid.forEach(elem => elem.classList.remove("validation-invalid"));
+
   for (let i = 0; i < response.pages.length; i++) {
     const page = response.pages[i] as Components.Page;
     displayValidationData(page);
@@ -807,6 +854,16 @@ function displayValidationData(page: Components.Page) {
 // ======================= \\
 // IMPORT / EXPORT HELPERS \\
 // ======================= \\
+
+function promptWorkflowName() {
+  let name = prompt("Please enter a name for the diagnosis workflow: (case sensitive)");
+
+  name = name?.replace(/ /g, "_");
+  name = name?.replace(/'/g, "");
+
+  if (name) updateDisplayName(name);
+  return name;
+}
 
 // Give a reference to a DOM element (specifically a page card),
 // creates a Page component for exporting purposes.

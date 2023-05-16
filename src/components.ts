@@ -129,10 +129,10 @@ export module Components {
 }
 
 export let documentation: { [key: string]: any } = {
-  // "Page": {
-  //   defaultLink: "string", 
-  //   isDiagnosisPage: "boolean",
-  // },
+  "Page": {
+    "defaultLink": 'By default each page has two buttons, "Next" and "Prev". The page "Next" sends to may depend on logic in the page. If no logic is triggered, defaultLink is the destination.<br><br>However, LogicComponents trigger when "Next" is pressed and can override this defaultLink. If there are multiple LogicComponents, tiebreaking if multiple are satisfied is done based on order (highest on page has highest precedence).', 
+    "isDiagnosisPage": "After all data has been collected, there is a special page displaying all the collected information and diagnoses. There should be only one page that is the diagnosis page. This page has no components.",
+  },
   
   "Paragraph": {
     "text": "The paragraph text content."

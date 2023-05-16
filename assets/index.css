@@ -47,6 +47,12 @@ h2 {
   font-weight: 300;
 }
 
+h3 {
+  text-align: center;
+  margin-top: 0;
+  font-weight: 400;
+}
+
 button,
 input,
 option,
@@ -217,7 +223,7 @@ button {
   height: 30px;
   margin-left: 5px;
   cursor: pointer;
-  transition: opacity 0.5s ease;
+  transition: opacity 0.5s ease, background-color 0.5s ease;
 }
 
 .info-button {
@@ -226,6 +232,12 @@ button {
   margin-left: auto;
   margin-right: 5px;
   cursor: help;
+  background-color: var(--near-black);
+  border-radius: 50%;
+}
+
+.info-button:hover {
+  background-color: var(--alrite-green);
 }
 
 .goto-button {
@@ -354,11 +366,9 @@ button {
   transform: scale(1);
 }
 
-.tooltip-text {
-  display: none;
-  width: 100%;
-  max-width: 30em;
-  /* white-space: nowrap; */
+.tooltip {
+  color: var(--alrite-green);
+  margin: 0;
 }
 
 /* HOVER TOOLTIP */
@@ -475,9 +485,20 @@ button {
   padding: 6.5px 5px;
   display: flex;
   flex-direction: row-reverse;
+  align-items: center;
   border-radius: 10px;
   border: 3px solid var(--light-border);
+  transition: border 0.5s cubic-bezier(.47, 1.64, .41, .8);
+}
+
+#utility-section,
+#toggle-menu-button {
   background-color: white;
+}
+
+#utility-section.minimized {
+  border-color: transparent;
+  background-color: transparent;
 }
 
 #utility-section::before {
@@ -497,9 +518,23 @@ button {
   height: 40px;
   margin: 0 3px 1px;
   cursor: pointer;
-  transition: transform 0.1s ease, opacity 0.1s ease, border 0.5s ease;
+  --bounce: cubic-bezier(.47, 1.64, .41, 1);
+  --no-over-bounce: cubic-bezier(.47, 1.48, .41, .8);
+  transition: transform 0.1s ease,
+    opacity 0.5s var(--bounce),
+    border 0.5s var(--bounce),
+    width 0.5s var(--bounce),
+    height 0.5s var(--no-over-bounce);
   border: 2px solid transparent;
   border-radius: 8px;
+}
+
+.minimized .util-button:not(#toggle-menu-button) {
+  width: 0px;
+  height: 0px;
+  opacity: 0;
+  --bounce: cubic-bezier(.47, .18, .49, -0.61);
+  --no-over-bounce: cubic-bezier(.45, .22, .51, -0.53);
 }
 
 .darkMode .needs-dark-fill {
@@ -515,7 +550,49 @@ button {
 .util-button:active {
   border: 2px solid var(--alrite-green);
   transform: scale(0.95);
-  opacity: 0.75;
+}
+
+.darkMode .comparison-logic-preview::before,
+.darkMode .comparison-logic-preview::after {
+  color: var(--near-black);
+  transition: color 0.5s ease;
+}
+
+.comparison-logic-preview {
+  height: 0;
+  margin: 0 5px 0;
+  opacity: 0;
+  font-size: 18px;
+  color: var(--alrite-green);
+  border: 1px solid transparent;
+  transition:
+    opacity 0.25s ease,
+    margin 0.5s ease,
+    padding 0.5s ease,
+    height 0.5s ease,
+    color 0.5s ease,
+    border-radius 0.5s ease,
+    background-color 0.5s ease,
+    border 0.5s ease;
+}
+
+.comparison-logic-preview.active {
+  height: 27px;
+  /* height of size 18px font is 27px */
+  margin: 2.5px 5px 20px;
+  opacity: 1;
+  padding: 10px 0;
+  border: 3px solid var(--alrite-green);
+  background-color: rgba(var(--alrite-rgb), 0.1);
+  border-radius: 10px;
+}
+
+.comparison-logic-preview::before {
+  content: var(--targetValueID) " ";
+}
+
+.comparison-logic-preview::after {
+  content: " " var(--threshold);
 }
 
 ::-webkit-scrollbar {
@@ -550,7 +627,8 @@ button {
   display: none;
 }
 
-.darkMode #utility-section,
+.darkMode #utility-section:not(.minimized),
+.darkMode #toggle-menu-button,
 body.darkMode {
   background-color: var(--near-black);
 }
@@ -567,6 +645,9 @@ body.darkMode {
 .darkMode #tooltip,
 .darkMode h1,
 .darkMode h2,
+/* .darkMode h3, */
+.darkMode .comparison-logic-preview::before,
+.darkMode .comparison-logic-preview::after,
 .darkMode .prop-input::before {
   color: white
 }
