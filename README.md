@@ -126,7 +126,7 @@ This component is used to do logic with numbers. For example, say a page should 
 
 For a sample workflow showing a (slightly more complex) example of using comparison branching logic, click the link below. It is more easy to digest when it is laid out visually. You will notice in the example that there are multiple `ComparisonLogic` components, and that their order is intentional; it reflects which should have the highest precedence in the case that multiple are satisfied.
 
-http://127.0.0.1:8000/alrite/editor/?workflow=Fever_Logic
+http://54.190.44.215:8000/alrite/editor/?workflow=Fever_Logic
     
 **`SelectionLogic`** (LogicComponent)
 
