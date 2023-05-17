@@ -20,7 +20,7 @@
   <script src="lib/dragdrop.js" type="text/javascript"></script>
 </head>
 
-<body>
+<body class="darkMode">
   <!-- PAGE CARD -->
   <section class="page-card hidden" id="template-page-card">
     <div class="card page-card-header">
@@ -479,6 +479,8 @@
     </svg>
   </div>
 
+  <img class="util-button" id="go-back-button" style="--label: Go Back" src="assets/go_back.png" />
+
   <section id="utility-section" class="minimized">
     <svg class="util-button" id="toggle-menu-button" viewBox="0 0 100 100" fill="none"
       xmlns="http://www.w3.org/2000/svg">
@@ -489,8 +491,7 @@
     <img class="util-button" id="dark-mode-button" style="--label: Change Theme" src="assets/dark_mode.png" />
 
     <!-- LIGHT MODE BUTTON -->
-    <img class="util-button" id="light-mode-button" style="--label: Change Theme" src="assets/light_mode.png"
-      class="hidden" />
+    <img class="util-button" id="light-mode-button" style="--label: Change Theme" src="assets/light_mode.png" />
 
     <!-- EXPORT BUTTON -->
     <img class="util-button" id="export-button" style="--label: Upload Workflow" src="assets/export.png" />

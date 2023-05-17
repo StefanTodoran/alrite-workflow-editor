@@ -2,7 +2,6 @@ import { Components, documentation } from "./components";
 
 window.addEventListener("load", init);
 
-var body: HTMLElement = null; // Just a nice shorthand to have
 var selectedCard: string = null; // The currently selected page card
 var darkMode: boolean = false;
 var componentID = 0; // Used to ensure unique component ids in the HTML
@@ -26,33 +25,31 @@ var templates: { [key: string]: string } = {
  * Initialization function that should handle anything that needs to occur on page load.
  */
 function init() {
-  body = document.querySelector("body");
+  handleDarkModePreference();
+  setTimeout(() => document.body.classList.add("do-transition"), 10);
 
   document.getElementById("add-page-button").addEventListener("click", addNewPage);
+  document.getElementById("toggle-menu-button").addEventListener("click", toggleUtilMenu);
+  document.getElementById("rename-button").addEventListener("click", promptWorkflowName);
 
   document.getElementById("export-button").addEventListener("click", function () { postWorkflow(false) });
   document.getElementById("validate-button").addEventListener("click", function () { postWorkflow(true) });
 
-  document.getElementById("toggle-menu-button").addEventListener("click", toggleUtilMenu);
-  document.getElementById("rename-button").addEventListener("click", promptWorkflowName);
-
   document.getElementById("import-button").addEventListener("click", promptAndFetchWorkflow);
   document.getElementById("file-import-button").addEventListener("click", triggerFileImport);
   document.getElementById("importer").addEventListener("input", prepareReader);
-
   document.getElementById("file-download-button").addEventListener("click", downloadToFile);
 
-  // Handling dark mode
-  darkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
   document.getElementById("light-mode-button").addEventListener("click", toggleDarkMode);
   document.getElementById("dark-mode-button").addEventListener("click", toggleDarkMode);
-  updateDarkMode();
 
-  addEventListener("mousemove", updateTooltip);
+  document.getElementById("go-back-button").addEventListener("click", function () { history.back() });
 
   // Adds a confirmation prompt if the user attempts to
   // close the tab or go back, so changes aren't lost.
   window.onbeforeunload = () => { return true; };
+
+  addEventListener("mousemove", updateTooltip);
 
   populatePageOnStartup();
 }
@@ -70,7 +67,7 @@ function addNewPage() {
   updateAllDropDowns();
 
   window.scrollTo({
-    left: body.scrollWidth,
+    left: document.body.scrollWidth,
     behavior: "smooth",
   });
 }
@@ -146,12 +143,12 @@ function addPageCard(id: string, title: string, isDiagnosisPage?: boolean, defau
   // semantic meaning since intra-page navigation is done via links,
   // but this is useful for convenience of editing.
   createButtonClickEvent(card, ".move-left-button", function (evt) {
-    body.insertBefore(card, card.previousSibling);
+    document.body.insertBefore(card, card.previousSibling);
     updatePageCardMoveButtons();
     evt.stopPropagation(); // Otherwise, click goes through to parent (the card header)
   });
   createButtonClickEvent(card, ".move-right-button", function (evt) {
-    body.insertBefore(card, card.nextSibling.nextSibling);
+    document.body.insertBefore(card, card.nextSibling.nextSibling);
     updatePageCardMoveButtons();
     evt.stopPropagation();
   });
@@ -159,7 +156,7 @@ function addPageCard(id: string, title: string, isDiagnosisPage?: boolean, defau
   // Prompts the user to double check they want to delete, then deletes.
   createButtonClickEvent(card, ".delete-button", function (evt) {
     if (window.confirm(`Are you sure you want to delete "${card.id}"?`)) {
-      body.removeChild(card);
+      document.body.removeChild(card);
       updateAllDropDowns();
       updatePageCardMoveButtons();
     }
@@ -198,7 +195,7 @@ function addPageCard(id: string, title: string, isDiagnosisPage?: boolean, defau
   }
 
   const addButton = document.getElementById("add-page-button");
-  body.insertBefore(card, addButton);
+  document.body.insertBefore(card, addButton);
 
   // To ensure the same index is never used twice.
   // newPageIndex++;
@@ -366,26 +363,6 @@ function updateSelectedCard() {
 
 function toggleUtilMenu() {
   document.getElementById("utility-section").classList.toggle("minimized");
-}
-
-function toggleDarkMode() {
-  darkMode = !darkMode;
-  updateDarkMode();
-}
-
-// This function updates the body's class. This affects page background, and since 
-// the body class also sets css variables contianing colors which all other components
-// use, it updates the entire page's styles. This function also swaps the buttons.
-function updateDarkMode() {
-  if (darkMode) {
-    body.classList.add("darkMode");
-    document.getElementById("light-mode-button").classList.add("hidden");
-    document.getElementById("dark-mode-button").classList.remove("hidden");
-  } else {
-    body.classList.remove("darkMode");
-    document.getElementById("dark-mode-button").classList.add("hidden");
-    document.getElementById("light-mode-button").classList.remove("hidden");
-  }
 }
 
 function updateTooltip(evt: MouseEvent) {
@@ -581,6 +558,58 @@ function createUniqueID(length: number) {
   }
 
   return result;
+}
+
+// ===================== \\
+// COOKIES AND DARK MODE \\
+// ===================== \\
+
+function handleDarkModePreference() {
+  if (getCookieValue("darkMode") === "true") {
+    darkMode = true;
+  } else if (getCookieValue("darkMode") === "false") {
+    darkMode = false;
+  } else {
+    // If the user has no stored preference, check their system settings.
+    darkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+
+  updateDarkMode();
+}
+
+function getCookieValue(key: string) {
+  const value = document.cookie
+    .split("; ")
+    .find((row) => row.startsWith(key + "="))
+    ?.split("=")[1];
+  return value;
+}
+
+function setCookieValue(key: string, value: any, age?: number) {
+  age = age || 31536000;
+  const cookie = `${key}=${value}; max-age=${age}; SameSite=None; path=/`;
+  document.cookie = cookie;
+}
+
+function toggleDarkMode() {
+  darkMode = !darkMode;
+  setCookieValue("darkMode", darkMode);
+  updateDarkMode();
+}
+
+// This function updates the body's class. This affects page background, and since 
+// the body class also sets css variables contianing colors which all other components
+// use, it updates the entire page's styles. This function also swaps the theme buttons.
+function updateDarkMode() {
+  if (darkMode) {
+    document.body.classList.add("darkMode");
+    document.getElementById("light-mode-button").classList.add("hidden");
+    document.getElementById("dark-mode-button").classList.remove("hidden");
+  } else {
+    document.body.classList.remove("darkMode");
+    document.getElementById("dark-mode-button").classList.add("hidden");
+    document.getElementById("light-mode-button").classList.remove("hidden");
+  }
 }
 
 // ======================= \\

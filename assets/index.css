@@ -18,6 +18,9 @@ body {
   align-items: center;
   overflow-y: scroll;
   min-height: 100vh;
+}
+
+.do-transition {
   transition: background-color 0.5s ease;
 }
 
@@ -489,10 +492,11 @@ button {
   border-radius: 10px;
   border: 3px solid var(--light-border);
   --bounce: cubic-bezier(.47, 1.64, .41, 1);
-  transition: border 0.5s var(--bounce), background-color 0.5s var(--bounce);
+  transition: border 0.5s var(--bounce), background-color 0.5s ease;
 }
 
 #utility-section,
+#go-back-button,
 #toggle-menu-button {
   background-color: white;
 }
@@ -507,6 +511,7 @@ button {
   content: var(--workflow-name);
   position: absolute;
   bottom: 100%;
+  right: 12.5px;
   color: var(--dark-green);
   white-space: nowrap;
   text-shadow:
@@ -524,8 +529,8 @@ button {
   --bounce: cubic-bezier(.47, 1.64, .41, 1);
   --no-over-bounce: cubic-bezier(.47, 1.48, .41, .8);
   transition: transform 0.1s ease,
+  border 0.5s ease,
     opacity 0.5s var(--bounce),
-    border 0.5s var(--bounce),
     width 0.5s var(--bounce),
     height 0.5s var(--no-over-bounce);
   border: 2px solid transparent;
@@ -536,8 +541,28 @@ button {
   width: 0px;
   height: 0px;
   opacity: 0;
+}
+
+.minimized .util-button {
   --bounce: cubic-bezier(.47, .18, .49, -0.61);
   --no-over-bounce: cubic-bezier(.45, .22, .51, -0.53);
+}
+
+.do-transition #go-back-button,
+.do-transition #toggle-menu-button {
+  transition: transform 0.1s ease,
+    background-color 0.5s ease,
+    border 0.5s ease;
+}
+
+#go-back-button {
+  position: fixed;
+  bottom: 15px;
+  left: 15px;
+}
+
+.needs-dark-fill {
+  transition: fill 0.5s ease
 }
 
 .darkMode .needs-dark-fill {
@@ -651,6 +676,7 @@ button {
 
 .darkMode #utility-section:not(.minimized),
 .darkMode #toggle-menu-button,
+.darkMode #go-back-button,
 body.darkMode {
   background-color: var(--near-black);
 }
