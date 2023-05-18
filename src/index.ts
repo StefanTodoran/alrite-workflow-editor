@@ -1,4 +1,4 @@
-import { Components, documentation } from "./components";
+import { Components, documentation } from "./components.js";
 
 window.addEventListener("load", init);
 
@@ -54,10 +54,8 @@ function init() {
   populatePageOnStartup();
 }
 
-// let newPageIndex = 1;
 function addNewPage() {
   const page = <Components.Page>{
-    // pageID: `page_${newPageIndex}`,
     pageID: createUniqueID(5),
     title: "Blank Page",
     content: [],
@@ -139,7 +137,7 @@ function addPageCard(id: string, title: string, isDiagnosisPage?: boolean, defau
     updateSelectedCard();
   });
 
-  // These buttons are used to rearrange page cards, the order has no 
+    // These buttons are used to rearrange page cards, the order has no 
   // semantic meaning since intra-page navigation is done via links,
   // but this is useful for convenience of editing.
   createButtonClickEvent(card, ".move-left-button", function (evt) {
@@ -157,8 +155,8 @@ function addPageCard(id: string, title: string, isDiagnosisPage?: boolean, defau
   createButtonClickEvent(card, ".delete-button", function (evt) {
     if (window.confirm(`Are you sure you want to delete "${card.id}"?`)) {
       document.body.removeChild(card);
-      updateAllDropDowns();
       updatePageCardMoveButtons();
+      updateAllDropDowns();
     }
     evt.stopPropagation();
   });
@@ -196,9 +194,6 @@ function addPageCard(id: string, title: string, isDiagnosisPage?: boolean, defau
 
   const addButton = document.getElementById("add-page-button");
   document.body.insertBefore(card, addButton);
-
-  // To ensure the same index is never used twice.
-  // newPageIndex++;
 }
 
 // Given a card, a component type, and the reference to the "new component" card
@@ -546,6 +541,13 @@ function updateComparisonPreview(component: HTMLElement) {
   }
 }
 
+function highlightDraggableElement(card: HTMLElement) {
+  const highlighted = document.querySelectorAll(".allow-drop");
+  highlighted.forEach((page) => page.classList.remove("allow-drop"));
+
+  card?.classList.add("allow-drop");
+}
+
 function createUniqueID(length: number) {
   let result = "id_";
   const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -618,22 +620,47 @@ function updateDarkMode() {
 
 // For some reason after changing the TS compiler options,
 // these functions don't get detected anymore...
+// It has something to do with dojo.
 
-function allowDrop(evt: any) {
+export function allowComponentDrop(evt: any) {
+  if (evt.target.closest(".page-card").classList.contains("diagnosis-page")) return;
+  if (!evt.dataTransfer.getData("component")) return;
+
+  const highlight = evt.target.closest(".card.component-card") || evt.target.closest(".settings-card");
+  highlightDraggableElement(highlight);
   evt.preventDefault();
 }
 
-function drag(evt: any) { // Called on drag start
+export function allowPageDrop(evt: any) {
+  if (evt.dataTransfer.getData("page")) {
+    highlightDraggableElement(evt.target.closest(".page-card"));
+    evt.preventDefault();
+  }
+}
+
+export function dragComponent(evt: any) { // called on drag start
+  evt.dataTransfer.setData("starty", evt.clientY);
   evt.dataTransfer.setData("component", evt.target.parentNode.id);
 }
 
-function drop(evt: any, target: string, before: boolean) {
-  evt.preventDefault();
+export function dragPage(evt: any) { // called on drag start
+  evt.dataTransfer.setData("startx", evt.clientX);
+  evt.dataTransfer.setData("page", evt.target.closest(".page-card").id);
+
+  selectedCard = null;
+  updateSelectedCard();
+}
+
+export function dropComponent(evt: any) {
   const id = evt.dataTransfer.getData("component");
+  if (!id) {
+    return;
+  }
+
   const component = document.getElementById(id);
 
   // The component we want to move the dragged component above
-  const targetComponent = evt.target.closest(target);
+  const targetComponent = evt.target.closest(".card.component-card") || evt.target.closest(".card.settings-card");
   const pageCard = targetComponent.parentNode;
 
   // Update the id (in case we were dragged to a new page)
@@ -641,19 +668,37 @@ function drop(evt: any, target: string, before: boolean) {
   const parts = component.id.split(".");
   component.id = `${pageCard.id}.${parts[1]}.${componentID++}`;
 
-  if (before) {
+  const starty = evt.dataTransfer.getData("starty");
+  if (evt.clientY - starty < 0 && !evt.target.closest(".card.settings-card")) {
+    // We want to insert before if the component was dragged up, unless
+    // it is being dropped on the settings card.
     pageCard.insertBefore(component, targetComponent);
   } else {
-    pageCard.insertBefore(component, targetComponent.nextSibling);
+    pageCard.insertBefore(component, targetComponent.nextSibling); // insert after
   }
+
+  highlightDraggableElement(null);
+  evt.preventDefault();
 }
 
-function dropBefore(evt: any) {
-  drop(evt, ".card.component-card", true);
-}
+export function dropPage(evt: any) {
+  const id = evt.dataTransfer.getData("page");
+  if (!id) {
+    return;
+  }
 
-function dropAfter(evt: any) {
-  drop(evt, ".card.settings-card", false);
+  const page = document.getElementById(id);
+  const target = evt.target.closest(".page-card");
+
+  const startx = evt.dataTransfer.getData("startx");
+  if (evt.clientX - startx < 0) {
+    document.body.insertBefore(page, target);
+  } else {
+    document.body.insertBefore(page, target.nextSibling); // insert after
+  }
+
+  highlightDraggableElement(null);
+  evt.preventDefault();
 }
 
 // ========================= \\
@@ -806,6 +851,7 @@ function importWorkflow(json: any, dummy?: true) {
     addPageCard(page.pageID, page.title, page.isDiagnosisPage, page.defaultLink, IDs, components);
   });
 
+  updatePageCardMoveButtons();
   updateAllDropDowns();
 }
 

@@ -94,6 +94,10 @@ button {
   background-color: var(--alrite-green);
 }
 
+.page-card-label h1 {
+  cursor: text;
+}
+
 .page-card-label h2 {
   font-size: 16px;
   opacity: 0.5;
@@ -257,15 +261,6 @@ button {
 
 .page-card:not(.selected) .add-subcomponent-button {
   margin: 5px 0 5px 50%;
-}
-
-.page-card-label {
-  margin-right: 25px;
-  transition: margin 0.5s ease;
-}
-
-.selected>.page-card-label {
-  margin-right: 50px;
 }
 
 .disabled,
@@ -668,6 +663,19 @@ button {
   100% {
     opacity: 1;
   }
+}
+
+.settings-card.allow-drop,
+.component-card.allow-drop {
+  box-shadow: 0px 0px 0px 5px rgba(var(--alrite-rgb), 0.35);
+}
+
+.page-card.allow-drop {
+  background-color: rgba(var(--alrite-rgb), 0.075);
+}
+
+.darkMode .page-card.allow-drop {
+  background-color: rgba(var(--alrite-rgb), 0.05);
 }
 
 .hidden {
