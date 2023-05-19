@@ -113,6 +113,8 @@ This component should almost never be used. Generally, navigating through the wo
 ***timeLimit***: How long to count for, given in seconds.<br>
 ***offerManualInput***: True or false, whether the counter can be bypassed by directly typing in a value.
 
+<img src="assets/comparison_sample.png" style="width: 100%; border: 1px solid gray; border-radius: 5px;"/>
+
 ## Logic Components
 
 **`ComparisonLogic`** (LogicComponent)

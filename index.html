@@ -21,6 +21,7 @@
     import { dragPage } from "./lib/index.js";
     import { dropComponent } from "./lib/index.js";
     import { dropPage } from "./lib/index.js";
+    import { onDragEnd } from "./lib/index.js";
 
     window.allowComponentDrop = allowComponentDrop;
     window.allowPageDrop = allowPageDrop;
@@ -28,13 +29,14 @@
     window.dragPage = dragPage;
     window.dropComponent = dropComponent;
     window.dropPage = dropPage;
+    window.onDragEnd = onDragEnd;
   </script>
 </head>
 
 <body class="darkMode">
   <!-- PAGE CARD -->
   <section class="page-card hidden" id="template-page-card" ondrop="dropPage(event)" ondragover="allowPageDrop(event)">
-    <div class="card page-card-header" draggable="true" ondragstart="dragPage(event)">
+    <div class="card page-card-header" draggable="true" ondragstart="dragPage(event)" ondragend="onDragEnd()">
       <div class="page-card-label">
         <h1 contenteditable="true" onclick="event.stopPropagation();"></h1>
         <h2></h2>
@@ -113,7 +115,7 @@
   <!-- PARAGRAPH PAGE COMPONENT -->
   <div class="card component-card hidden" id="template-paragraph-component" ondrop="dropComponent(event)"
     ondragover="allowComponentDrop(event)">
-    <div class="component-card-header" draggable="true" ondragstart="dragComponent(event)">
+    <div class="component-card-header" draggable="true" ondragstart="dragComponent(event)" ondragend="onDragEnd()">
       <div>
         <h1>Paragraph</h1>
         <h2>Page Component</h2>
@@ -139,7 +141,7 @@
   <!-- MEDIA ITEM PAGE COMPONENT -->
   <div class="card component-card hidden" id="template-media-item-component" ondrop="dropComponent(event)"
     ondragover="allowComponentDrop(event)">
-    <div class="component-card-header" draggable="true" ondragstart="dragComponent(event)">
+    <div class="component-card-header" draggable="true" ondragstart="dragComponent(event)" ondragend="onDragEnd()">
       <div>
         <h1>Media Item</h1>
         <h2>Page Component</h2>
@@ -168,7 +170,7 @@
   <!-- MULTIPLE CHOICE PAGE COMPONENT -->
   <div class="card component-card hidden" id="template-multiple-choice-component" ondrop="dropComponent(event)"
     ondragover="allowComponentDrop(event)">
-    <div class="component-card-header" draggable="true" ondragstart="dragComponent(event)">
+    <div class="component-card-header" draggable="true" ondragstart="dragComponent(event)" ondragend="onDragEnd()">
       <div>
         <h1>Multiple Choice</h1>
         <h2>Page Component</h2>
@@ -247,7 +249,7 @@
   <!-- TEXT INPUT PAGE COMPONENT -->
   <div class="card component-card hidden" id="template-text-input-component" ondrop="dropComponent(event)"
     ondragover="allowComponentDrop(event)">
-    <div class="component-card-header" draggable="true" ondragstart="dragComponent(event)">
+    <div class="component-card-header" draggable="true" ondragstart="dragComponent(event)" ondragend="onDragEnd()">
       <div>
         <h1>Text Input</h1>
         <h2>Page Component</h2>
@@ -288,7 +290,7 @@
   <!-- BUTTON PAGE COMPONENT -->
   <div class="card component-card hidden" id="template-button-component" ondrop="dropComponent(event)"
     ondragover="allowComponentDrop(event)">
-    <div class="component-card-header" draggable="true" ondragstart="dragComponent(event)">
+    <div class="component-card-header" draggable="true" ondragstart="dragComponent(event)" ondragend="onDragEnd()">
       <div>
         <h1>Button</h1>
         <h2>Page Component</h2>
@@ -323,7 +325,7 @@
   <!-- COUNTER COMPONENT -->
   <div class="card component-card hidden" id="template-counter-component" ondrop="dropComponent(event)"
     ondragover="allowComponentDrop(event)">
-    <div class="component-card-header" draggable="true" ondragstart="dragComponent(event)">
+    <div class="component-card-header" draggable="true" ondragstart="dragComponent(event)" ondragend="onDragEnd()">
       <div>
         <h1>Counter</h1>
         <h2>Page Component</h2>
@@ -370,7 +372,7 @@
   <!-- COMPARISON LOGIC COMPONENT -->
   <div class="card component-card hidden" id="template-comparison-component" ondrop="dropComponent(event)"
     ondragover="allowComponentDrop(event)">
-    <div class="component-card-header" draggable="true" ondragstart="dragComponent(event)">
+    <div class="component-card-header" draggable="true" ondragstart="dragComponent(event)" ondragend="onDragEnd()">
       <div>
         <h1>Comparison</h1>
         <h2>Logic Component</h2>
@@ -411,7 +413,7 @@
   <!-- SELECTION LOGIC COMPONENT -->
   <div class="card component-card hidden" id="template-selection-component" ondrop="dropComponent(event)"
     ondragover="allowComponentDrop(event)">
-    <div class="component-card-header" draggable="true" ondragstart="dragComponent(event)">
+    <div class="component-card-header" draggable="true" ondragstart="dragComponent(event)" ondragend="onDragEnd()">
       <div>
         <h1>Selection</h1>
         <h2>Logic Component</h2>
@@ -446,7 +448,7 @@
   <!-- VALIDATION LOGIC COMPONENT -->
   <div class="card component-card hidden" id="template-validation-component" ondrop="dropComponent(event)"
     ondragover="allowComponentDrop(event)">
-    <div class="component-card-header" draggable="true" ondragstart="dragComponent(event)">
+    <div class="component-card-header" draggable="true" ondragstart="dragComponent(event)" ondragend="onDragEnd()">
       <div>
         <h1>Validation</h1>
         <h2>Logic Component</h2>

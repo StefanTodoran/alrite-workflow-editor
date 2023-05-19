@@ -665,9 +665,32 @@ button {
   }
 }
 
-.settings-card.allow-drop,
-.component-card.allow-drop {
-  box-shadow: 0px 0px 0px 5px rgba(var(--alrite-rgb), 0.35);
+.settings-card,
+.component-card {
+  position: relative;
+}
+
+.settings-card.allow-drop-before::after,
+.component-card.allow-drop-before::after,
+.settings-card.allow-drop-after::after,
+.component-card.allow-drop-after::after {
+  content: "";
+  height: 4px;
+  width: 100%;
+  background-color: rgba(var(--alrite-rgb), 0.5);
+  position: absolute;
+  left: 0;
+  border-radius: 1.5px;
+}
+
+.settings-card.allow-drop-after::after,
+.component-card.allow-drop-after::after {
+  bottom: -10px;
+}
+
+.settings-card.allow-drop-before::after,
+.component-card.allow-drop-before::after {
+  top: -10px;
 }
 
 .page-card.allow-drop {

@@ -137,7 +137,7 @@ function addPageCard(id: string, title: string, isDiagnosisPage?: boolean, defau
     updateSelectedCard();
   });
 
-    // These buttons are used to rearrange page cards, the order has no 
+  // These buttons are used to rearrange page cards, the order has no 
   // semantic meaning since intra-page navigation is done via links,
   // but this is useful for convenience of editing.
   createButtonClickEvent(card, ".move-left-button", function (evt) {
@@ -541,11 +541,23 @@ function updateComparisonPreview(component: HTMLElement) {
   }
 }
 
-function highlightDraggableElement(card: HTMLElement) {
+function highlightDraggablePage(card: HTMLElement) {
   const highlighted = document.querySelectorAll(".allow-drop");
-  highlighted.forEach((page) => page.classList.remove("allow-drop"));
+  highlighted.forEach((page) => {
+    page.classList.remove("allow-drop");
+  });
 
   card?.classList.add("allow-drop");
+}
+
+function highlightDraggableComponent(card: HTMLElement, before?: boolean) {
+  const highlighted = [...document.querySelectorAll(".allow-drop-before"), ...document.querySelectorAll(".allow-drop-after")];
+  highlighted.forEach((page) => {
+    page.classList.remove("allow-drop-before");
+    page.classList.remove("allow-drop-after");
+  });
+
+  card?.classList.add(before ? "allow-drop-before" : "allow-drop-after");
 }
 
 function createUniqueID(length: number) {
@@ -626,14 +638,17 @@ export function allowComponentDrop(evt: any) {
   if (evt.target.closest(".page-card").classList.contains("diagnosis-page")) return;
   if (!evt.dataTransfer.getData("component")) return;
 
-  const highlight = evt.target.closest(".card.component-card") || evt.target.closest(".settings-card");
-  highlightDraggableElement(highlight);
+  const settings = evt.target.closest(".settings-card");
+  const highlight = evt.target.closest(".card.component-card") || settings;
+  const starty = evt.dataTransfer.getData("starty");
+
+  highlightDraggableComponent(highlight, (evt.clientY - starty < 0 && !settings));
   evt.preventDefault();
 }
 
 export function allowPageDrop(evt: any) {
   if (evt.dataTransfer.getData("page")) {
-    highlightDraggableElement(evt.target.closest(".page-card"));
+    highlightDraggablePage(evt.target.closest(".page-card"));
     evt.preventDefault();
   }
 }
@@ -677,7 +692,7 @@ export function dropComponent(evt: any) {
     pageCard.insertBefore(component, targetComponent.nextSibling); // insert after
   }
 
-  highlightDraggableElement(null);
+  highlightDraggableComponent(null);
   evt.preventDefault();
 }
 
@@ -697,8 +712,13 @@ export function dropPage(evt: any) {
     document.body.insertBefore(page, target.nextSibling); // insert after
   }
 
-  highlightDraggableElement(null);
+  highlightDraggablePage(null);
   evt.preventDefault();
+}
+
+export function onDragEnd() {
+  highlightDraggableComponent(null);
+  highlightDraggablePage(null);
 }
 
 // ========================= \\
