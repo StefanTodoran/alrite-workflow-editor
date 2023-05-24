@@ -23,34 +23,38 @@ var templates: { [key: string]: string } = {
 
 /**
  * Initialization function that should handle anything that needs to occur on page load.
+ * Sets event listeners for
  */
 function init() {
   handleDarkModePreference();
   setTimeout(() => document.body.classList.add("do-transition"), 10);
+  // We wait to give the body transition styles so that the styles
+  // don't flash dark or light theme before stored preferences kick in.
 
-  document.getElementById("add-page-button").addEventListener("click", addNewPage);
-  document.getElementById("toggle-menu-button").addEventListener("click", toggleUtilMenu);
-  document.getElementById("rename-button").addEventListener("click", promptWorkflowName);
+  addButtonOnClick("add-page-button", addNewPage);
+  addButtonOnClick("toggle-menu-button", toggleUtilMenu);
+  addButtonOnClick("rename-button", promptWorkflowName);
 
-  document.getElementById("export-button").addEventListener("click", function () { postWorkflow(false) });
-  document.getElementById("validate-button").addEventListener("click", function () { postWorkflow(true) });
+  addButtonOnClick("export-button", () => { postWorkflow(false, "Uploading Workflow...") });
+  addButtonOnClick("validate-button", () => { postWorkflow(true) });
 
-  document.getElementById("import-button").addEventListener("click", promptAndFetchWorkflow);
-  document.getElementById("file-import-button").addEventListener("click", triggerFileImport);
+  addButtonOnClick("import-button", promptAndFetchWorkflow);
+  addButtonOnClick("file-import-button", triggerFileImport);
   document.getElementById("importer").addEventListener("input", prepareReader);
-  document.getElementById("file-download-button").addEventListener("click", downloadToFile);
+  addButtonOnClick("file-download-button", downloadToFile);
 
-  document.getElementById("light-mode-button").addEventListener("click", toggleDarkMode);
-  document.getElementById("dark-mode-button").addEventListener("click", toggleDarkMode);
+  addButtonOnClick("light-mode-button", toggleDarkMode);
+  addButtonOnClick("dark-mode-button", toggleDarkMode);
 
-  document.getElementById("go-back-button").addEventListener("click", function () { history.back() });
+  addButtonOnClick("go-back-button", () => { window.location.href = ".." });
 
-  // Adds a confirmation prompt if the user attempts to
-  // close the tab or go back, so changes aren't lost.
-  window.onbeforeunload = () => { return true; };
+  setTimeout(() => {
+    // Adds a confirmation prompt if the user attempts to
+    // close the tab or go back, so changes aren't lost.
+    window.onbeforeunload = () => { return true; };
+  }, 5000);
 
   addEventListener("mousemove", updateTooltip);
-
   populatePageOnStartup();
 }
 
@@ -408,6 +412,18 @@ function updateTooltip(evt: MouseEvent) {
   }
 }
 
+function displayInfoMessage(text: string) {
+  document.getElementById("info-container").classList.add("active");
+  document.getElementById("info-message").innerText = text;
+}
+
+function hideInfoMessage(seconds?: number) {
+  seconds = isNaN(seconds) ? 0.75 : Math.max(seconds, 0.75);
+  setTimeout(() => {
+    document.getElementById("info-container").classList.remove("active");
+  }, seconds * 1000);
+}
+
 // ======================= \\
 // EDITOR HELPER FUNCTIONS \\
 // ======================= \\
@@ -425,9 +441,17 @@ function getTemplateCopy(id: string) {
   return clone;
 }
 
+// Used for giving a button identified via class inside 
+// some card component a click event listener.
 function createButtonClickEvent(container: HTMLElement, query: string, func: (evt: Event) => any) {
   const button = container.querySelector(query) as HTMLElement;
   button.addEventListener("click", func);
+}
+
+// Used to give util buttons identified 
+// via id a click event listener.
+function addButtonOnClick(id: string, func: (evt: Event) => any) {
+  document.getElementById(id).addEventListener("click", func);
 }
 
 function getAllPageIDs() {
@@ -659,7 +683,7 @@ export function dragComponent(evt: any) { // called on drag start
 }
 
 export function dragPage(evt: any) { // called on drag start
-  evt.dataTransfer.setData("startx", evt.clientX);
+  evt.dataTransfer.setData("startx", evt.clientX + window.scrollX);
   evt.dataTransfer.setData("page", evt.target.closest(".page-card").id);
 
   selectedCard = null;
@@ -706,7 +730,8 @@ export function dropPage(evt: any) {
   const target = evt.target.closest(".page-card");
 
   const startx = evt.dataTransfer.getData("startx");
-  if (evt.clientX - startx < 0) {
+  const currx = evt.clientX + window.scrollX;
+  if (currx - startx < 0) {
     document.body.insertBefore(page, target);
   } else {
     document.body.insertBefore(page, target.nextSibling); // insert after
@@ -772,7 +797,7 @@ function downloadToFile() {
 
   const downloader = document.getElementById("downloader");
   downloader.setAttribute("href", dataStr);
-  downloader.setAttribute("download", "workflow.json");
+  downloader.setAttribute("download", `${workflow.name}.json`);
   downloader.click();
 }
 
@@ -819,8 +844,8 @@ function fetchWorkflow(name: string, version?: string) {
   if (version) {
     target += version + "/";
   }
-  console.log("Attempting to get from:", target);
 
+  // displayInfoMessage("Importing Workflow...");
   fetch(target, {
     method: "GET",
     headers: {
@@ -829,6 +854,7 @@ function fetchWorkflow(name: string, version?: string) {
   })
     .then(res => res.json())
     .then(res => importWorkflow(res));
+  // hideInfoMessage();
 }
 
 /**
@@ -875,18 +901,16 @@ function importWorkflow(json: any, dummy?: true) {
   updateAllDropDowns();
 }
 
-function postWorkflow(onlyValidate: boolean) {
+function postWorkflow(onlyValidate: boolean, infoMessage?: string) {
   const workflow = extractWorkflowData(onlyValidate);
   if (!workflow) {
     return;
   }
 
-  console.log("Workflow Object:\n", workflow);
-
   // TODO: Verify if workflow posted successfully,
   // and add an override warnings option.
   const endpoint = onlyValidate ? "validation" : "workflows/" + workflow.name;
-  console.log("Attempting to post to:", "/alrite/apis/" + endpoint + "/");
+  infoMessage && displayInfoMessage(infoMessage);
 
   fetch("/alrite/apis/" + endpoint + "/", {
     method: "POST",
@@ -895,26 +919,45 @@ function postWorkflow(onlyValidate: boolean) {
     },
     body: JSON.stringify(workflow)
   })
-    .then(res => res.json())
-    .then(json => handleValidation(json));
+    .then(async (res) => {
+      let data = await res.json();
+      if (typeof data === "string") data = JSON.parse(data);
+      
+      handleValidation(data, res.status);
+    });
 
   updateDisplayName(workflow.name);
+  hideInfoMessage();
 }
 
-function handleValidation(response: any) {
-  // Clear any existing validation data first
-  const invalid = document.querySelectorAll(".validation-invalid");
-  invalid.forEach(elem => elem.classList.remove("validation-invalid"));
+function handleValidation(response: any, status: number) {
+  if (status === 200) {
+    displayInfoMessage("No Errors Found!");
+    hideInfoMessage();
+  }
 
-  for (let i = 0; i < response.pages.length; i++) {
-    const page = response.pages[i] as Components.Page;
-    displayValidationData(page);
+  if (status === 400) {
+    // Clear any existing validation data first
+    const invalid = document.querySelectorAll(".validation-invalid");
+    invalid.forEach(elem => elem.classList.remove("validation-invalid"));
+  
+    for (let i = 0; i < response.pages.length; i++) {
+      const page = response.pages[i] as Components.ValidatedPage;
+      displayValidationData(page);
+    }
   }
 }
 
-function displayValidationData(page: Components.Page) {
+function displayValidationData(page: Components.ValidatedPage) {
   const card = document.getElementById(page.pageID);
   const settings = card.querySelector(".settings-card-fields");
+
+  if (page.pageError) {
+    const pageError = card.querySelector(".page-error-container");
+    pageError.textContent = page.pageError;
+    pageError.classList.add("validation-invalid");
+    card.querySelector(".settings-card").classList.add("validation-invalid");
+  }
 
   if (page.defaultLink) {
     const defaultLink = settings.querySelector(".prop-defaultLink");

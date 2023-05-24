@@ -8,13 +8,33 @@ It is recommended to use either Chrome or Firefox. While the editor may work wit
 
 The basic page setup lays out pages horizontally with their respective components underneath them. Press the plus button on the right hand side to add new pages. Click on a page's header card to edit its properties, or to add, modify, or delete its components. You can also click on a page's name to modify it.
 
-In the bottom right you can find the utility buttons. Hover over these to see their labels. Using these buttons one can import a workflow from a `.json` file or from the server, one can upload their workflow to the server, and the editor's theme can also be changed.
+In the bottom right you can find the collapsable menu which contains the utility buttons. Hover over these to see their labels. Using these buttons one can import a workflow from a `.json` file or from the server, validate a workflow, upload a workflow to the server, or change the editor's theme. 
 
 Page order is irrelevant and has no effect on the workflow, it is merely for user convenience. The only exception to this is the first page, which is the entry point for the workflow. Component order does matter, and components can be reordered by drag and drop. They can also be moved to different pages.
 
 <img src="assets/prop_name.png" style="width: 100%; border: 1px solid gray; border-radius: 5px;"/>
 
 In the above image we can see the user hovering a tooltip for more information about what the input type property on the `TextInput` component should be. Notice the wort "type" in parenthesis in the tooltip, this is the *name* of the property. If you wanted more information about this property, this property name in parenthesis is how it would be referred to in this usage document. The "Input Type" label is merely for convenience.
+
+## Workflow Validation
+
+A useful safeguard / tool when working with workflows is the validation feature. This can be used by pressing the validation button in the utility menu, which looks like this:
+
+<picture>
+  <source
+    srcset="assets/validate_dark.png"
+    media="(prefers-color-scheme: dark)"
+  />
+  <source
+    srcset="assets/validate.png"
+    media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)"
+  />
+  <img style="width: 3em;" src="assets/validate.png" />
+</picture>
+
+Pressing this button will send the workflow to the server without creating a new version, the server will merely check for errors and return them. Any validation errors will be highlighted orange and will show an error message indicating the issue. Be careful with this feature, and do not rely on validation to be sure that a workflow is safe! Test all workflows in the app! Validation is only meant to catch certain common issues early.
+
+<img src="assets/validation.png" style="width: 100%; border: 1px solid gray; border-radius: 5px;"/>
 
 ## Branching Logic
 
@@ -144,13 +164,15 @@ http://54.190.44.215:8000/alrite/editor/?workflow=Fever_Logic
 
 Unlike the above two logic components, `ValidationLogic` components are not used to create branching but rather for input validation. By default, all input components are required before "Next" can be pressed. However, to validate said inputs this component is necessary. 
 
-If the expression described by a `ValidationLogic` component is satisfied, the page's "Next" button will be disabled, just like it would be if an input component on the page was not filled out. Like with other logic components, multiple `ValidationLogic` components can be used on the same page, and the `valueID`s they target do not need to necessarily correspond to components on that page.
+If the expression described by a `ValidationLogic` component is satisfied, the page's "Next" button will be disabled, just like it would be if an input component on the page was not filled out. Like with other logic components, multiple `ValidationLogic` components can be used on the same page, and the `valueID`s they target do not need to necessarily correspond to components on that page. Click the link below for an example workflow where input validation is achieved using this component.
+
+http://54.190.44.215:8000/alrite/editor/?workflow=Input_Validation
 
 # Making Changes
 
 ## Running Locally
 
-Run `tsc npx -w` to tell the TypeScript compiler to watch for changes. Then, open index.html in the browser. Any changes you make the the HTML, CSS or TypeScript should be updated on refresh.
+Run `tsc npx -w` to tell the TypeScript compiler to watch for changes. Then, open `/alrite/editor/` in the browser. Any changes you make to the HTML, CSS or TypeScript should be updated on refresh.
 
 If working with the server, run `python manage.py runserver`, and make sure you are editing the subcomponent alrite editor found in the `static` folder. Otherwise, you will have to push and pull every time you want the server to reflect your changes.
 

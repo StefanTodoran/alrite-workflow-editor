@@ -285,11 +285,13 @@ button {
 }
 
 .prop-input {
+  position: relative;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
   margin: 5px 5px;
+  transition: outline 0.5s ease, margin-bottom 0.5s ease;
 }
 
 .prop-input::before {
@@ -391,16 +393,38 @@ button {
 }
 
 .validation-invalid.prop-input {
-  position: relative;
   margin-bottom: 35px;
 }
 
-.validation-invalid.prop-input::after {
+.prop-input::after {
   content: var(--error-message);
   color: var(--warning-orange);
   position: absolute;
-  bottom: -25px;
   right: 0;
+  bottom: 0;
+  opacity: 0;
+  transition: opacity 0.5s ease, bottom 0.5s ease;
+}
+
+.validation-invalid.prop-input::after {
+  bottom: -25px;
+  opacity: 1;
+}
+
+.page-card.selected .page-error-container {
+  margin: 5px 5px;
+}
+
+.page-error-container {
+  color: var(--warning-orange);
+  height: 0;
+  opacity: 0;
+  transition: opacity 0.5s ease, height 0.5s ease, margin 0.5s ease;
+}
+
+.validation-invalid.page-error-container {
+  height: 1.5em;
+  opacity: 1;
 }
 
 /* INVALID PROP */
@@ -701,6 +725,39 @@ button {
   background-color: rgba(var(--alrite-rgb), 0.05);
 }
 
+#info-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(125, 125, 125, 0.1);
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease, backdrop-filter 0.5s ease;
+}
+
+#info-container.active {
+  opacity: 1;
+  pointer-events: unset;
+  backdrop-filter: blur(3px);
+}
+
+#info-message {
+  font-size: 30px;
+  font-weight: 500; 
+  color: var(--dark-green);
+  text-shadow:
+    1px 1px 0 whitesmoke,
+    1px -1px 0 whitesmoke,
+    -1px 1px 0 whitesmoke,
+    -1px -1px 0 whitesmoke;
+}
+
 .hidden {
   display: none;
 }
@@ -736,6 +793,7 @@ body.darkMode {
   border: 1px solid var(--light-border)
 }
 
+.darkMode #info-message,
 .darkMode #utility-section::before {
   text-shadow:
     1px 1px 0 var(--near-black),

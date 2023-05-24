@@ -17,6 +17,19 @@ export module Components {
     isDiagnosisPage: boolean,
   }
 
+  export interface ValidatedPage extends Page {
+    // This component is not used for building workflows!
+    // This component is returned from the server in the workflow
+    // validation artifact, and this interface represents the form
+    // in which validation data is returned.
+
+    // Validation data is a copy of the exported workflow json,
+    // except valid properties on pages and components are removed,
+    // and invalid properties have their values replaced by string
+    // error messages.
+    pageError: string,
+  }
+
   // =============== \\
   // PAGE COMPONENTS \\
   // =============== \\
