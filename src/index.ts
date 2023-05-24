@@ -4,6 +4,7 @@ window.addEventListener("load", init);
 
 var selectedCard: string = null; // The currently selected page card
 var darkMode: boolean = false;
+var menuOpen: boolean = false;
 var componentID = 0; // Used to ensure unique component ids in the HTML
 
 var templates: { [key: string]: string } = {
@@ -26,6 +27,7 @@ var templates: { [key: string]: string } = {
  * Sets event listeners for
  */
 function init() {
+  handleMenuPreference();
   handleDarkModePreference();
   setTimeout(() => document.body.classList.add("do-transition"), 10);
   // We wait to give the body transition styles so that the styles
@@ -360,10 +362,6 @@ function updateSelectedCard() {
   }
 }
 
-function toggleUtilMenu() {
-  document.getElementById("utility-section").classList.toggle("minimized");
-}
-
 function updateTooltip(evt: MouseEvent) {
   const tooltip = document.getElementById("tooltip");
   const hovered = this.document.querySelectorAll(":hover");
@@ -598,9 +596,15 @@ function createUniqueID(length: number) {
   return result;
 }
 
-// ===================== \\
-// COOKIES AND DARK MODE \\
-// ===================== \\
+// ========================= \\
+// STORED COOKIE PREFERENCES \\
+// ========================= \\
+
+function handleMenuPreference() {
+  if (getCookieValue("menuOpen") === "true") {
+    toggleUtilMenu();
+  }
+}
 
 function handleDarkModePreference() {
   if (getCookieValue("darkMode") === "true") {
@@ -633,6 +637,12 @@ function toggleDarkMode() {
   darkMode = !darkMode;
   setCookieValue("darkMode", darkMode);
   updateDarkMode();
+}
+
+function toggleUtilMenu() {
+  menuOpen = !menuOpen;
+  setCookieValue("menuOpen", menuOpen);
+  document.getElementById("utility-section").classList.toggle("minimized");
 }
 
 // This function updates the body's class. This affects page background, and since 
@@ -1000,9 +1010,10 @@ function extractWorkflowData(needsName: boolean) {
   name = name.replace(/'/g, "");
 
   const cards = getAllPageCards() as NodeListOf<HTMLElement>;
-  const workflow: { name: string, pages: Components.Page[] } = {
+  const workflow: { name: string, pages: Components.Page[], csrftoken: string } = {
     name: name,
     pages: [],
+    csrftoken: getCookieValue("csrftoken"),
   };
 
   for (let i = 0; i < cards.length; i++) {

@@ -383,6 +383,7 @@ button {
 }
 
 .validation-invalid.prop-input>select,
+.validation-invalid.prop-input>textarea,
 .validation-invalid.prop-input>input {
   outline: 3px solid var(--warning-orange) !important;
   border-radius: 3px;
@@ -397,17 +398,18 @@ button {
 }
 
 .prop-input::after {
-  content: var(--error-message);
+  content: var(--error-message) url(./prop-indicator.png);
   color: var(--warning-orange);
   position: absolute;
   right: 0;
   bottom: 0;
   opacity: 0;
   transition: opacity 0.5s ease, bottom 0.5s ease;
+  pointer-events: none;
 }
 
 .validation-invalid.prop-input::after {
-  bottom: -25px;
+  bottom: -30px;
   opacity: 1;
 }
 
