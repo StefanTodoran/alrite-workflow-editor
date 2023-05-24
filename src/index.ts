@@ -922,7 +922,7 @@ function postWorkflow(onlyValidate: boolean, infoMessage?: string) {
     .then(async (res) => {
       let data = await res.json();
       if (typeof data === "string") data = JSON.parse(data);
-      
+
       handleValidation(data, res.status);
     });
 
@@ -931,16 +931,16 @@ function postWorkflow(onlyValidate: boolean, infoMessage?: string) {
 }
 
 function handleValidation(response: any, status: number) {
+  // Clear any existing validation data first
+  const invalid = document.querySelectorAll(".validation-invalid");
+  invalid.forEach(elem => elem.classList.remove("validation-invalid"));
+
   if (status === 200) {
     displayInfoMessage("No Errors Found!");
     hideInfoMessage();
   }
 
   if (status === 400) {
-    // Clear any existing validation data first
-    const invalid = document.querySelectorAll(".validation-invalid");
-    invalid.forEach(elem => elem.classList.remove("validation-invalid"));
-  
     for (let i = 0; i < response.pages.length; i++) {
       const page = response.pages[i] as Components.ValidatedPage;
       displayValidationData(page);
