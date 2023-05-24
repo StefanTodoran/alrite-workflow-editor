@@ -917,6 +917,8 @@ function postWorkflow(onlyValidate: boolean, infoMessage?: string) {
     return;
   }
 
+  const csrftoken = getCookieValue("csrftoken");
+
   // TODO: Verify if workflow posted successfully,
   // and add an override warnings option.
   const endpoint = onlyValidate ? "validation" : "workflows/" + workflow.name;
@@ -926,6 +928,7 @@ function postWorkflow(onlyValidate: boolean, infoMessage?: string) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      "X-CSRFToken": csrftoken,
     },
     body: JSON.stringify(workflow)
   })
@@ -1010,10 +1013,9 @@ function extractWorkflowData(needsName: boolean) {
   name = name.replace(/'/g, "");
 
   const cards = getAllPageCards() as NodeListOf<HTMLElement>;
-  const workflow: { name: string, pages: Components.Page[], csrftoken: string } = {
+  const workflow: { name: string, pages: Components.Page[] } = {
     name: name,
     pages: [],
-    csrftoken: getCookieValue("csrftoken"),
   };
 
   for (let i = 0; i < cards.length; i++) {
