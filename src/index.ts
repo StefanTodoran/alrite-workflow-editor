@@ -629,7 +629,7 @@ function getCookieValue(key: string) {
 
 function setCookieValue(key: string, value: any, age?: number) {
   age = age || 31536000;
-  const cookie = `${key}=${value}; max-age=${age}; SameSite=None; path=/`;
+  const cookie = `${key}=${value}; max-age=${age}; SameSite=None; path=/; Secure`;
   document.cookie = cookie;
 }
 
@@ -841,10 +841,9 @@ function promptAndFetchWorkflow() {
   if (name == null || name == "") {
     return;
   }
-  name = name.replace(/ /g, "_");
 
-  // This prompts if you'd like to leave the page...
-  // window.location.assign("?workflow=" + name);
+  history.pushState("", "", `/alrite/editor/?workflow=${name}`);
+  name = name.replace(/ /g, "_");
 
   fetchWorkflow(name);
 }
