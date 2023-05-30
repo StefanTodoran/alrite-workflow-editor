@@ -103,12 +103,14 @@ button {
   opacity: 0.5;
 }
 
+#import-modal h1,
 .settings-card h1,
 .component-card h1 {
   font-size: 20px;
   opacity: 0.85;
 }
 
+#import-modal h2,
 .settings-card h2,
 .component-card h2 {
   font-size: 12px;
@@ -156,17 +158,20 @@ button {
   /* padding: 10px 30px; */
 }
 
+#import-modal,
 .card {
   background-color: var(--light-background);
   border: 3px solid var(--light-border);
   border-radius: 10px;
   padding: 15px 10px;
-  margin-bottom: 10px;
-  width: 100%;
-
   color: var(--near-black);
   transition: border 0.5s ease, background-color 0.5s ease, outline 0.5s ease;
   outline: 2px solid transparent;
+}
+
+.card {
+  margin-bottom: 10px;
+  width: 100%;
 }
 
 .selected .card {
@@ -550,7 +555,7 @@ button {
   --bounce: cubic-bezier(.47, 1.64, .41, 1);
   --no-over-bounce: cubic-bezier(.47, 1.48, .41, .8);
   transition: transform 0.1s ease,
-  border 0.5s ease,
+    border 0.5s ease,
     opacity 0.5s var(--bounce),
     width 0.5s var(--bounce),
     height 0.5s var(--no-over-bounce);
@@ -727,22 +732,27 @@ button {
   background-color: rgba(var(--alrite-rgb), 0.05);
 }
 
+#import-modal::backdrop,
+#info-container {
+  background-color: rgba(125, 125, 125, 0.1);
+  transition: opacity 0.5s ease, backdrop-filter 0.5s ease;
+}
+
 #info-container {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(125, 125, 125, 0.1);
+  opacity: 0;
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  opacity: 0;
   pointer-events: none;
-  transition: opacity 0.5s ease, backdrop-filter 0.5s ease;
 }
 
+#import-modal::backdrop,
 #info-container.active {
   opacity: 1;
   pointer-events: unset;
@@ -751,13 +761,39 @@ button {
 
 #info-message {
   font-size: 30px;
-  font-weight: 500; 
+  font-weight: 500;
   color: var(--dark-green);
   text-shadow:
     1px 1px 0 whitesmoke,
     1px -1px 0 whitesmoke,
     -1px 1px 0 whitesmoke,
     -1px -1px 0 whitesmoke;
+}
+
+#modal-import-button {
+  margin-left: 20px;
+}
+
+#import-modal {
+  padding: 15px 20px 25px 20px;
+}
+
+#import-modal[open] {
+  animation: modalFadeIn 0.25s ease normal;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+
+#import-modal select {
+  margin-top: 20px;
 }
 
 .hidden {

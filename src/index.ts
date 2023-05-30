@@ -40,7 +40,7 @@ function init() {
   addButtonOnClick("export-button", () => { postWorkflow(false, "Uploading Workflow...") });
   addButtonOnClick("validate-button", () => { postWorkflow(true) });
 
-  addButtonOnClick("import-button", promptAndFetchWorkflow);
+  addButtonOnClick("import-button", populateModalOptions);
   addButtonOnClick("file-import-button", triggerFileImport);
   document.getElementById("importer").addEventListener("input", prepareReader);
   addButtonOnClick("file-download-button", downloadToFile);
@@ -49,6 +49,11 @@ function init() {
   addButtonOnClick("dark-mode-button", toggleDarkMode);
 
   addButtonOnClick("go-back-button", () => { window.location.href = ".." });
+
+  // TODO: Move this to some modal init function
+  const modal = document.getElementById("import-modal") as HTMLDialogElement;
+  addButtonOnClick("modal-import-button", modalFetchWorkflow);
+  addButtonOnClick("modal-cancel-button", () => { modal.close(); });
 
   setTimeout(() => {
     // Adds a confirmation prompt if the user attempts to
@@ -836,16 +841,53 @@ function getJSON(this: FileReader, event: ProgressEvent<FileReader>) {
   importWorkflow(json);
 }
 
-function promptAndFetchWorkflow() {
-  let name = promptWorkflowName();
-  if (name == null || name == "") {
-    return;
-  }
+async function populateModalOptions() {
+  const modal = document.getElementById("import-modal") as HTMLDialogElement;
+  modal.showModal();
+
+  const workflows = await fetchAllWorkflowNames();
+  const select = modal.querySelector("select") as HTMLSelectElement;
+  select.innerHTML = "";
+
+  workflows.forEach((workflow: { workflow_id: string }) => {
+    const option = document.createElement("option");
+
+    option.value = workflow.workflow_id;
+    option.innerHTML = workflow.workflow_id.replace(/ /g, "_");
+
+    select.appendChild(option);
+  });
+}
+
+function modalFetchWorkflow() {
+  // let name = promptWorkflowName();
+  // if (name == null || name == "") {
+  //   return;
+  // }
+
+  const modal = document.getElementById("import-modal") as HTMLDialogElement;
+  modal.close();
+
+  const select = modal.querySelector("select") as HTMLSelectElement;
+  const name = select.value;
+  console.log(name);
 
   history.pushState("", "", `/alrite/editor/?workflow=${name}`);
-  name = name.replace(/ /g, "_");
-
   fetchWorkflow(name);
+}
+
+async function fetchAllWorkflowNames() {
+  let target = "/alrite/apis/workflows/";
+
+  const res = await fetch(target, {
+    method: "GET",
+    headers: {
+      "Accept": "application/json",
+    },
+  });
+  const json = await res.json();
+
+  return json;
 }
 
 function fetchWorkflow(name: string, version?: string) {
@@ -911,7 +953,7 @@ function importWorkflow(json: any, dummy?: true) {
 }
 
 function postWorkflow(onlyValidate: boolean, infoMessage?: string) {
-  const workflow = extractWorkflowData(onlyValidate);
+  const workflow = extractWorkflowData(!onlyValidate);
   if (!workflow) {
     return;
   }
