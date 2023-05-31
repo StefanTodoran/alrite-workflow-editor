@@ -725,7 +725,7 @@ function handleServerImport() {
   
       // We don't need an event dispatch here because there is nothing
       // which will await a server import mode modal.
-      history.pushState("", "", `/alrite/editor/?workflow=${name}`);
+      history.pushState("", "", `/editor/?workflow=${name}`);
       fetchWorkflow(name);
     }
   }, { once: true });
@@ -951,7 +951,7 @@ function getJSON(this: FileReader, event: ProgressEvent<FileReader>) {
 }
 
 async function fetchAllWorkflowNames() {
-  let target = "/alrite/apis/workflows/";
+  let target = "/apis/workflows/";
 
   const res = await fetch(target, {
     method: "GET",
@@ -965,7 +965,7 @@ async function fetchAllWorkflowNames() {
 }
 
 function fetchWorkflow(name: string, version?: string) {
-  let target = "/alrite/apis/workflows/" + name + "/";
+  let target = "/apis/workflows/" + name + "/";
   if (version) {
     target += version + "/";
   }
@@ -1035,7 +1035,7 @@ async function postWorkflow(onlyValidate: boolean, infoMessage?: string) {
     return;
   }
 
-  history.pushState("", "", `/alrite/editor/?workflow=${workflow.name}`);
+  if (!onlyValidate) history.pushState("", "", `/editor/?workflow=${workflow.name}`);
   const csrftoken = getCookieValue("csrftoken");
 
   // TODO: Verify if workflow posted successfully,
@@ -1043,7 +1043,7 @@ async function postWorkflow(onlyValidate: boolean, infoMessage?: string) {
   const endpoint = onlyValidate ? "validation" : "workflows/" + workflow.name;
   infoMessage && displayInfoMessage(infoMessage);
 
-  fetch("/alrite/apis/" + endpoint + "/", {
+  fetch("/apis/" + endpoint + "/", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
