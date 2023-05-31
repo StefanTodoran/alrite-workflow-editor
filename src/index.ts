@@ -24,7 +24,8 @@ var templates: { [key: string]: string } = {
 
 /**
  * Initialization function that should handle anything that needs to occur on page load.
- * Sets event listeners for
+ * Sets event listeners for the util menu, handles cookie preferences, populates the editor,
+ * and misc other.
  */
 function init() {
   handleMenuPreference();
@@ -33,27 +34,24 @@ function init() {
   // We wait to give the body transition styles so that the styles
   // don't flash dark or light theme before stored preferences kick in.
 
+  // ================= \\
+  // Util menu buttons \\
   addButtonOnClick("add-page-button", addNewPage);
   addButtonOnClick("toggle-menu-button", toggleUtilMenu);
-  addButtonOnClick("rename-button", promptWorkflowName);
 
   addButtonOnClick("export-button", () => { postWorkflow(false, "Uploading Workflow...") });
   addButtonOnClick("validate-button", () => { postWorkflow(true) });
 
-  addButtonOnClick("import-button", populateModalOptions);
   addButtonOnClick("file-import-button", triggerFileImport);
   document.getElementById("importer").addEventListener("input", prepareReader);
   addButtonOnClick("file-download-button", downloadToFile);
 
   addButtonOnClick("light-mode-button", toggleDarkMode);
   addButtonOnClick("dark-mode-button", toggleDarkMode);
+  // End til menu buttons \\
+  // ==================== \\
 
   addButtonOnClick("go-back-button", () => { window.location.href = ".." });
-
-  // TODO: Move this to some modal init function
-  const modal = document.getElementById("import-modal") as HTMLDialogElement;
-  addButtonOnClick("modal-import-button", modalFetchWorkflow);
-  addButtonOnClick("modal-cancel-button", () => { modal.close(); });
 
   setTimeout(() => {
     // Adds a confirmation prompt if the user attempts to
@@ -63,6 +61,7 @@ function init() {
 
   addEventListener("mousemove", updateTooltip);
   populatePageOnStartup();
+  initializeModal();
 }
 
 function addNewPage() {
@@ -665,6 +664,109 @@ function updateDarkMode() {
   }
 }
 
+// ====================== \\
+// MODAL HELPER FUNCTIONS \\
+// ====================== \\
+
+const modal = document.getElementById("modal") as HTMLDialogElement;
+var modalSeqNum = 0; // Used to ignore old event listeners
+
+function initializeModal() {
+  addButtonOnClick("modal-cancel-button", () => {
+    modal.dispatchEvent(new Event("cancel"));
+    modal.close();
+    modalSeqNum++;
+  });
+
+  addButtonOnClick("modal-confirm-button", () => {
+    modal.dispatchEvent(new Event("confirm"));
+    modal.close();
+    modalSeqNum++;
+  });
+  modal.addEventListener("keydown", (evt) => {
+    if (evt.key === "Enter") {
+      modal.dispatchEvent(new Event("confirm"));
+      modal.close();
+      modalSeqNum++;
+    }
+  });
+
+  addButtonOnClick("import-button", handleServerImport);
+  addButtonOnClick("rename-button", promptWorkflowName);
+}
+
+function openModal(modalMode: ("server_import" | "rename_workflow")) {
+  modal.showModal();
+  switch (modalMode) {
+    case "server_import":
+      modal.querySelector("h1").textContent = "Server Import";
+      modal.querySelector("h2").textContent = "Select Workflow";
+      modal.querySelector("input").classList.add("hidden");
+      modal.querySelector("select").classList.remove("hidden");
+      break;
+    case "rename_workflow":
+      modal.querySelector("h1").textContent = "Name Workflow";
+      modal.querySelector("h2").textContent = "Enter Name";
+      modal.querySelector("input").classList.remove("hidden");
+      modal.querySelector("select").classList.add("hidden");
+      break;
+  }
+}
+
+function handleServerImport() {
+  openModal("server_import");
+  populateModalOptions();
+  const curSeqNum = modalSeqNum;
+  
+  modal.addEventListener("confirm", () => {
+    if (curSeqNum === modalSeqNum) {
+      const select = modal.querySelector("select") as HTMLSelectElement;
+      const name = select.value;
+  
+      // We don't need an event dispatch here because there is nothing
+      // which will await a server import mode modal.
+      history.pushState("", "", `/alrite/editor/?workflow=${name}`);
+      fetchWorkflow(name);
+    }
+  }, { once: true });
+}
+
+async function populateModalOptions() {
+  const select = modal.querySelector("select") as HTMLSelectElement;
+  select.innerHTML = "";
+
+  const workflows = await fetchAllWorkflowNames();
+  workflows.forEach((workflow: { workflow_id: string }) => {
+    const option = document.createElement("option");
+    
+    option.value = workflow.workflow_id;
+    option.innerHTML = workflow.workflow_id.replace(/_/g, " ");
+
+    select.appendChild(option);
+  });
+}
+
+function promptWorkflowName() {
+  openModal("rename_workflow");
+  const curSeqNum = modalSeqNum;
+
+  return new Promise(function (resolve) {
+    modal.addEventListener("confirm", () => {
+      if (curSeqNum === modalSeqNum) {
+        let name = modal.querySelector("input").value;
+        name = getCleanWorkflowName(name);
+        
+        if (name) updateDisplayName(name);
+        resolve(name);
+      }
+    }, { once: true });
+
+    modal.addEventListener("cancel", () => {
+      if (curSeqNum === modalSeqNum) resolve(null);
+    }, { once: true });
+  });
+}
+
 // ======================= \\
 // DRAG AND DROP FUNCTIONS \\
 // ======================= \\
@@ -790,7 +892,7 @@ function populatePageOnStartup() {
         <Components.Page>{
           pageID: "page_2",
           title: "Second Page",
-          defaultLink: "page_3",
+          defaultLink: "diag_page",
           content: [],
         },
         <Components.Page>{
@@ -806,10 +908,11 @@ function populatePageOnStartup() {
   }
 }
 
-function downloadToFile() {
-  const workflow = extractWorkflowData(true);
-  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(workflow));
+async function downloadToFile() {
+  const workflow = await extractWorkflowData(true);
+  if (!workflow) return;
 
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(workflow));
   const downloader = document.getElementById("downloader");
   downloader.setAttribute("href", dataStr);
   downloader.setAttribute("download", `${workflow.name}.json`);
@@ -832,48 +935,19 @@ function prepareReader() {
 
 function getJSON(this: FileReader, event: ProgressEvent<FileReader>) {
   let json;
-  if (typeof event.target.result === "string") {
-    json = JSON.parse(event.target.result);
-  } else {
-    json = String.fromCharCode.apply(null, new Uint8Array(event.target.result));
+
+  try {
+    if (typeof event.target.result === "string") {
+      json = JSON.parse(event.target.result);
+    } else {
+      json = String.fromCharCode.apply(null, new Uint8Array(event.target.result));
+    }
+  } catch {
+    displayInfoMessage("Import Failed: Check File Type");
+    hideInfoMessage();
   }
 
   importWorkflow(json);
-}
-
-async function populateModalOptions() {
-  const modal = document.getElementById("import-modal") as HTMLDialogElement;
-  modal.showModal();
-
-  const workflows = await fetchAllWorkflowNames();
-  const select = modal.querySelector("select") as HTMLSelectElement;
-  select.innerHTML = "";
-
-  workflows.forEach((workflow: { workflow_id: string }) => {
-    const option = document.createElement("option");
-
-    option.value = workflow.workflow_id;
-    option.innerHTML = workflow.workflow_id.replace(/ /g, "_");
-
-    select.appendChild(option);
-  });
-}
-
-function modalFetchWorkflow() {
-  // let name = promptWorkflowName();
-  // if (name == null || name == "") {
-  //   return;
-  // }
-
-  const modal = document.getElementById("import-modal") as HTMLDialogElement;
-  modal.close();
-
-  const select = modal.querySelector("select") as HTMLSelectElement;
-  const name = select.value;
-  console.log(name);
-
-  history.pushState("", "", `/alrite/editor/?workflow=${name}`);
-  fetchWorkflow(name);
 }
 
 async function fetchAllWorkflowNames() {
@@ -918,9 +992,10 @@ function fetchWorkflow(name: string, version?: string) {
  */
 function importWorkflow(json: any, dummy?: true) {
   const pages = json.pages;
-  if (!pages || (!dummy && !json.name)) {
-    // If we don't have a name, a dummy workflow is still valid
-    return; // TODO: notify user of invalid upload.
+  if (!pages || (!dummy && !json.name)) { // If we don't have a name, a dummy workflow is still valid
+    displayInfoMessage("Import Failed");
+    hideInfoMessage();
+    return;
   }
 
   if (json.name) updateDisplayName(json.name);
@@ -952,12 +1027,15 @@ function importWorkflow(json: any, dummy?: true) {
   updateAllDropDowns();
 }
 
-function postWorkflow(onlyValidate: boolean, infoMessage?: string) {
-  const workflow = extractWorkflowData(!onlyValidate);
+async function postWorkflow(onlyValidate: boolean, infoMessage?: string) {
+  const workflow = await extractWorkflowData(!onlyValidate);
   if (!workflow) {
+    displayInfoMessage("Upload Failed: No Name");
+    hideInfoMessage();
     return;
   }
 
+  history.pushState("", "", `/alrite/editor/?workflow=${workflow.name}`);
   const csrftoken = getCookieValue("csrftoken");
 
   // TODO: Verify if workflow posted successfully,
@@ -1042,16 +1120,11 @@ function displayValidationData(page: Components.ValidatedPage) {
 // IMPORT / EXPORT HELPERS \\
 // ======================= \\
 
-function extractWorkflowData(needsName: boolean) {
+async function extractWorkflowData(needsName: boolean) {
   let name = getDisplayName();
-  if (needsName && !name) {
-    name = prompt("Please enter the name to export the workflow as: (case sensitive)");
-    if (name == null || name == "") {
-      return undefined;
-    }
-  }
-  name = name.replace(/ /g, "_");
-  name = name.replace(/'/g, "");
+  if (needsName && !name) name = await promptWorkflowName() as string;
+  name = getCleanWorkflowName(name);
+  if (needsName && !name) return null;
 
   const cards = getAllPageCards() as NodeListOf<HTMLElement>;
   const workflow: { name: string, pages: Components.Page[] } = {
@@ -1066,16 +1139,6 @@ function extractWorkflowData(needsName: boolean) {
   }
 
   return workflow;
-}
-
-function promptWorkflowName() {
-  let name = prompt("Please enter a name for the diagnosis workflow: (case sensitive)");
-
-  name = name?.replace(/ /g, "_");
-  name = name?.replace(/'/g, "");
-
-  if (name) updateDisplayName(name);
-  return name;
 }
 
 // Give a reference to a DOM element (specifically a page card),
@@ -1184,6 +1247,13 @@ function updateDisplayName(workflowName: string) {
 
 function getDisplayName() {
   return document.getElementById("utility-section").style.getPropertyValue("--workflow-name");
+}
+
+function getCleanWorkflowName(name: string) {
+  name = name?.replace(/ /g, "_");
+  name = name?.replace(/'/g, "");
+  name = name?.replace(/\W/g, "");
+  return name;
 }
 
 function getComponentInfo(component: Element) {
