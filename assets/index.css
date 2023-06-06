@@ -334,14 +334,15 @@ button {
   width: unset;
   margin-top: 10px;
   margin-bottom: 0;
-  padding: 0 10px;
+  padding: 5px;
   display: flex;
   flex-direction: column;
 }
 
 .sub-card {
-  margin-top: 10px;
-  margin-bottom: 10px;
+  margin: 5px;
+  padding: 5px;
+  border-radius: 5px;
 }
 
 /* ============= */

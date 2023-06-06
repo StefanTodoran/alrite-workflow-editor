@@ -359,11 +359,15 @@ function updateSelectedCard() {
   if (newSelected) newSelected.classList.add("selected");
 
   if (newSelected) {
-    const xPosition = newSelected.getBoundingClientRect().left + window.scrollX;
-    const windowHeight = window.innerWidth || document.documentElement.clientWidth;
-
-    window.scrollTo({ top: 0, left: xPosition - (windowHeight / 3), behavior: 'smooth' });
+    scrollToCard(newSelected);
   }
+}
+
+function scrollToCard(card: Element) {
+  const xPosition = card.getBoundingClientRect().left + window.scrollX;
+  const windowHeight = window.innerWidth || document.documentElement.clientWidth;
+
+  window.scrollTo({ top: 0, left: xPosition - (windowHeight / 3), behavior: 'smooth' });
 }
 
 function updateTooltip(evt: MouseEvent) {
@@ -1066,25 +1070,30 @@ function handleValidation(response: any, status: number) {
   // Clear any existing validation data first
   const invalid = document.querySelectorAll(".validation-invalid");
   invalid.forEach(elem => elem.classList.remove("validation-invalid"));
-
   
   if (status === 200) {
     displayInfoMessage("No Errors Found!");
     hideInfoMessage();
   } else {
-    displayInfoMessage("Check Errors And Try Again");
+    displayInfoMessage(response.status || "Check Errors And Try Again");
     hideInfoMessage();
   }
+
   
   if (status === 400) {
     for (let i = 0; i < response.pages.length; i++) {
       const page = response.pages[i] as Components.ValidatedPage;
-      displayValidationData(page);
+      displayPageValidationData(page);
+    }
+
+    if (response.firstInvalidPage) {
+      const firstInvalid = document.getElementById(response.firstInvalidPage);
+      scrollToCard(firstInvalid);
     }
   }
 }
 
-function displayValidationData(page: Components.ValidatedPage) {
+function displayPageValidationData(page: Components.ValidatedPage) {
   const card = document.getElementById(page.pageID);
   const settings = card.querySelector(".settings-card-fields");
 
@@ -1106,26 +1115,33 @@ function displayValidationData(page: Components.ValidatedPage) {
   const components = card.querySelectorAll(".card.component-card");
   for (let i = 0; i < components.length; i++) {
     const validation = page.content[i] as { [key: string]: any };
-    const props = components[i].querySelector(".component-card-fields").querySelectorAll(".prop-input");
-
-    props.forEach(prop => {
-      const input = getPropInput(prop) || prop.querySelector(".slider-button");
-      const propName = getPropName(input);
-      
-      if (validation[propName]) {
-        markPropInvalid(input, validation[propName]);
-        components[i].classList.add("validation-invalid");
-      }
-    });
+    if (!validation) continue; // We have no validation data for this component...
+    
+    displayComponentValidationData(components[i], validation);
 
     const choices = components[i].querySelector(".card-subcomponents")?.querySelectorAll(".sub-card");
     let choiceIndex = 0;
 
     choices && choices.forEach(choice => {
-      console.log(choice, validation["choices"][choiceIndex]);
+      const choiceValidation = validation["choices"][choiceIndex];
+      displayComponentValidationData(choice, choiceValidation);
       choiceIndex++;
     });
   }
+}
+
+function displayComponentValidationData(component: Element, validation: { [key: string]: any }, ) {
+  const props = component.querySelector(".component-card-fields").querySelectorAll(".prop-input");
+
+  props.forEach(prop => {
+    const input = getPropInput(prop) || prop.querySelector(".slider-button");
+    const propName = getPropName(input);
+    
+    if (validation[propName]) {
+      markPropInvalid(input, validation[propName]);
+      component.classList.add("validation-invalid");
+    }
+  });
 }
 
 // ======================= \\
