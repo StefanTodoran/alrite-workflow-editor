@@ -48,7 +48,7 @@ function init() {
 
   addButtonOnClick("light-mode-button", toggleDarkMode);
   addButtonOnClick("dark-mode-button", toggleDarkMode);
-  // End til menu buttons \\
+  // End util menu buttons \\
   // ==================== \\
 
   addButtonOnClick("go-back-button", () => { window.location.href = ".." });
@@ -64,6 +64,8 @@ function init() {
   initializeModal();
 }
 
+// Adds a blank page with a unique identifier and 
+// no content, then scrolls the page to it.
 function addNewPage() {
   const page = <Components.Page>{
     pageID: createUniqueID(5),
@@ -591,6 +593,18 @@ function highlightDraggableComponent(card: HTMLElement, before?: boolean) {
 }
 
 function createUniqueID(length: number) {
+  const existing = getAllPageIDs();
+  let ID;
+  
+  do { // The odds of collision are very low, but not zero
+    ID = createRandomID(length);
+  } while (existing.includes(ID));
+
+  return ID;
+}
+
+// Don't use this, use createUniqueID
+function createRandomID(length: number) {
   let result = "id_";
   const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   const charactersLength = characters.length;
@@ -912,6 +926,13 @@ function populatePageOnStartup() {
   }
 }
 
+async function saveToLocalStorage() {
+  const workflow = await extractWorkflowData(true);
+  if (!workflow) return;
+
+  localStorage.setItem(workflow.name, JSON.stringify(workflow));
+}
+
 async function downloadToFile() {
   const workflow = await extractWorkflowData(true);
   if (!workflow) return;
@@ -1072,14 +1093,14 @@ function handleValidation(response: any, status: number) {
   invalid.forEach(elem => elem.classList.remove("validation-invalid"));
   
   if (status === 200) {
-    displayInfoMessage("No Errors Found!");
+    displayInfoMessage("Success! No Errors Found!");
     hideInfoMessage();
   } else {
     displayInfoMessage(response.status || "Check Errors And Try Again");
     hideInfoMessage();
   }
 
-  
+  console.log(response);
   if (status === 400) {
     for (let i = 0; i < response.pages.length; i++) {
       const page = response.pages[i] as Components.ValidatedPage;
@@ -1093,6 +1114,12 @@ function handleValidation(response: any, status: number) {
   }
 }
 
+/**
+ * Given a validation artifact for a page, visualizes errors for
+ * the page's props and for all of its components.
+ * @param page The validation artifact for the page, where
+ * the value for a prop is either null or a string error description.
+ */
 function displayPageValidationData(page: Components.ValidatedPage) {
   const card = document.getElementById(page.pageID);
   const settings = card.querySelector(".settings-card-fields");
