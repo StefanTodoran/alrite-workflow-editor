@@ -362,7 +362,7 @@ function updateSelectedCard() {
     const xPosition = newSelected.getBoundingClientRect().left + window.scrollX;
     const windowHeight = window.innerWidth || document.documentElement.clientWidth;
 
-    window.scrollTo({ left: xPosition - (windowHeight / 3), behavior: 'smooth' });
+    window.scrollTo({ top: 0, left: xPosition - (windowHeight / 3), behavior: 'smooth' });
   }
 }
 
@@ -1069,6 +1069,9 @@ function handleValidation(response: any, status: number) {
 
   if (status === 200) {
     displayInfoMessage("No Errors Found!");
+    hideInfoMessage();
+  } else {
+    displayInfoMessage("Check Errors And Try Again");
     hideInfoMessage();
   }
 
