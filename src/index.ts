@@ -595,7 +595,7 @@ function highlightDraggableComponent(card: HTMLElement, before?: boolean) {
 function createUniqueID(length: number) {
   const existing = getAllPageIDs();
   let ID;
-  
+
   do { // The odds of collision are very low, but not zero
     ID = createRandomID(length);
   } while (existing.includes(ID));
@@ -735,12 +735,12 @@ function handleServerImport() {
   openModal("server_import");
   populateModalOptions();
   const curSeqNum = modalSeqNum;
-  
+
   modal.addEventListener("confirm", () => {
     if (curSeqNum === modalSeqNum) {
       const select = modal.querySelector("select") as HTMLSelectElement;
       const name = select.value;
-  
+
       // We don't need an event dispatch here because there is nothing
       // which will await a server import mode modal.
       history.pushState("", "", `/editor/?workflow=${name}`);
@@ -756,7 +756,7 @@ async function populateModalOptions() {
   const workflows = await fetchAllWorkflowNames();
   workflows.forEach((workflow: { workflow_id: string }) => {
     const option = document.createElement("option");
-    
+
     option.value = workflow.workflow_id;
     option.innerHTML = workflow.workflow_id.replace(/_/g, " ");
 
@@ -773,7 +773,7 @@ function promptWorkflowName() {
       if (curSeqNum === modalSeqNum) {
         let name = modal.querySelector("input").value;
         name = getCleanWorkflowName(name);
-        
+
         if (name) updateDisplayName(name);
         resolve(name);
       }
@@ -1091,7 +1091,7 @@ function handleValidation(response: any, status: number) {
   // Clear any existing validation data first
   const invalid = document.querySelectorAll(".validation-invalid");
   invalid.forEach(elem => elem.classList.remove("validation-invalid"));
-  
+
   if (status === 200) {
     displayInfoMessage("Success! No Errors Found!");
     hideInfoMessage();
@@ -1107,10 +1107,8 @@ function handleValidation(response: any, status: number) {
       displayPageValidationData(page);
     }
 
-    if (response.firstInvalidPage) {
-      const firstInvalid = document.getElementById(response.firstInvalidPage);
-      scrollToCard(firstInvalid);
-    }
+    const firstInvalid = document.querySelector(".validation-invalid");
+    scrollToCard(firstInvalid);
   }
 }
 
@@ -1143,7 +1141,7 @@ function displayPageValidationData(page: Components.ValidatedPage) {
   for (let i = 0; i < components.length; i++) {
     const validation = page.content[i] as { [key: string]: any };
     if (!validation) continue; // We have no validation data for this component...
-    
+
     displayComponentValidationData(components[i], validation);
 
     const choices = components[i].querySelector(".card-subcomponents")?.querySelectorAll(".sub-card");
@@ -1157,13 +1155,13 @@ function displayPageValidationData(page: Components.ValidatedPage) {
   }
 }
 
-function displayComponentValidationData(component: Element, validation: { [key: string]: any }, ) {
+function displayComponentValidationData(component: Element, validation: { [key: string]: any },) {
   const props = component.querySelector(".component-card-fields").querySelectorAll(".prop-input");
 
   props.forEach(prop => {
     const input = getPropInput(prop) || prop.querySelector(".slider-button");
     const propName = getPropName(input);
-    
+
     if (validation[propName]) {
       markPropInvalid(input, validation[propName]);
       component.classList.add("validation-invalid");
