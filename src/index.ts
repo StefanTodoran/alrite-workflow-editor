@@ -1067,6 +1067,7 @@ function handleValidation(response: any, status: number) {
   const invalid = document.querySelectorAll(".validation-invalid");
   invalid.forEach(elem => elem.classList.remove("validation-invalid"));
 
+  
   if (status === 200) {
     displayInfoMessage("No Errors Found!");
     hideInfoMessage();
@@ -1074,7 +1075,7 @@ function handleValidation(response: any, status: number) {
     displayInfoMessage("Check Errors And Try Again");
     hideInfoMessage();
   }
-
+  
   if (status === 400) {
     for (let i = 0; i < response.pages.length; i++) {
       const page = response.pages[i] as Components.ValidatedPage;
@@ -1110,12 +1111,20 @@ function displayValidationData(page: Components.ValidatedPage) {
     props.forEach(prop => {
       const input = getPropInput(prop) || prop.querySelector(".slider-button");
       const propName = getPropName(input);
-
+      
       if (validation[propName]) {
         markPropInvalid(input, validation[propName]);
         components[i].classList.add("validation-invalid");
       }
-    })
+    });
+
+    const choices = components[i].querySelector(".card-subcomponents")?.querySelectorAll(".sub-card");
+    let choiceIndex = 0;
+
+    choices && choices.forEach(choice => {
+      console.log(choice, validation["choices"][choiceIndex]);
+      choiceIndex++;
+    });
   }
 }
 
